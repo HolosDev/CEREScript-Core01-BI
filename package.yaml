@@ -1,0 +1,53 @@
+name:                CEREScript-Core01-BI
+version:             0.1.0.0
+github:              "MiRiS-Project/CEREScript-Core01-BI"
+license:             OtherLicense
+author:              "YongJoon Joe"
+maintainer:          "developer@quietjoon.net"
+copyright:           "2019-2020 MiRiS Project"
+
+extra-source-files:
+- README.md
+- ChangeLog.md
+
+# synopsis:            Short description of your package
+# category:            Web
+
+description:         Please see the README on GitHub at <https://github.com/MiRiS-Project/CEREScript-Core01-BI#readme>
+
+dependencies:
+- base >= 4.7 && < 5
+- array
+- containers
+- text
+- text-show
+- CEREScript-Core01
+
+default-extensions:
+- OverloadedStrings
+- RecordWildCards
+
+library:
+  source-dirs: src
+
+executables:
+  CEREScript-Core01-BI-exe:
+    main:                Main.hs
+    source-dirs:         app
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - CEREScript-Core01-BI
+
+tests:
+  CEREScript-Core01-BI-test:
+    main:                Spec.hs
+    source-dirs:         tests/Spec
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - CEREScript-Core01-BI

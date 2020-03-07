@@ -1,0 +1,9 @@
+resolver: lts-14.27
+
+packages:
+- .
+#- /AoDw/CEREScript/CEREScript-Core01
+
+extra-deps:
+- github: MiRiS-Project/CEREScript-Core01
+  commit: 8815baed467c59af27679d6462b7156f702d0fcd
