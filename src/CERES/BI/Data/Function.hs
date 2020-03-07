@@ -23,9 +23,9 @@ updateWorldState ws newWorldHistory newWorldDict newWorldVars = ws
   , worldVars    = newWorldVars
   }
 
+-- TODO: Move sub functions in a nest
 getHValueFromWS :: WorldState -> Time -> ID -> Maybe Value
-getHValueFromWS worldState =
-  getHValueFromVT (worldHistory worldState)
+getHValueFromWS worldState = getHValueFromVT (worldHistory worldState)
 
 getHValueFromVT :: HistoricTable -> Time -> ID -> Maybe Value
 getHValueFromVT worldHistory time idx =
@@ -34,7 +34,8 @@ getHValueFromVT worldHistory time idx =
 getHValuesFromWS :: WorldState -> [(Time, ID)] -> [[((Time, ID), Maybe Value)]]
 getHValuesFromWS WorldState {..} = getHValuesFromVT worldHistory
 
-getHValuesFromVT :: HistoricTable -> [(Time, ID)] -> [[((Time, ID), Maybe Value)]]
+getHValuesFromVT
+  :: HistoricTable -> [(Time, ID)] -> [[((Time, ID), Maybe Value)]]
 getHValuesFromVT worldHistory indices = map
   (getHValuesFromVTSub worldHistory)
   grouped
@@ -43,8 +44,10 @@ getHValuesFromVT worldHistory indices = map
   sorted  = sortBy (\x y -> compare (getTime x) (getTime y)) indices
   grouped = groupBy (\x y -> getTime x == getTime y) sorted
 
-getHValuesFromVTSub :: HistoricTable -> [(Time, ID)] -> [((Time, ID), Maybe Value)]
-getHValuesFromVTSub aHistoricTable indices = getHValuesFromVTSubSub aValues indices
+getHValuesFromVTSub
+  :: HistoricTable -> [(Time, ID)] -> [((Time, ID), Maybe Value)]
+getHValuesFromVTSub aHistoricTable indices = getHValuesFromVTSubSub aValues
+                                                                    indices
  where
   theTime = fst . head $ indices
   aValues = maybe IM.empty values (IM.lookup theTime aHistoricTable)
@@ -62,25 +65,27 @@ updateValueToWS worldState time idx aMValue = worldState
 updateValueToVT :: HistoricTable -> Time -> ID -> Maybe Value -> HistoricTable
 updateValueToVT worldHistory time idx aMValue = newHistoricTable
  where
-  baseValues    = maybe IM.empty values . IM.lookup time $ worldHistory
-  newEpochRow   = EpochRow time (IM.update (const aMValue) idx baseValues)
+  baseValues       = maybe IM.empty values . IM.lookup time $ worldHistory
+  newEpochRow      = EpochRow time (IM.update (const aMValue) idx baseValues)
   newHistoricTable = IM.insert time newEpochRow worldHistory
 
 updateValuesToWS :: WorldState -> [((Time, ID), Maybe Value)] -> HistoricTable
 updateValuesToWS WorldState {..} = updateValuesToVT worldHistory
 
-updateValuesToVT :: HistoricTable -> [((Time, ID), Maybe Value)] -> HistoricTable
+updateValuesToVT
+  :: HistoricTable -> [((Time, ID), Maybe Value)] -> HistoricTable
 updateValuesToVT worldHistory ivList = newHistoricTable
  where
-  getTime       = fst . fst
-  sorted        = sortBy (\x y -> compare (getTime x) (getTime y)) ivList
-  grouped       = groupBy (\x y -> getTime x == getTime y) sorted
-  lastTime      = getTime . head . last $ grouped
+  getTime          = fst . fst
+  sorted           = sortBy (\x y -> compare (getTime x) (getTime y)) ivList
+  grouped          = groupBy (\x y -> getTime x == getTime y) sorted
+  lastTime         = getTime . head . last $ grouped
   newHistoricTable = foldr updateValuesToVTSub worldHistory grouped
 
 -- TODO: Should be parallel when update existing element
 -- NOTE: But, inserting new element should be serialized
-updateValuesToVTSub :: [((Time, ID), Maybe Value)] -> HistoricTable -> HistoricTable
+updateValuesToVTSub
+  :: [((Time, ID), Maybe Value)] -> HistoricTable -> HistoricTable
 updateValuesToVTSub ivList aHistoricTable = newHistoricTable
  where
   theTime = fst . fst . head $ ivList
@@ -111,25 +116,28 @@ getVValuesFromWS :: WorldState -> [ID] -> [(ID, Maybe Value)]
 getVValuesFromWS WorldState {..} = getValuesFromValueMap worldVars
 
 getValuesFromValueMap :: ValueMap -> [ID] -> [(ID, Maybe Value)]
-getValuesFromValueMap valueMap = map (\idx -> (idx,IM.lookup idx valueMap))
+getValuesFromValueMap valueMap = map (\idx -> (idx, IM.lookup idx valueMap))
 
 
 updateDValueToWS :: WorldState -> ID -> Maybe Value -> WorldState
-updateDValueToWS ws@WorldState {..} idx aMValue = ws {worldDict = updateValueToValueMap worldDict idx aMValue}
+updateDValueToWS ws@WorldState {..} idx aMValue =
+  ws { worldDict = updateValueToValueMap worldDict idx aMValue }
 
 updateVValueToWS :: WorldState -> ID -> Maybe Value -> WorldState
-updateVValueToWS ws@WorldState {..} idx aMValue = ws {worldDict = updateValueToValueMap worldVar idx aMValue}
+updateVValueToWS ws@WorldState {..} idx aMValue =
   ws { worldDict = updateValueToValueMap worldVars idx aMValue }
 
 updateValueToValueMap :: ValueMap -> ID -> Maybe Value -> ValueMap
-updateValueToValueMap valueMap idx aMValue = IM.update (const aMValue) idx valueMap
+updateValueToValueMap valueMap idx aMValue =
+  IM.update (const aMValue) idx valueMap
 
 updateValuesToDict :: WorldState -> [(ID, Maybe Value)] -> WorldState
-updateValuesToDict ws@WorldState {..} ivList = ws {worldDict = updateValuesToValueMap worldDict ivList}
+updateValuesToDict ws@WorldState {..} ivList =
+  ws { worldDict = updateValuesToValueMap worldDict ivList }
 
 updateValuesToVar :: WorldState -> [(ID, Maybe Value)] -> WorldState
-updateValuesToVar ws@WorldState {..} ivList = ws {worldDict = updateValuesToValueMap worldVar ivList}
+updateValuesToVar ws@WorldState {..} ivList =
   ws { worldDict = updateValuesToValueMap worldVars ivList }
 
 updateValuesToValueMap :: ValueMap -> [(ID, Maybe Value)] -> ValueMap
-updateValuesToValueMap valueMap = foldr (\(i,v) -> IM.update (const v) i) valueMap
+updateValuesToValueMap = foldr (\(i, v) -> IM.update (const v) i)

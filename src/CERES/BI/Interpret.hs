@@ -44,7 +44,9 @@ runTimeSlot aWorld@World {..} = notYetImpl "runTimeSlot"
   deltaHList      = undefined
   deltaDList      = undefined
   deltaVList      = undefined
-  -- TODO: map (unwrap RW . filter notR) cache
+  -- NOTE: newWorldHistory
+  -- NOTE: * Update WorldHistory with delta
+  -- NOTE: * Generate next time EpochRow by filling with current EpochRow values
   newWorldHistory = undefined deltaHList
    where
     deltaValues = maybe IM.empty values mNextEpochRow
@@ -52,9 +54,10 @@ runTimeSlot aWorld@World {..} = notYetImpl "runTimeSlot"
     theNextValues = IM.union deltaValues (values currentEpochRow)
       where currentEpochRow = newWorldHistory IM.! worldTime
     newNextEpochRow = EpochRow (worldTime + 1) theNextValues
-  newWorldDict    = undefined deltaDList -- foldr
-  newWorldVars    = undefined deltaVList -- foldr
-  newWorldState = updateWorldState worldState newWorldHistory newWorldDict newWorldVars
+  newWorldDict = undefined deltaDList -- foldr
+  newWorldVars = undefined deltaVList -- foldr
+  newWorldState =
+    updateWorldState worldState newWorldHistory newWorldDict newWorldVars
 
 
 runSpoolTree :: World -> SpoolTree -> ([(SIIS, SpoolInstance)], WorldCache)
