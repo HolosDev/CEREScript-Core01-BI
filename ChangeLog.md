@@ -9,6 +9,7 @@ Changelog for CEREScript-Core01-BI
 * Implement `runInstruction`
 
 ### Change
+* Change design for backpack compatibility
 * Study how to handle readVP/writeVP in CERESSpool
 * Use ValueContainer instead of Value
 * Implement parallel `updateValuesToVT`
