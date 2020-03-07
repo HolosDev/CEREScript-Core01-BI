@@ -50,7 +50,7 @@ runTimeSlot aWorld@World {..} = newWorld
     deltaValues = maybe IM.empty values mNextEpochRow
       where mNextEpochRow = IM.lookup nextWorldTime targetWorldHistory
     theNextValues = IM.union deltaValues (values currentEpochRow)
-      where currentEpochRow = (worldHistory committed) IM.! worldTime
+      where currentEpochRow = fromMaybe (EpochRow worldTime IM.empty) . IM.lookup worldTime $ (worldHistory committed)
     newNextEpochRow = EpochRow nextWorldTime theNextValues
   newWorldState = committed { worldHistory = newWorldHistory }
   newSITable    = siisExecutor worldTime worldSITable siisList
