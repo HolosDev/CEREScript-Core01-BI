@@ -11,7 +11,7 @@ Global state with time.
 
 ### Dict
 
-Global state without time.
+A global state without time.
 
 ### (AtTime)
 
@@ -20,32 +20,32 @@ Based on WorldState.
 
 ### Local
 
-A storage which belongs to a spool instance which is lasting after a time slot.
+Storage which belongs to a spool instance which is lasting after a time slot.
 
 ### Cache
 
-A storage which belongs to a spool instance which is not lasting after a time slot.
+Storage which belongs to a spool instance which is not lasting after a time slot.
 Stores temporal/focused variable only.
 
 ### (AtHere)
 
 No storage.
-Stored in a instruction itself.
+Stored in an instruction itself.
 
 ## Instruction
 
 ### AtWorld
 
-Global state with absolute time definition.
+A global state with absolute time definition.
 Without time notation, the time is set to 0.
 
 ### AtDict
 
-Global state without time.
+A global state without time.
 
 ### AtTime
 
-Global state with relative time definition.
+ A global state with relative time definition.
 Without time notation, the time is set to `current`.
 
 ### AtLocal
@@ -63,7 +63,7 @@ Just for using it, not for storing.
 
 ## Value retention in a Table
 
-The `Value` or `ValueContainer` does not requires retention description to keep it.
+The `Value` or `ValueContainer` does not require retention description to keep it.
 Without explicit `DeleteVariable` instruction, a new Time-Slot would copy every value in the last Time-Slot.
 
 ## Reserved Storage
@@ -83,11 +83,11 @@ Without explicit `DeleteVariable` instruction, a new Time-Slot would copy every 
   * "Abolish": end the `SpoolInstance`
 * 1: Jump the retained `SpoolInstance`
 * 16~23: Add readVP/writeVP in SpoolInstance
-  * Usually, BI do not add a new VP when Spool initiate Variable
+  * Usually, BI does not add a new VP when Spool initiate Variable
 * 24~31: Remove readVP/writeVP in SpoolInstance
   * Usually, BI do not remove a VP when Spool initiate Variable
 * 32~47: Invoke a new `SpoolInstance`
-  * Should remove number limitation by array
+  * Should remove number limitation by an array
 * 48~63: Stop other `SpoolInstance`
-  * Should remove number limitation by array
+  * Should remove number limitation by an array
 

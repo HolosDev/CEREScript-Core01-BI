@@ -7,7 +7,7 @@ Changelog for CEREScript-Core01-BI
 * Implement `runSpoolInstance`
 * Implement `runCEREScript`
 * Implement `runInstruction`
-* Implement `cacheCommiter`
+* Implement `cacheCommitter`
 
 ### Change
 * Study how to handle readVP/writeVP in CERESSpool
