@@ -10,6 +10,7 @@ import           Data.CERES.Value
 import           CERES.BI.Data
 import           CERES.BI.Data.Constants
 import           CERES.BI.Data.Environment
+import           CERES.BI.Data.Function
 
 import           CERES.BI.Interpret.Spool
 import           CERES.BI.Interpret.Cache
@@ -53,10 +54,7 @@ runTimeSlot aWorld@World {..} = notYetImpl "runTimeSlot"
     newNextEpochRow = EpochRow (worldTime + 1) theNextValues
   newWorldDict    = undefined deltaDList -- foldr
   newWorldVars    = undefined deltaVList -- foldr
-  newWorldState = worldState { worldHistory = newWorldHistory
-                             , worldDict    = newWorldDict
-                             , worldVar     = newWorldVar
-                             }
+  newWorldState = updateWorldState worldState newWorldHistory newWorldDict newWorldVars
 
 
 runSpoolTree :: World -> SpoolTree -> ([(SIIS, SpoolInstance)], WorldCache)

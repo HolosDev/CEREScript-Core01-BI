@@ -15,6 +15,14 @@ import           Data.List                      ( groupBy
 import           Data.Maybe
 
 
+updateWorldState
+  :: WorldState -> HistoricTable -> Dictionary -> Variables -> WorldState
+updateWorldState ws newWorldHistory newWorldDict newWorldVars = ws
+  { worldHistory = newWorldHistory
+  , worldDict    = newWorldDict
+  , worldVars    = newWorldVars
+  }
+
 getHValueFromWS :: WorldState -> Time -> ID -> Maybe Value
 getHValueFromWS worldState =
   getHValueFromVT (worldHistory worldState)
