@@ -86,3 +86,6 @@ instance TextShow SpoolInstance where
     fromLazyText "SI(" <> showb id <> fromLazyText "): " <> fromLazyText name
 
 type LocalState = ValueMap
+
+type SIIS = SpoolInstanceInheritStatus
+data SpoolInstanceInheritStatus = SIJump Int | SIEnd

@@ -74,6 +74,3 @@ runSpoolTree aWorld@World {..} aSpoolTree@SpoolTree {..} =
 runSpoolInstance
   :: World -> SpoolInstance -> WorldCache -> ((SIIS, SpoolInstance), WorldCache)
 runSpoolInstance = notYetImpl "runSpoolInstance"
-
-type SIIS = SpoolInstanceInheritStatus
-data SpoolInstanceInheritStatus = SIJump Int | SIEnd
