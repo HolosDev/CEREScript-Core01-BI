@@ -35,29 +35,28 @@ runSimulator endTime = runSimulatorSub
 
 -- NOTE: Assume that the current EpochRow exists
 runTimeSlot :: World -> World
-runTimeSlot aWorld@World {..} = notYetImpl "runTimeSlot"
+runTimeSlot aWorld@World {..} = newWorld
  where
   aSpoolForest    = siAggregator aWorld
   resultList      = map (runSpoolTree aWorld) aSpoolForest
-  siisList        = map fst resultList
+  siisList        = concatMap fst resultList
   wcList          = map snd resultList
-  deltaHList      = undefined
-  deltaDList      = undefined
-  deltaVList      = undefined
-  -- NOTE: newWorldHistory
-  -- NOTE: * Update WorldHistory with delta
-  -- NOTE: * Generate next time EpochRow by filling with current EpochRow values
-  newWorldHistory = undefined deltaHList
+  -- TODO: Change cacheCommitter style or union WorldCache in wcList
+  committed       = foldr cacheCommitter worldState wcList
+  newWorldHistory = IM.insert (worldTime + 1) newNextEpochRow targetWorldHistory
    where
+    targetWorldHistory = worldHistory committed
     deltaValues = maybe IM.empty values mNextEpochRow
-      where mNextEpochRow = IM.lookup (worldTime + 1) newWorldHistory
+      where mNextEpochRow = IM.lookup (worldTime + 1) targetWorldHistory
     theNextValues = IM.union deltaValues (values currentEpochRow)
-      where currentEpochRow = newWorldHistory IM.! worldTime
+      where currentEpochRow = (worldHistory committed) IM.! worldTime
     newNextEpochRow = EpochRow (worldTime + 1) theNextValues
-  newWorldDict = undefined deltaDList -- foldr
-  newWorldVars = undefined deltaVList -- foldr
-  newWorldState =
-    updateWorldState worldState newWorldHistory newWorldDict newWorldVars
+  newWorldState = committed { worldHistory = newWorldHistory }
+  newSITable    = undefined worldSITable siisList
+  newWorld      = aWorld { worldState   = newWorldState
+                         , worldSITable = newSITable
+                         , worldTime    = worldTime + 1
+                         }
 
 
 runSpoolTree :: World -> SpoolTree -> ([(SIIS, SpoolInstance)], WorldCache)

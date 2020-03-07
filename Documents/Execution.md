@@ -41,12 +41,12 @@ Serialized Execution
 
 * runSimulator :: `World -> World`
   * runTimeSlot :: `World -> World`
-    * siAggregator :: `World -> [SpoolTree]`
+    * siAggregator :: `World -> SpoolForest`
     * runSpoolTree :: `SpoolTree -> World -> (SpoolTree, WorldCache)`
       * cacheMaker :: `SpoolTree -> World -> WorldCache`
       * runSpoolInstance :: `SI -> WorldCache -> World -> ((SIIS,SI),WorldCache)`
         * runCEREScript :: `World -> WorldCache -> Local -> [CEREScript] -> ST (WorldCache,Local)`
           * runInstruction :: `World -> WorldCache -> Local -> CEREScript -> (WorldCache,Local)`
-      * cacheCommitter :: `WorldState -> [Cache] -> WorldState`
+    * cacheCommitter' :: `WorldState -> [WorldCache] -> WorldState`
 
 
