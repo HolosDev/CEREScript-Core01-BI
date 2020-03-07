@@ -1,12 +1,14 @@
 module CERES.BI.Interpret.Cache where
 
-
+import           Data.Bifunctor
 import           Data.IntMap                    ( IntMap )
 import qualified Data.IntMap                   as IM
 import           Data.Map                       ( Map )
 import qualified Data.Map                      as M
 import           Data.Maybe
-import           Data.List                      ( partition )
+import           Data.List                      ( nub
+                                                , partition
+                                                )
 import           Data.Set                       ( Set )
 import qualified Data.Set                      as S
 
@@ -89,4 +91,39 @@ setHCacheSub time idx mode mValue hCache = newHCache
   newHCache = IM.insert time newVMap hCache
 
 setRWMVMap :: ID -> (Maybe Value -> RWMV) -> Maybe Value -> RWMVMap -> RWMVMap
-setRWMVMap idx mode mValue rwmvMap = IM.insert idx (mode mValue) rwmvMap
+setRWMVMap idx mode mValue = IM.insert idx (mode mValue)
+
+-- TODO: This style is for foldr, we may change this better
+-- TODO: Change this for when many WorldCache is given as List or etc.
+cacheCommitter :: WorldCache -> WorldState -> WorldState
+cacheCommitter (hCache, dCache, vCache) aWorldState@WorldState {..} =
+  newWorldState
+ where
+  newWorldState =
+    updateWorldState aWorldState newWorldHistory newWorldDict newWorldVars
+  newWorldHistory = updateWorldHistoryFromCache worldHistory hCache
+  newWorldDict    = updateValuesToValueMap worldDict (unwrapFromRWMV dCache)
+  newWorldVars    = updateValuesToValueMap worldDict (unwrapFromRWMV vCache)
+
+unwrapFromRWMV :: RWMVMap -> [(ID, Maybe Value)]
+unwrapFromRWMV = map (second runRW) . filter (notR . snd) . IM.toList
+
+-- NOTE: HistoricCache could have values in a time-slot which HistoricTable may not have
+-- NOTE: Anyway, every values should alive
+-- TODO: Optimize unique key generator
+-- TODO: Optimize with/without updateValuesToVT
+updateWorldHistoryFromCache :: HistoricTable -> HistoricCache -> HistoricTable
+updateWorldHistoryFromCache historicTable hCache = IM.map newRow uniqueTimes
+ where
+  uniqueTimes =
+    IM.fromList
+      .  map (\x -> (x, x))
+      .  nub
+      $  IM.keys historicTable
+      ++ IM.keys hCache
+  newRow time = EpochRow time newValues
+   where
+    baseRow     = maybe IM.empty values . IM.lookup time $ historicTable
+    targetCache = fromMaybe IM.empty . IM.lookup time $ hCache
+    unwrapped   = unwrapFromRWMV targetCache
+    newValues   = updateValuesToValueMap baseRow unwrapped
