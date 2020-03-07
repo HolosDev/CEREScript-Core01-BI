@@ -52,7 +52,7 @@ runTimeSlot aWorld@World {..} = notYetImpl "runTimeSlot"
       where currentEpochRow = newWorldHistory IM.! worldTime
     newNextEpochRow = EpochRow (worldTime + 1) theNextValues
   newWorldDict    = undefined deltaDList -- foldr
-  newWorldVar     = undefined deltaVList -- foldr
+  newWorldVars    = undefined deltaVList -- foldr
   newWorldState = worldState { worldHistory = newWorldHistory
                              , worldDict    = newWorldDict
                              , worldVar     = newWorldVar

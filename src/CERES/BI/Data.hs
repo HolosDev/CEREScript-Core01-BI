@@ -36,7 +36,7 @@ data WorldState = WorldState
   { evaluatedSpan :: TimeSpan
   , worldHistory  :: HistoricTable
   , worldDict     :: Dictionary
-  , worldVar      :: Variables
+  , worldVars     :: Variables
   } deriving Show
 
 type TimeSpan = Maybe (Time, Time)

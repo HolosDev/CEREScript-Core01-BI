@@ -91,7 +91,7 @@ getDValueFromWS :: WorldState -> ID -> Maybe Value
 getDValueFromWS WorldState {..} = getValueFromValueMap worldDict
 
 getVValueFromWS :: WorldState -> ID -> Maybe Value
-getVValueFromWS WorldState {..} = getValueFromValueMap worldVar
+getVValueFromWS WorldState {..} = getValueFromValueMap worldVars
 
 getValueFromValueMap :: ValueMap -> ID -> Maybe Value
 getValueFromValueMap valueMap idx = IM.lookup idx valueMap
@@ -100,7 +100,7 @@ getDValuesFromWS :: WorldState -> [ID] -> [(ID, Maybe Value)]
 getDValuesFromWS WorldState {..} = getValuesFromValueMap worldDict
 
 getVValuesFromWS :: WorldState -> [ID] -> [(ID, Maybe Value)]
-getVValuesFromWS WorldState {..} = getValuesFromValueMap worldVar
+getVValuesFromWS WorldState {..} = getValuesFromValueMap worldVars
 
 getValuesFromValueMap :: ValueMap -> [ID] -> [(ID, Maybe Value)]
 getValuesFromValueMap valueMap = map (\idx -> (idx,IM.lookup idx valueMap))
@@ -111,6 +111,7 @@ updateDValueToWS ws@WorldState {..} idx aMValue = ws {worldDict = updateValueToV
 
 updateVValueToWS :: WorldState -> ID -> Maybe Value -> WorldState
 updateVValueToWS ws@WorldState {..} idx aMValue = ws {worldDict = updateValueToValueMap worldVar idx aMValue}
+  ws { worldDict = updateValueToValueMap worldVars idx aMValue }
 
 updateValueToValueMap :: ValueMap -> ID -> Maybe Value -> ValueMap
 updateValueToValueMap valueMap idx aMValue = IM.update (const aMValue) idx valueMap
@@ -120,6 +121,7 @@ updateValuesToDict ws@WorldState {..} ivList = ws {worldDict = updateValuesToVal
 
 updateValuesToVar :: WorldState -> [(ID, Maybe Value)] -> WorldState
 updateValuesToVar ws@WorldState {..} ivList = ws {worldDict = updateValuesToValueMap worldVar ivList}
+  ws { worldDict = updateValuesToValueMap worldVars ivList }
 
 updateValuesToValueMap :: ValueMap -> [(ID, Maybe Value)] -> ValueMap
 updateValuesToValueMap valueMap = foldr (\(i,v) -> IM.update (const v) i) valueMap
