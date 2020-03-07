@@ -52,7 +52,7 @@ runTimeSlot aWorld@World {..} = newWorld
       where currentEpochRow = (worldHistory committed) IM.! worldTime
     newNextEpochRow = EpochRow (worldTime + 1) theNextValues
   newWorldState = committed { worldHistory = newWorldHistory }
-  newSITable    = undefined worldSITable siisList
+  newSITable    = siisExecutor worldTime worldSITable siisList
   newWorld      = aWorld { worldState   = newWorldState
                          , worldSITable = newSITable
                          , worldTime    = worldTime + 1
