@@ -7,15 +7,25 @@ Changelog for CEREScript-Core01-BI
 * Implement `runSpoolInstance`
 * Implement `runCEREScript`
 * Implement `runInstruction`
-* Implement `cacheCommitter`
 
 ### Change
 * Study how to handle readVP/writeVP in CERESSpool
-* Filter and Unwrap RW from WorldCache and apply to WorldState
 * Use ValueContainer instead of Value
 * Implement parallel `updateValuesToVT`
 * Use `getValues*` instead of using `foldr` in `cacheMaker`
 * Implement better `Eq` instance for handling `AtWorld` and `AtTime` simultaneously
+
+
+## 0.2.0.0 -- 2020-03-08
+
+### Added
+* Implement `cacheCommitter`
+* Implement `siisExecutor`
+* Implement `updateWorldState`
+* Filter and Unwrap RW from WorldCache and apply to WorldState
+
+### Changed
+* Move SIIS definition to Data
 
 
 ## 0.1.0.0 -- 2020-03-06
