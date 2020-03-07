@@ -43,19 +43,20 @@ runTimeSlot aWorld@World {..} = newWorld
   wcList          = map snd resultList
   -- TODO: Change cacheCommitter style or union WorldCache in wcList
   committed       = foldr cacheCommitter worldState wcList
-  newWorldHistory = IM.insert (worldTime + 1) newNextEpochRow targetWorldHistory
+  nextWorldTime   = (worldTime + 1)
+  newWorldHistory = IM.insert nextWorldTime newNextEpochRow targetWorldHistory
    where
     targetWorldHistory = worldHistory committed
     deltaValues = maybe IM.empty values mNextEpochRow
-      where mNextEpochRow = IM.lookup (worldTime + 1) targetWorldHistory
+      where mNextEpochRow = IM.lookup nextWorldTime targetWorldHistory
     theNextValues = IM.union deltaValues (values currentEpochRow)
       where currentEpochRow = (worldHistory committed) IM.! worldTime
-    newNextEpochRow = EpochRow (worldTime + 1) theNextValues
+    newNextEpochRow = EpochRow nextWorldTime theNextValues
   newWorldState = committed { worldHistory = newWorldHistory }
   newSITable    = siisExecutor worldTime worldSITable siisList
   newWorld      = aWorld { worldState   = newWorldState
                          , worldSITable = newSITable
-                         , worldTime    = worldTime + 1
+                         , worldTime    = nextWorldTime
                          }
 
 
