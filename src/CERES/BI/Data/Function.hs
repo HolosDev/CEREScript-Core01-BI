@@ -86,7 +86,6 @@ updateValuesToVT worldHistory ivList = newHistoricTable
   getTime          = fst . fst
   sorted           = sortBy (\x y -> compare (getTime x) (getTime y)) ivList
   grouped          = groupBy (\x y -> getTime x == getTime y) sorted
-  lastTime         = getTime . head . last $ grouped
   newHistoricTable = foldr updateValuesToVTSub worldHistory grouped
 
 -- TODO: Should be parallel when update existing element

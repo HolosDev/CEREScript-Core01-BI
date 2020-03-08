@@ -137,6 +137,7 @@ runCEREScript aWorld@World {..} aSI@SI {..} cState cScript = runCEREScriptSub
     -- NOTE: si == True, then end runCEREScript
 
 
+
    where
     (newWC, newLocalVars, newLocalCache, newRG) =
       runInstruction aWorld aSI cState ceres
