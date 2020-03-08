@@ -74,6 +74,7 @@ setHCache
   -> HistoricCache
 setHCache _         (AtWorld time) = setHCacheSub time
 setHCache worldTime (AtTime  time) = setHCacheSub (worldTime + time)
+setHCache _ vp = error $ "[ERROR]<setHCache> Given improper VariablePlace" ++ show vp
 
 setHCacheSub
   :: Time

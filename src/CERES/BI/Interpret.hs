@@ -94,6 +94,7 @@ runSpoolInstance world@World {..} si@SI {..} wCache =
     -- FIXME: Add SI initiation logic
     "Init"    -> (False, True, blankVM)
     "Abolish" -> (True, False, blankVM)
+    _ -> error "[ERROR]<runSpoolInstance :=: _> Undefined Retention Code"
    where
   -- NOTE: SIJump takes relative time-slot
   jumpTarget = maybe 1 getInt $ IM.lookup jumpOffsetID newLocalCache
