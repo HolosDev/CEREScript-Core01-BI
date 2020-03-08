@@ -1,5 +1,5 @@
 name:                CEREScript-Core01-BI
-version:             0.2.0.0
+version:             0.3.0.0
 github:              "MiRiS-Project/CEREScript-Core01-BI"
 license:             AllRightsReserved
 author:              "YongJoon Joe"
@@ -9,9 +9,6 @@ copyright:           "2019-2020 MiRiS Project"
 extra-source-files:
 - README.md
 - ChangeLog.md
-
-# synopsis:            Short description of your package
-# category:            Web
 
 description:         Please see the README on GitHub at <https://github.com/MiRiS-Project/CEREScript-Core01-BI#readme>
 
