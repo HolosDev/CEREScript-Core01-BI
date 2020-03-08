@@ -84,7 +84,11 @@ runSpoolInstance world@World {..} si@SI {..} wCache =
   -- TODO: Change `StrValue "Retain"` as a named constant
   iLocalCache = csInitLocalVars $ worldSpools IM.! siSpoolID
   isResume    = maybe False getBool $ IM.lookup resumeCodeID siLocalVars
-  iLocalVars  = IM.insert resumeCodeID (BoolValue False) siLocalVars
+  iLocalVars =
+    -- TODO: Not sure to initialize ExecutingTime variable
+    (if isResume then id else IM.insert executingTimeID (IntValue 0))
+      . IM.insert resumeCodeID (BoolValue False)
+      $ siLocalVars
   ((newWorldCache, newLocalVars, newLocalCache, newRG), restCEREScript) =
     runCEREScript world si (wCache, iLocalVars, iLocalCache, siRG) siRestScript
   siisCode = maybe "Retain" getStr $ IM.lookup retainCodeID newLocalCache
