@@ -23,6 +23,13 @@ updateWorldState ws newWorldHistory newWorldDict newWorldVars = ws
   , worldVars    = newWorldVars
   }
 
+updateWorld :: World -> WorldState -> SpoolInstanceTable -> Time -> World
+updateWorld aWorld newWorldState newSITable newWorldTime = aWorld
+  { worldState   = newWorldState
+  , worldSITable = newSITable
+  , worldTime    = newWorldTime
+  }
+
 -- TODO: Move sub functions in a nest
 getHValueFromWS :: WorldState -> Time -> ID -> Maybe Value
 getHValueFromWS worldState = getHValueFromVT (worldHistory worldState)

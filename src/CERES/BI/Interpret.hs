@@ -1,6 +1,10 @@
 module CERES.BI.Interpret where
 
 
+import           Data.IntMap                    ( IntMap )
+import qualified Data.IntMap                   as IM
+import           Data.Maybe
+
 import           CERES.Operate
 import           Data.CERES.Script
 import           Data.CERES.Operator
@@ -14,10 +18,6 @@ import           CERES.BI.Data.Function
 
 import           CERES.BI.Interpret.Spool
 import           CERES.BI.Interpret.Cache
-
-import           Data.IntMap                    ( IntMap )
-import qualified Data.IntMap                   as IM
-import           Data.Maybe
 
 import           Debug
 
@@ -43,21 +43,23 @@ runTimeSlot aWorld@World {..} = newWorld
   wcList          = map snd resultList
   -- TODO: Change cacheCommitter style or union WorldCache in wcList
   committed       = foldr cacheCommitter worldState wcList
-  nextWorldTime   = (worldTime + 1)
-  newWorldHistory = IM.insert nextWorldTime newNextEpochRow targetWorldHistory
+  nextWorldTime   = worldTime + 1
+  nextWorldHistory = IM.insert nextWorldTime newNextEpochRow targetWorldHistory
    where
     targetWorldHistory = worldHistory committed
-    deltaValues = maybe IM.empty values mNextEpochRow
+    deltaValues        = maybe IM.empty values mNextEpochRow
       where mNextEpochRow = IM.lookup nextWorldTime targetWorldHistory
     theNextValues = IM.union deltaValues (values currentEpochRow)
-      where currentEpochRow = fromMaybe (EpochRow worldTime IM.empty) . IM.lookup worldTime $ (worldHistory committed)
+     where
+      currentEpochRow =
+        fromMaybe (EpochRow worldTime IM.empty)
+          . IM.lookup worldTime
+          . worldHistory
+          $ committed
     newNextEpochRow = EpochRow nextWorldTime theNextValues
-  newWorldState = committed { worldHistory = newWorldHistory }
+  newWorldState = committed { worldHistory = nextWorldHistory }
   newSITable    = siisExecutor worldTime worldSITable siisList
-  newWorld      = aWorld { worldState   = newWorldState
-                         , worldSITable = newSITable
-                         , worldTime    = nextWorldTime
-                         }
+  newWorld      = updateWorld aWorld newWorldState newSITable nextWorldTime
 
 
 runSpoolTree :: World -> SpoolTree -> ([(SIIS, SpoolInstance)], WorldCache)
