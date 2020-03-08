@@ -77,6 +77,10 @@ Without explicit `DeleteVariable` instruction, a new Time-Slot would copy every 
 
 ### LocalVariables
 
+* 0: ExecutingTime for a next CERES instruction
+  * Need to be initialized before add in SITable
+* 2: Elapsed InternalTime in time-slot
+
 ### LocalCache
 
 Stores only variables which should not be inherited after time-slot
