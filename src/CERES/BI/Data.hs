@@ -67,6 +67,8 @@ data CERESSpool = CERESSpool
   , readVP     :: Set VPosition
   , writeVP    :: Set VPosition
   , csPriority :: Priority
+  , csInitLocalVars :: ValueMap
+  , csInitLocalCache :: ValueMap
   } deriving (Eq, Ord, Show, Read)
 
 data SpoolInstanceRow = SIRow
@@ -101,6 +103,7 @@ instance TextShow SpoolInstance where
       <> ")"
 
 type SIIS = SpoolInstanceInheritStatus
+-- NOTE: SIJump takes relative time-slot
 data SpoolInstanceInheritStatus = SIJump Int | SIEnd
 
 -- NOTE: Alias for abstract PRNG type
