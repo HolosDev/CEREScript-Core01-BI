@@ -73,17 +73,25 @@ type SpoolInstances = IntMap SpoolInstance
 data SpoolInstance = SI
   { siID         :: ID
   , siName       :: Name
-  , siF          :: World -> World
-  , siLocalState :: LocalState
   , siVPS        :: Set VPosition -- Only World, Dict, Var
+  , siLocalState :: LocalState
+  , siSpoolID    :: ID
+  , siRestScript :: CEREScript
+  , siF          :: World -> World
   }
 
 instance Show SpoolInstance where
   show = TL.unpack . showtl
 
 instance TextShow SpoolInstance where
-  showb (SI id name _ _ _) =
-    fromLazyText "SI(" <> showb id <> fromLazyText "): " <> fromLazyText name
+  showb (SI id name _ _ sID _ _) =
+    fromLazyText "SI("
+      <> showb id
+      <> fromLazyText "): "
+      <> fromLazyText name
+      <> fromLazyText " Based on Spool("
+      <> showb sID
+      <> ")"
 
 type LocalState = ValueMap
 
