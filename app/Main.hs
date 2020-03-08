@@ -1,6 +1,12 @@
 module Main where
 
 
+import           Data.IntMap                    ( IntMap )
+import qualified Data.IntMap                   as IM
+import qualified Data.Text.IO as T
+
+import           System.Random.SplitMix
+
 import CERES.Operate
 import Data.CERES.Script
 import Data.CERES.Operator
@@ -10,10 +16,6 @@ import Data.CERES.Value
 import CERES.BI.Data
 import CERES.BI.Data.Environment
 import CERES.BI.Interpret
-
-import           Data.IntMap                    ( IntMap )
-import qualified Data.IntMap                   as IM
-import qualified Data.Text.IO as T
 
 
 main :: IO ()
@@ -33,7 +35,8 @@ initializer = do
   T.putStrLn " - = + Set HistoricTable"
   let iHistoricTable = IM.empty
   let iValueMap = IM.empty
-  let iWorldState = WorldState Nothing iHistoricTable iValueMap iValueMap
+  let rGen = mkSMGen .fromIntegral $ 0
+  let iWorldState = WorldState Nothing iHistoricTable iValueMap iValueMap rGen
   T.putStrLn " - = Set SpoolInstances"
   let iSITable = IM.empty
   let iWorld = World iSpools iValueList iWorldState iSITable 0

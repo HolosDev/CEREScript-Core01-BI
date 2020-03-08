@@ -11,6 +11,8 @@ import qualified Data.Text                     as T
 import qualified Data.Text.Lazy                as TL
 import qualified Data.Text.Lazy.IO             as TL
 
+import           System.Random.SplitMix
+
 import           TextShow
 
 import           Data.CERES.Script
@@ -39,6 +41,7 @@ data WorldState = WorldState
   , worldHistory  :: HistoricTable
   , worldDict     :: Dictionary
   , worldVars     :: Variables
+  , worldRG       :: RG
   } deriving Show
 
 type TimeSpan = Maybe (Time, Time)
@@ -79,6 +82,7 @@ data SpoolInstance = SI
   , siLocalVars  :: LocalVariables
   , siSpoolID    :: ID
   , siRestScript :: CEREScript
+  , siRG         :: RG
   , siF          :: World -> World
   }
 
@@ -86,7 +90,7 @@ instance Show SpoolInstance where
   show = TL.unpack . showtl
 
 instance TextShow SpoolInstance where
-  showb (SI id name _ _ sID _ _) =
+  showb (SI id name _ _ sID _ _ _) =
     fromLazyText "SI("
       <> showb id
       <> fromLazyText "): "
@@ -97,3 +101,6 @@ instance TextShow SpoolInstance where
 
 type SIIS = SpoolInstanceInheritStatus
 data SpoolInstanceInheritStatus = SIJump Int | SIEnd
+
+-- NOTE: Alias for abstract PRNG type
+type RG = SMGen
