@@ -53,3 +53,4 @@ siisExecutor worldTime theSITable siList = foldr siisExecutorSub theSITable siLi
     targetSIs = maybe IM.empty sis . IM.lookup theTime $ aSITable
     newSIRow = SIRow theTime . IM.insert theTime si $ targetSIs
     newSITable = IM.insert theTime newSIRow theSITable
+  siisExecutorSub _ aSITable = aSITable
