@@ -45,8 +45,8 @@ Serialized Execution
     * runSpoolTree :: `SpoolTree -> World -> (SpoolTree, WorldCache)`
       * cacheMaker :: `SpoolTree -> World -> WorldCache`
       * runSpoolInstance :: `SI -> WorldCache -> World -> ((SIIS,SI),WorldCache)`
-        * runCEREScript :: `World -> WorldCache -> Local -> [CEREScript] -> ST (WorldCache,Local)`
-          * runInstruction :: `World -> WorldCache -> Local -> CEREScript -> (WorldCache,Local)`
+        * runCEREScript :: `World -> WorldCache -> LocalVariable -> LocalCache -> [CEREScript] -> ST (WorldCache,Local)`
+          * runInstruction :: `World -> WorldCache -> LocalVariable -> LocalCache -> CEREScript -> (WorldCache,Local)`
     * cacheCommitter' :: `WorldState -> [WorldCache] -> WorldState`
 
 

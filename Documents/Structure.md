@@ -75,11 +75,15 @@ Without explicit `DeleteVariable` instruction, a new Time-Slot would copy every 
   * "Stop": stop the simulation
 * 1: 
 
-### LocalState
+### LocalVariables
+
+### LocalCache
+
+Stores only variables which should not be inherited after time-slot
 
 * 0: Retention code of `SpoolInstance`
   * "Retain": keep the `SpoolInstance`
-  * "Init": keep the `SpoolInstance`, but do not keep `LocalState`
+  * "Init": keep the `SpoolInstance`, but do not keep `LocalVariables`
   * "Abolish": end the `SpoolInstance`
 * 1: Jump the retained `SpoolInstance`
 * 16~23: Add readVP/writeVP in SpoolInstance
@@ -90,4 +94,3 @@ Without explicit `DeleteVariable` instruction, a new Time-Slot would copy every 
   * Should remove number limitation by an array
 * 48~63: Stop other `SpoolInstance`
   * Should remove number limitation by an array
-

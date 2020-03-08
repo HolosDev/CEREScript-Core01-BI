@@ -35,7 +35,7 @@ type HistoricCache = IntMap RWMVMap
 type DictionaryCache = RWMVMap
 type VariableCache = RWMVMap
 
-type LocalVariable = ValueMap
+type LocalVariables = ValueMap
 type LocalCache = ValueMap
 
 type VV = (VPosition, RWMV)

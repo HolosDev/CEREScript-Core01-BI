@@ -17,6 +17,8 @@ import           Data.CERES.Script
 import           Data.CERES.Type
 import           Data.CERES.Value
 
+import           CERES.BI.Data.Environment
+
 
 -- | World stores everything
 data World = World
@@ -74,7 +76,7 @@ data SpoolInstance = SI
   { siID         :: ID
   , siName       :: Name
   , siVPS        :: Set VPosition -- Only World, Dict, Var
-  , siLocalState :: LocalState
+  , siLocalVars  :: LocalVariables
   , siSpoolID    :: ID
   , siRestScript :: CEREScript
   , siF          :: World -> World
@@ -92,9 +94,6 @@ instance TextShow SpoolInstance where
       <> fromLazyText " Based on Spool("
       <> showb sID
       <> ")"
-
-type LocalState = ValueMap
-type LocalCache = ValueMap
 
 type SIIS = SpoolInstanceInheritStatus
 data SpoolInstanceInheritStatus = SIJump Int | SIEnd
