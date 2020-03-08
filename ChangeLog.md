@@ -15,6 +15,16 @@ Changelog for CEREScript-Core01-BI
 * Implement better `Eq` instance for handling `AtWorld` and `AtTime` simultaneously
 
 
+## 0.3.1.0 -- 2020-03-08
+
+### Fixed
+* Fill non-exhaustive patters
+* Fix wrong localVariables is given in `runSpoolInstance`
+
+### Removed
+* Remove unused definition
+
+
 ## 0.3.0.0 -- 2020-03-08
 
 ### Added
@@ -24,7 +34,6 @@ Changelog for CEREScript-Core01-BI
 
 ### Changed
 * Add PRNG generator field to `WorldState` and `SpoolInstance`
-
 
 
 ## 0.2.0.0 -- 2020-03-08
