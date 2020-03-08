@@ -111,7 +111,7 @@ runSpoolInstance world@World {..} si@SI {..} wCache =
           )
           csScript
         $ IM.lookup siSpoolID worldSpools
-  newSI = si { siLocalVars  = newLocalVars
+  newSI = si { siLocalVars  = nextLocalVars
              , siRestScript = nextCEREScript
              , siRG         = newRG
              }
