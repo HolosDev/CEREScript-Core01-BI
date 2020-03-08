@@ -10,14 +10,16 @@ import           Data.CERES.Script
 import           Data.CERES.Operator
 import           Data.CERES.Type
 import           Data.CERES.Value
+import           Data.CERES.Value.Method
 
 import           CERES.BI.Data
 import           CERES.BI.Data.Constants
 import           CERES.BI.Data.Environment
 import           CERES.BI.Data.Function
 
-import           CERES.BI.Interpret.Spool
 import           CERES.BI.Interpret.Cache
+import           CERES.BI.Interpret.Instruction
+import           CERES.BI.Interpret.Spool
 
 import           Debug
 
@@ -37,13 +39,13 @@ runSimulator endTime = runSimulatorSub
 runTimeSlot :: World -> World
 runTimeSlot aWorld@World {..} = newWorld
  where
-  aSpoolForest    = siAggregator aWorld
-  resultList      = map (runSpoolTree aWorld) aSpoolForest
-  siisList        = concatMap fst resultList
-  wcList          = map snd resultList
+  aSpoolForest     = siAggregator aWorld
+  resultList       = map (runSpoolTree aWorld) aSpoolForest
+  siisList         = concatMap fst resultList
+  wcList           = map snd resultList
   -- TODO: Change cacheCommitter style or union WorldCache in wcList
-  committed       = foldr cacheCommitter worldState wcList
-  nextWorldTime   = worldTime + 1
+  committed        = foldr cacheCommitter worldState wcList
+  nextWorldTime    = worldTime + 1
   nextWorldHistory = IM.insert nextWorldTime newNextEpochRow targetWorldHistory
    where
     targetWorldHistory = worldHistory committed
@@ -76,4 +78,105 @@ runSpoolTree aWorld@World {..} aSpoolTree@SpoolTree {..} =
 
 runSpoolInstance
   :: World -> SpoolInstance -> WorldCache -> ((SIIS, SpoolInstance), WorldCache)
-runSpoolInstance = notYetImpl "runSpoolInstance"
+runSpoolInstance world@World {..} si@SI {..} wCache =
+  ((siis, newSI), newWorldCache)
+ where
+  -- TODO: Change `StrValue "Retain"` as a named constant
+  iLocalCache = csInitLocalVars $ worldSpools IM.! siSpoolID
+  isResume    = maybe False getBool $ IM.lookup resumeCodeID siLocalVars
+  iLocalVars  = IM.insert resumeCodeID (BoolValue False) siLocalVars
+  ((newWorldCache, newLocalVars, newLocalCache, newRG), restCEREScript) =
+    runCEREScript world si (wCache, iLocalVars, iLocalCache, siRG) siRestScript
+  siisCode = maybe "Retain" getStr $ IM.lookup retainCodeID newLocalCache
+  (doAbolish, doInit, nextLocalVars) = case siisCode of
+    "Retain"  -> (False, False, newLocalVars)
+    "Forget"  -> (False, False, blankVM)
+    -- FIXME: Add SI initiation logic
+    "Init"    -> (False, True, blankVM)
+    "Abolish" -> (True, False, blankVM)
+   where
+  -- NOTE: SIJump takes relative time-slot
+  jumpTarget = maybe 1 getInt $ IM.lookup jumpOffsetID newLocalCache
+  siis       = if doAbolish || null (restCEREScript :: CEREScript)
+    then SIEnd
+    else SIJump jumpTarget
+  nextCEREScript = if doInit then newCEREScript else restCEREScript
+   where
+    newCEREScript =
+      maybe
+          (  error
+          $  "[ERROR]<runSpoolInstance :=: newCEREScript> No such SpoolID("
+          ++ show siSpoolID
+          ++ ") in worldSpools"
+          )
+          csScript
+        $ IM.lookup siSpoolID worldSpools
+  newSI = si { siLocalVars  = newLocalVars
+             , siRestScript = nextCEREScript
+             , siRG         = newRG
+             }
+
+
+runCEREScript
+  :: World
+  -> SpoolInstance
+  -> (WorldCache, LocalVariables, LocalCache, RG)
+  -> CEREScript
+  -> ((WorldCache, LocalVariables, LocalCache, RG), CEREScript)
+runCEREScript aWorld@World {..} aSI@SI {..} cState cScript = runCEREScriptSub
+  cState
+  cScript
+ where
+  runCEREScriptSub cState@(wc@(hCache, dCache, vCache), localVars, localCache, rg) []
+    = (cState, [])
+  runCEREScriptSub cState@(wc@(hCache, dCache, vCache), localVars, localCache, rg) (ceres : cScript)
+    = if sp
+      then ((nextWC, nextLocalVars, nextLocalCache, nextRG), nextCEREScript)
+      else runCEREScriptSub (nextWC, nextLocalVars, nextLocalCache, nextRG)
+                            nextCEREScript
+    -- NOTE: si == True, then end runCEREScript
+
+
+   where
+    (newWC, newLocalVars, newLocalCache, newRG) =
+      runInstruction aWorld aSI cState ceres
+    -- TODO: Check Stop or Pause
+    spCode        = maybe "" getStr $ IM.lookup spCodeID newLocalCache
+    sp            = spCode == "Stop" || spCode == "Pause"
+    retentionCode = case spCode of
+      "Stop"    -> "Abolish"
+      -- TODO: Not sure do I need to identify whether this is "Pause"
+      "Pause"   -> "Retain"
+      otherwise -> maybe "Retain" getStr $ IM.lookup retainCodeID newLocalCache
+    -- TODO: Check the instruction is executed or not
+    resumeFlag     = maybe False getBool $ IM.lookup resumeCodeID newLocalVars
+    nextCEREScript = if resumeFlag then (ceres : cScript) else cScript
+    nextWC         = newWC
+    nextLocalVars =
+      IM.insert retainCodeID (StrValue retentionCode) newLocalVars
+    nextLocalCache = newLocalCache
+    nextRG         = newRG
+
+
+runInstruction
+  :: World
+  -> SpoolInstance
+  -> (WorldCache, LocalVariables, LocalCache, RG)
+  -> CERES
+  -> (WorldCache, LocalVariables, LocalCache, RG)
+runInstruction aWorld aSI cState aCERES
+  = case aCERES of
+    (CRSInitVariable      vpA vpB)     -> crsInitVariable     aWorld aSI cState vpA vpB
+    (CRSSetValue          vpA vpB)     -> crsSetValue         aWorld aSI cState vpA vpB
+    (CRSDeleteVariable    vp)          -> crsDeleteVariable   aWorld aSI cState vp
+    (CRSModifyValue       vpA vpB cOp) -> crsModifyValue      aWorld aSI cState vpA vpB cOp
+    (CRSCopyValue         vpA vpB)     -> crsCopyValue        aWorld aSI cState vpA vpB
+    (CRSConvertValue      vp vt)       -> crsConvertValue     aWorld aSI cState vp vt
+    (CRSConvertValueBy    vpA vpB)     -> crsConvertValueBy   aWorld aSI cState vpA vpB
+    (CRSConvertValueWith  vpA vpB)     -> crsConvertValueWith aWorld aSI cState vpA vpB
+    (CRSRandom            vpA vpB)     -> crsRandom           aWorld aSI cState vpA vpB
+    (CRSElapseTime        vpA vpB)     -> crsElapsedTime      aWorld aSI cState vpA vpB
+    (CRSSPControl         vp)          -> crsSPControl        aWorld aSI cState vp
+    (CRSSIControl         vpA vpB)     -> crsSIControl        aWorld aSI cState vpA vpB
+    (CRSSIInit            vpA vpB vpC) -> crsSIInit           aWorld aSI cState vpA vpB vpC
+    _ -> error "[ERROR]<runInstruction :=: otherwise> Can't be reached"

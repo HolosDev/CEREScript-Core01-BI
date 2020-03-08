@@ -6,4 +6,4 @@ packages:
 
 extra-deps:
 - github: MiRiS-Project/CEREScript-Core01
-  commit: 8815baed467c59af27679d6462b7156f702d0fcd
+  commit: bc72ec4b78937e2531c1b9d94ae28595c84a79df
