@@ -94,6 +94,7 @@ instance TextShow SpoolInstance where
       <> ")"
 
 type LocalState = ValueMap
+type LocalCache = ValueMap
 
 type SIIS = SpoolInstanceInheritStatus
 data SpoolInstanceInheritStatus = SIJump Int | SIEnd
