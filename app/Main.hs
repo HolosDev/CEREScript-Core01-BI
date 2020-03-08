@@ -39,7 +39,7 @@ initializer = do
   let iWorldState = WorldState Nothing iHistoricTable iValueMap iValueMap rGen
   T.putStrLn " - = Set SpoolInstances"
   let iSITable = IM.empty
-  let iWorld = World iSpools iValueList iWorldState iSITable 0
+  let iWorld = World iSpools iValueList iWorldState iSITable 0 256
   let newWorld = runSimulator 16 iWorld
   print newWorld
 

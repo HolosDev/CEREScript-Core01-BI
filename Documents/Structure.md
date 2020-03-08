@@ -86,6 +86,7 @@ Stores only variables which should not be inherited after time-slot
   * "Init": keep the `SpoolInstance`, but do not keep `LocalVariables`
   * "Abolish": end the `SpoolInstance`
 * 1: Jump the retained `SpoolInstance`
+* 2: Elapsed InternalTime in time-slot
 * 16~23: Add readVP/writeVP in SpoolInstance
   * Usually, BI does not add a new VP when Spool initiate Variable
 * 24~31: Remove readVP/writeVP in SpoolInstance

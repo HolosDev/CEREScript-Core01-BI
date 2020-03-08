@@ -29,6 +29,7 @@ data World = World
   , worldState     :: WorldState
   , worldSITable   :: SpoolInstanceTable
   , worldTime      :: Time
+  , worldTSSize    :: InternalTime
   } deriving Show
 
 -- | ValueList remembers type of each Variable
@@ -104,3 +105,4 @@ data SpoolInstanceInheritStatus = SIJump Int | SIEnd
 
 -- NOTE: Alias for abstract PRNG type
 type RG = SMGen
+type InternalTime = Int
