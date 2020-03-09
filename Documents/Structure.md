@@ -68,7 +68,7 @@ Without explicit `DeleteVariable` instruction, a new Time-Slot would copy every 
 
 ## Reserved Storage
 
-### WorldState
+### WorldVars
 
 * 0: Simulation Control
   * "Run": run next Time-Slot
@@ -77,9 +77,14 @@ Without explicit `DeleteVariable` instruction, a new Time-Slot would copy every 
 
 ### LocalVariables
 
-* 0: ExecutingTime for a next CERES instruction
+* 0: Reserved for Control Flow
+* 1: Reserved for Control Flow
+* 2: ExecutingTime for a next CERES instruction
   * Need to be initialized before add in SITable
-* 2: Elapsed InternalTime in time-slot
+* 3: Elapsed InternalTime in time-slot
+* 4: Resume or not
+  * True: do not get a new executingTime
+  * otherwise: get a new executingTime
 
 ### LocalCache
 
@@ -87,10 +92,14 @@ Stores only variables which should not be inherited after time-slot
 
 * 0: Retention code of `SpoolInstance`
   * "Retain": keep the `SpoolInstance`
-  * "Init": keep the `SpoolInstance`, but do not keep `LocalVariables`
+  * "Forget": keep the `SpoolInstance`, but do not keep `LocalVariables`
+  * "Init": Initiate `CEREScript` and `LocalVariables`
   * "Abolish": end the `SpoolInstance`
 * 1: Jump the retained `SpoolInstance`
-* 2: Elapsed InternalTime in time-slot
+* 4: Stop or Pause immediately
+  * "Stop": stop and remove rest CEREScript
+  * "Pause": pause in this time-slot
+  * otherwise: continue
 * 16~23: Add readVP/writeVP in SpoolInstance
   * Usually, BI does not add a new VP when Spool initiate Variable
 * 24~31: Remove readVP/writeVP in SpoolInstance
