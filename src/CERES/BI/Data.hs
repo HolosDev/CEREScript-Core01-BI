@@ -11,14 +11,13 @@ import qualified Data.Text                     as T
 import qualified Data.Text.Lazy                as TL
 import qualified Data.Text.Lazy.IO             as TL
 
-import           System.Random.SplitMix
-
 import           TextShow
 
 import           Data.CERES.Script
 import           Data.CERES.Type
 import           Data.CERES.Value
 
+import           CERES.BI.Type
 import           CERES.BI.Data.Environment
 
 
@@ -105,7 +104,3 @@ instance TextShow SpoolInstance where
 type SIIS = SpoolInstanceInheritStatus
 -- NOTE: SIJump takes relative time-slot
 data SpoolInstanceInheritStatus = SIJump Int | SIEnd
-
--- NOTE: Alias for abstract PRNG type
-type RG = SMGen
-type InternalTime = Int

@@ -20,6 +20,8 @@ import           Data.CERES.Type
 import           Data.CERES.Value
 import           Data.CERES.Value.Error
 
+import           CERES.BI.Type
+
 
 -- TODO: How to distinguish
 --  * 1. Referred, Added, or Changed
@@ -38,8 +40,7 @@ type VariableCache = RWMVMap
 type LocalVariables = ValueMap
 type LocalCache = ValueMap
 
-type VV = (VPosition, RWMV)
-type VVMap = Map VPosition RWMV
+type Env = (WorldCache, LocalVariables, LocalCache, RG)
 
 data RW a = R a | W a | RW a deriving (Eq, Ord)
 
