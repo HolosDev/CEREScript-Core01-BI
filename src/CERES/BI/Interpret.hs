@@ -123,11 +123,7 @@ runSpoolInstance world@World {..} si@SI {..} wCache =
 
 
 runCEREScript
-  :: World
-  -> SpoolInstance
-  -> (WorldCache, LocalVariables, LocalCache, RG)
-  -> CEREScript
-  -> ((WorldCache, LocalVariables, LocalCache, RG), CEREScript)
+  :: World -> SpoolInstance -> Env -> CEREScript -> (Env, CEREScript)
 runCEREScript aWorld@World {..} aSI@SI {..} cState cScript = runCEREScriptSub
   cState
   cScript
@@ -140,9 +136,6 @@ runCEREScript aWorld@World {..} aSI@SI {..} cState cScript = runCEREScriptSub
       else runCEREScriptSub (nextWC, nextLocalVars, nextLocalCache, nextRG)
                             nextCEREScript
     -- NOTE: si == True, then end runCEREScript
-
-
-
    where
     (newWC, newLocalVars, newLocalCache, newRG) =
       runInstruction aWorld aSI cState ceres
@@ -164,12 +157,7 @@ runCEREScript aWorld@World {..} aSI@SI {..} cState cScript = runCEREScriptSub
     nextRG         = newRG
 
 
-runInstruction
-  :: World
-  -> SpoolInstance
-  -> (WorldCache, LocalVariables, LocalCache, RG)
-  -> CERES
-  -> (WorldCache, LocalVariables, LocalCache, RG)
+runInstruction :: World -> SpoolInstance -> Env -> CERES -> Env
 runInstruction aWorld aSI cState aCERES
   = case aCERES of
     (CRSInitVariable      vpA vpB)     -> crsInitVariable     aWorld aSI cState vpA vpB

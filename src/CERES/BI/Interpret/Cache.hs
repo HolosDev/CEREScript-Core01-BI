@@ -28,6 +28,9 @@ import           CERES.BI.Interpret.Spool
 import           Debug
 import           Util
 
+
+type Env = (WorldCache, LocalVariables, LocalCache, RG)
+
 -- TODO: Not using foldr, but Refactoring to use getValues* instead of getValue
 -- TODO: But using getValues* is hard to use
 cacheMaker :: SpoolTree -> World -> WorldCache
