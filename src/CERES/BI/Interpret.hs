@@ -99,7 +99,6 @@ runSpoolInstance world@World {..} si@SI {..} wCache =
     "Init"    -> (False, True, blankVM)
     "Abolish" -> (True, False, blankVM)
     _ -> error "[ERROR]<runSpoolInstance :=: _> Undefined Retention Code"
-   where
   -- NOTE: SIJump takes relative time-slot
   jumpTarget = maybe 1 getInt $ IM.lookup jumpOffsetID newLocalCache
   siis       = if doAbolish || null (restCEREScript :: CEREScript)
@@ -124,9 +123,7 @@ runSpoolInstance world@World {..} si@SI {..} wCache =
 
 runCEREScript
   :: World -> SpoolInstance -> Env -> CEREScript -> (Env, CEREScript)
-runCEREScript aWorld@World {..} aSI@SI {..} cState cScript = runCEREScriptSub
-  cState
-  cScript
+runCEREScript aWorld@World {..} aSI@SI {..} = runCEREScriptSub
  where
   runCEREScriptSub cState@(wc@(hCache, dCache, vCache), localVars, localCache, rg) []
     = (cState, [])
@@ -146,7 +143,7 @@ runCEREScript aWorld@World {..} aSI@SI {..} cState cScript = runCEREScriptSub
       "Stop"    -> "Abolish"
       -- TODO: Not sure do I need to identify whether this is "Pause"
       "Pause"   -> "Retain"
-      otherwise -> maybe "Retain" getStr $ IM.lookup retainCodeID newLocalCache
+      _ -> maybe "Retain" getStr $ IM.lookup retainCodeID newLocalCache
     -- TODO: Check the instruction is executed or not
     resumeFlag     = maybe False getBool $ IM.lookup resumeCodeID newLocalVars
     nextCEREScript = if resumeFlag then (ceres : cScript) else cScript
