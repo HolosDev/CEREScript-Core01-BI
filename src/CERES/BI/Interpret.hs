@@ -173,6 +173,7 @@ runInstruction
 runInstruction aWorld aSI cState aCERES
   = case aCERES of
     (CRSInitVariable      vpA vpB)     -> crsInitVariable     aWorld aSI cState vpA vpB
+    (CRSInitVariableAt    vpA vpB)     -> crsInitVariableAt   aWorld aSI cState vpA vpB
     (CRSSetValue          vpA vpB)     -> crsSetValue         aWorld aSI cState vpA vpB
     (CRSDeleteVariable    vp)          -> crsDeleteVariable   aWorld aSI cState vp
     (CRSModifyValue       vpA vpB cOp) -> crsModifyValue      aWorld aSI cState vpA vpB cOp

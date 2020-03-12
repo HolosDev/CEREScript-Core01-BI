@@ -29,6 +29,9 @@ import           Debug
 crsInitVariable :: World -> SpoolInstance -> (WorldCache, LocalVariables, LocalCache, RG) -> VPosition -> VPosition -> (WorldCache, LocalVariables, LocalCache, RG)
 crsInitVariable     World {..} SI {..} cState@(wc@(hCache, dCache, vCache), localVars, localCache, rg) vpA vpB = undefined
 
+crsInitVariableAt :: World -> SpoolInstance -> (WorldCache, LocalVariables, LocalCache, RG) -> VPosition -> VPosition -> (WorldCache, LocalVariables, LocalCache, RG)
+crsInitVariableAt   World {..} SI {..} cState@(wc@(hCache, dCache, vCache), localVars, localCache, rg) vpA vpB = undefined
+
 crsSetValue :: World -> SpoolInstance -> (WorldCache, LocalVariables, LocalCache, RG) -> VPosition -> VPosition -> (WorldCache, LocalVariables, LocalCache, RG)
 crsSetValue         World {..} SI {..} cState@(wc@(hCache, dCache, vCache), localVars, localCache, rg) vpA vpB = undefined
 

@@ -6,4 +6,4 @@ packages:
 
 extra-deps:
 - github: HolosDev/CEREScript-Core01
-  commit: bc72ec4b78937e2531c1b9d94ae28595c84a79df
+  commit: 3885fcb88d9838891ca04ad558bab11985a2a7db
