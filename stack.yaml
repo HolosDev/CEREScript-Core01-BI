@@ -5,5 +5,5 @@ packages:
 #- /AoDw/CEREScript/CEREScript-Core01
 
 extra-deps:
-- github: MiRiS-Project/CEREScript-Core01
+- github: HolosDev/CEREScript-Core01
   commit: bc72ec4b78937e2531c1b9d94ae28595c84a79df
