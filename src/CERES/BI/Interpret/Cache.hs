@@ -62,6 +62,8 @@ cacheMaker SpoolTree {..} World {..} = S.foldr cacheMakerSub blankCache vpSet
           (hCache, dCache, vCache) = aCache
           newVCache                = setRWMVMap variableID R mValue vCache
       in  (hCache, dCache, newVCache)
+    AtHere -> aCache
+    AtNull -> aCache
     _ ->
       error $ "[ERROR]<cacheMaker> Not compatible for " ++ show variablePlace
 
@@ -100,6 +102,7 @@ setEnvBy _ AtLocal idx mode mValue (wCache, localVars, localCache, rg) =
 setEnvBy _ AtCache idx mode mValue (wCache, localVars, localCache, rg) =
   (wCache, localVars, newLocalCache, rg)
   where newLocalCache = setVMap idx mValue localCache
+setEnvBy _ AtNull _ _ _ cState = cState
 setEnvBy _ AtHere _ _ _ _ = error "[ERROR]<setEnvBy :=: AtHere> Can't set at AtHere"
 
 setHCacheBy
@@ -147,6 +150,8 @@ getEnvBy _ AtDict idx ((_, dCache, _), _, _, _) = getRWMVMap idx dCache
 getEnvBy _ AtVar idx ((_, _, vCache), _, _, _) = getRWMVMap idx vCache
 getEnvBy _ AtLocal idx (_, localVars, _, _) = getVMap idx localVars
 getEnvBy _ AtCache idx (_, _, localCache, _) = getVMap idx localCache
+getEnvBy _ AtNull idx (_, _, localCache, _) = error "[ERROR]<getEnvBy :=: AtNull> Can't access AtNull"
+getEnvBy _ _ _ _ = error "[ERROR]<getEnvBy :=: otherwise> Can't reach"
 
 getHCacheBy :: Time -> VariablePlace -> ID -> HistoricCache -> Value
 getHCacheBy _         (AtWorld time) = getHCacheSub time
