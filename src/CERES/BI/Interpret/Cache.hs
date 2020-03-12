@@ -67,6 +67,33 @@ cacheMaker SpoolTree {..} World {..} = S.foldr cacheMakerSub blankCache vpSet
     _ ->
       error $ "[ERROR]<cacheMaker> Not compatible for " ++ show variablePlace
 
+setEnv
+  :: Time
+  -> VariablePlace
+  -> ID
+  -> (Maybe Value -> RWMV)
+  -> Maybe Value
+  -> Env
+  -> Env
+setEnv worldTime vp@(AtWorld _) idx mode mValue ((hCache, dCache, vCache), localVars, localCache, rg)
+  = ((newHCache, dCache, vCache), localVars, localCache, rg)
+  where newHCache = setHCache worldTime vp idx mode mValue hCache
+setEnv worldTime vp@(AtTime _) idx mode mValue ((hCache, dCache, vCache), localVars, localCache, rg)
+  = ((newHCache, dCache, vCache), localVars, localCache, rg)
+  where newHCache = setHCache worldTime vp idx mode mValue hCache
+setEnv _ AtDict idx mode mValue ((hCache, dCache, vCache), localVars, localCache, rg)
+  = ((hCache, newDCache, vCache), localVars, localCache, rg)
+  where newDCache = setRWMVMap idx mode mValue dCache
+setEnv _ AtVar idx mode mValue ((hCache, dCache, vCache), localVars, localCache, rg)
+  = ((hCache, dCache, newVCache), localVars, localCache, rg)
+  where newVCache = setRWMVMap idx mode mValue vCache
+setEnv _ AtLocal idx mode mValue (wCache, localVars, localCache, rg) =
+  (wCache, newLocalVars, localCache, rg)
+  where newLocalVars = setVMap idx mValue localVars
+setEnv _ AtCache idx mode mValue (wCache, localVars, localCache, rg) =
+  (wCache, localVars, newLocalCache, rg)
+  where newLocalCache = setVMap idx mValue localCache
+
 setHCache
   :: Time
   -> VariablePlace
@@ -77,7 +104,8 @@ setHCache
   -> HistoricCache
 setHCache _         (AtWorld time) = setHCacheSub time
 setHCache worldTime (AtTime  time) = setHCacheSub (worldTime + time)
-setHCache _ vp = error $ "[ERROR]<setHCache> Given improper VariablePlace" ++ show vp
+setHCache _ vp =
+  error $ "[ERROR]<setHCache> Given improper VariablePlace" ++ show vp
 
 setHCacheSub
   :: Time
@@ -88,14 +116,55 @@ setHCacheSub
   -> HistoricCache
 setHCacheSub time idx mode mValue hCache = newHCache
  where
-  vMap :: IntMap RWMV
-  vMap = fromMaybe IM.empty (IM.lookup time hCache)
-  newVMap :: IntMap RWMV
-  newVMap   = IM.insert idx (mode mValue) vMap
-  newHCache = IM.insert time newVMap hCache
+  rwmvMap    = fromMaybe IM.empty (IM.lookup time hCache)
+  newRWMVMap = setRWMVMap idx mode mValue rwmvMap
+  newHCache  = IM.insert time newRWMVMap hCache
 
 setRWMVMap :: ID -> (Maybe Value -> RWMV) -> Maybe Value -> RWMVMap -> RWMVMap
 setRWMVMap idx mode mValue = IM.insert idx (mode mValue)
+
+setVMap :: ID -> Maybe Value -> ValueMap -> ValueMap
+setVMap idx mValue = IM.update (const mValue) idx
+
+
+getEnv :: Time -> VariablePlace -> ID -> Env -> Value
+getEnv worldTime vp@(AtWorld _) idx ((hCache, _, _), _, _, _) =
+  getHCache worldTime vp idx hCache
+getEnv worldTime vp@(AtTime _) idx ((hCache, _, _), _, _, _) =
+  getHCache worldTime vp idx hCache
+getEnv _ AtDict idx ((_, dCache, _), _, _, _) = getRWMVMap idx dCache
+getEnv _ AtVar idx ((_, _, vCache), _, _, _) = getRWMVMap idx vCache
+getEnv _ AtLocal idx (_, localVars, _, _) = getVMap idx localVars
+getEnv _ AtCache idx (_, _, localCache, _) = getVMap idx localCache
+
+getHCache :: Time -> VariablePlace -> ID -> HistoricCache -> Value
+getHCache _         (AtWorld time) = getHCacheSub time
+getHCache worldTime (AtTime  time) = getHCacheSub (worldTime + time)
+getHCache _ vp =
+  error $ "[ERROR]<getHCache> Given improper VariablePlace" ++ show vp
+
+getHCacheSub :: Time -> ID -> HistoricCache -> Value
+getHCacheSub time idx hCache = fromMaybe
+  (ErrValue "[ERROR]<getHCacheSub> No such Value")
+  found
+ where
+  found :: Maybe Value
+  found = IM.lookup time hCache >>= IM.lookup idx >>= runRW
+
+getRWMVMap :: ID -> RWMVMap -> Value
+getRWMVMap idx rwmvMap = fromMaybe
+  (ErrValue "[ERROR]<getRWMVMap> No such Value")
+  found
+ where
+  found :: Maybe Value
+  found = IM.lookup idx rwmvMap >>= runRW
+
+getVMap :: ID -> ValueMap -> Value
+getVMap id vMap = fromMaybe (ErrValue "[ERROR]<getVMap> No such Value") found
+ where
+  found :: Maybe Value
+  found = IM.lookup id vMap
+
 
 -- TODO: This style is for foldr, we may change this better
 -- TODO: Change this for when many WorldCache is given as List or etc.
