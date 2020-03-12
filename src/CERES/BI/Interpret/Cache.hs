@@ -41,7 +41,7 @@ cacheMaker SpoolTree {..} World {..} = S.foldr cacheMakerSub blankCache vpSet
         mValue                   = getHValueFromWS worldState time variableID
         (hCache, dCache, vCache) = aCache
         newHCache =
-          setHCache worldTime variablePlace variableID R mValue hCache
+          setHCacheBy worldTime variablePlace variableID R mValue hCache
       in
         (newHCache, dCache, vCache)
     AtTime time ->
@@ -49,7 +49,7 @@ cacheMaker SpoolTree {..} World {..} = S.foldr cacheMakerSub blankCache vpSet
         mValue = getHValueFromWS worldState (worldTime + time) variableID
         (hCache, dCache, vCache) = aCache
         newHCache =
-          setHCache worldTime variablePlace variableID R mValue hCache
+          setHCacheBy worldTime variablePlace variableID R mValue hCache
       in
         (newHCache, dCache, vCache)
     AtDict ->
@@ -65,7 +65,7 @@ cacheMaker SpoolTree {..} World {..} = S.foldr cacheMakerSub blankCache vpSet
     _ ->
       error $ "[ERROR]<cacheMaker> Not compatible for " ++ show variablePlace
 
-setEnv
+setEnvBy
   :: Time
   -> VariablePlace
   -> ID
@@ -73,26 +73,26 @@ setEnv
   -> Maybe Value
   -> Env
   -> Env
-setEnv worldTime vp@(AtWorld _) idx mode mValue ((hCache, dCache, vCache), localVars, localCache, rg)
+setEnvBy worldTime vp@(AtWorld _) idx mode mValue ((hCache, dCache, vCache), localVars, localCache, rg)
   = ((newHCache, dCache, vCache), localVars, localCache, rg)
-  where newHCache = setHCache worldTime vp idx mode mValue hCache
-setEnv worldTime vp@(AtTime _) idx mode mValue ((hCache, dCache, vCache), localVars, localCache, rg)
+  where newHCache = setHCacheBy worldTime vp idx mode mValue hCache
+setEnvBy worldTime vp@(AtTime _) idx mode mValue ((hCache, dCache, vCache), localVars, localCache, rg)
   = ((newHCache, dCache, vCache), localVars, localCache, rg)
-  where newHCache = setHCache worldTime vp idx mode mValue hCache
-setEnv _ AtDict idx mode mValue ((hCache, dCache, vCache), localVars, localCache, rg)
+  where newHCache = setHCacheBy worldTime vp idx mode mValue hCache
+setEnvBy _ AtDict idx mode mValue ((hCache, dCache, vCache), localVars, localCache, rg)
   = ((hCache, newDCache, vCache), localVars, localCache, rg)
   where newDCache = setRWMVMap idx mode mValue dCache
-setEnv _ AtVar idx mode mValue ((hCache, dCache, vCache), localVars, localCache, rg)
+setEnvBy _ AtVar idx mode mValue ((hCache, dCache, vCache), localVars, localCache, rg)
   = ((hCache, dCache, newVCache), localVars, localCache, rg)
   where newVCache = setRWMVMap idx mode mValue vCache
-setEnv _ AtLocal idx mode mValue (wCache, localVars, localCache, rg) =
+setEnvBy _ AtLocal idx mode mValue (wCache, localVars, localCache, rg) =
   (wCache, newLocalVars, localCache, rg)
   where newLocalVars = setVMap idx mValue localVars
-setEnv _ AtCache idx mode mValue (wCache, localVars, localCache, rg) =
+setEnvBy _ AtCache idx mode mValue (wCache, localVars, localCache, rg) =
   (wCache, localVars, newLocalCache, rg)
   where newLocalCache = setVMap idx mValue localCache
 
-setHCache
+setHCacheBy
   :: Time
   -> VariablePlace
   -> ID
@@ -100,9 +100,9 @@ setHCache
   -> Maybe Value
   -> HistoricCache
   -> HistoricCache
-setHCache _         (AtWorld time) = setHCacheSub time
-setHCache worldTime (AtTime  time) = setHCacheSub (worldTime + time)
-setHCache _ vp =
+setHCacheBy _         (AtWorld time) = setHCacheSub time
+setHCacheBy worldTime (AtTime  time) = setHCacheSub (worldTime + time)
+setHCacheBy _ vp =
   error $ "[ERROR]<setHCache> Given improper VariablePlace" ++ show vp
 
 setHCacheSub
@@ -125,20 +125,20 @@ setVMap :: ID -> Maybe Value -> ValueMap -> ValueMap
 setVMap idx mValue = IM.update (const mValue) idx
 
 
-getEnv :: Time -> VariablePlace -> ID -> Env -> Value
-getEnv worldTime vp@(AtWorld _) idx ((hCache, _, _), _, _, _) =
-  getHCache worldTime vp idx hCache
-getEnv worldTime vp@(AtTime _) idx ((hCache, _, _), _, _, _) =
-  getHCache worldTime vp idx hCache
-getEnv _ AtDict idx ((_, dCache, _), _, _, _) = getRWMVMap idx dCache
-getEnv _ AtVar idx ((_, _, vCache), _, _, _) = getRWMVMap idx vCache
-getEnv _ AtLocal idx (_, localVars, _, _) = getVMap idx localVars
-getEnv _ AtCache idx (_, _, localCache, _) = getVMap idx localCache
+getEnvBy :: Time -> VariablePlace -> ID -> Env -> Value
+getEnvBy worldTime vp@(AtWorld _) idx ((hCache, _, _), _, _, _) =
+  getHCacheBy worldTime vp idx hCache
+getEnvBy worldTime vp@(AtTime _) idx ((hCache, _, _), _, _, _) =
+  getHCacheBy worldTime vp idx hCache
+getEnvBy _ AtDict idx ((_, dCache, _), _, _, _) = getRWMVMap idx dCache
+getEnvBy _ AtVar idx ((_, _, vCache), _, _, _) = getRWMVMap idx vCache
+getEnvBy _ AtLocal idx (_, localVars, _, _) = getVMap idx localVars
+getEnvBy _ AtCache idx (_, _, localCache, _) = getVMap idx localCache
 
-getHCache :: Time -> VariablePlace -> ID -> HistoricCache -> Value
-getHCache _         (AtWorld time) = getHCacheSub time
-getHCache worldTime (AtTime  time) = getHCacheSub (worldTime + time)
-getHCache _ vp =
+getHCacheBy :: Time -> VariablePlace -> ID -> HistoricCache -> Value
+getHCacheBy _         (AtWorld time) = getHCacheSub time
+getHCacheBy worldTime (AtTime  time) = getHCacheSub (worldTime + time)
+getHCacheBy _ vp =
   error $ "[ERROR]<getHCache> Given improper VariablePlace" ++ show vp
 
 getHCacheSub :: Time -> ID -> HistoricCache -> Value
