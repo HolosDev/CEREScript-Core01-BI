@@ -65,6 +65,15 @@ cacheMaker SpoolTree {..} World {..} = S.foldr cacheMakerSub blankCache vpSet
     _ ->
       error $ "[ERROR]<cacheMaker> Not compatible for " ++ show variablePlace
 
+setEnv
+  :: Time
+  -> VPosition
+  -> (Maybe Value -> RWMV)
+  -> Maybe Value
+  -> Env
+  -> Env
+setEnv worldTime (VP idx vp _) = setEnvBy worldTime vp idx
+
 setEnvBy
   :: Time
   -> VariablePlace
@@ -91,6 +100,7 @@ setEnvBy _ AtLocal idx mode mValue (wCache, localVars, localCache, rg) =
 setEnvBy _ AtCache idx mode mValue (wCache, localVars, localCache, rg) =
   (wCache, localVars, newLocalCache, rg)
   where newLocalCache = setVMap idx mValue localCache
+setEnvBy _ AtHere _ _ _ _ = error "[ERROR]<setEnvBy :=: AtHere> Can't set at AtHere"
 
 setHCacheBy
   :: Time
@@ -124,6 +134,9 @@ setRWMVMap idx mode mValue = IM.insert idx (mode mValue)
 setVMap :: ID -> Maybe Value -> ValueMap -> ValueMap
 setVMap idx mValue = IM.update (const mValue) idx
 
+
+getEnv :: Time -> VPosition -> Env -> Value
+getEnv worldTime (VP idx vp here) env = if vp == AtHere then here else getEnvBy worldTime vp idx env
 
 getEnvBy :: Time -> VariablePlace -> ID -> Env -> Value
 getEnvBy worldTime vp@(AtWorld _) idx ((hCache, _, _), _, _, _) =
