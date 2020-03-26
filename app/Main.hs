@@ -23,7 +23,8 @@ main = do
   T.putStrLn "CEREScript-Core Basic Interpreter"
   T.putStrLn " - Initializing World"
   iWorld <- initializer
-  let result = runWorld iWorld
+  let newWorld = runSimulator 16 iWorld
+  print newWorld
   T.putStrLn "End"
 
 initializer = do
@@ -40,7 +41,5 @@ initializer = do
   T.putStrLn " - = Set SpoolInstances"
   let iSITable = IM.empty
   let iWorld = World iSpools iValueList iWorldState iSITable 0 256
-  let newWorld = runSimulator 16 iWorld
-  print newWorld
+  return iWorld
 
-runWorld = error "[TODO]<runWorld> Not yet implemented"
