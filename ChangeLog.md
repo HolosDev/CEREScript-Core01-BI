@@ -6,6 +6,7 @@ Changelog for CEREScript-Core01-BI
 ### Add
 * Implement each `crs*` instruction function
 
+
 ### Change
 * Change design for backpack compatibility
 * Study how to handle readVP/writeVP in CERESSpool
@@ -13,6 +14,18 @@ Changelog for CEREScript-Core01-BI
 * Implement parallel `updateValuesToVT`
 * Use `getValues*` instead of using `foldr` in `cacheMaker`
 * Implement better `Eq` instance for handling `AtWorld` and `AtTime` simultaneously
+* Move Move `get*Cache` and `set*Cache` functions to `CERES.BI.Data.*`
+
+
+## 0.4.0.0 -- 2020-03-12
+
+### Added
+* Implement new `set*` and `get*` for Cache
+* Define RG type and move to `CERES.BI.Type`
+
+### Changed
+* Update dependency of CEREScript-Core 0.9.0.0
+* Change old function name `get*` and `set*` to `get*By` and `set*By`
 
 
 ## 0.3.1.0 -- 2020-03-08
