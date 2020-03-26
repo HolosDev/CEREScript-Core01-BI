@@ -5,6 +5,7 @@ Changelog for CEREScript-Core01-BI
 
 ### Add
 * Implement each `crs*` instruction function
+* Add `Util.Random` module for random function aliases
 
 
 ### Change
@@ -15,6 +16,12 @@ Changelog for CEREScript-Core01-BI
 * Use `getValues*` instead of using `foldr` in `cacheMaker`
 * Implement better `Eq` instance for handling `AtWorld` and `AtTime` simultaneously
 * Move Move `get*Cache` and `set*Cache` functions to `CERES.BI.Data.*`
+
+
+## 0.5.0.0 -- 2020-03-26
+
+### Changed
+* Update dependency of CEREScript-Core 0.10.0.0
 
 
 ## 0.4.0.0 -- 2020-03-12
