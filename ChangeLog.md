@@ -18,6 +18,15 @@ Changelog for CEREScript-Core01-BI
 * Move Move `get*Cache` and `set*Cache` functions to `CERES.BI.Data.*`
 
 
+## 0.6.0.0 -- 2020-03-28
+
+### Added
+* Implement missing instruction functions template
+
+### Changed
+* Update dependency of CEREScript-Core 0.11.0.0
+
+
 ## 0.5.0.0 -- 2020-03-26
 
 ### Changed
