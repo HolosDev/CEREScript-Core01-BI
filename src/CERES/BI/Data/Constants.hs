@@ -8,24 +8,25 @@ import           Data.CERES.Value
 
 import           CERES.BI.Data
 
-indexTimeToEnd :: ID
+
+indexTimeToEnd :: Idx
 indexTimeToEnd = 0
 
 
 -- WorldVars
-wsSimulationControlID :: ID
-wsSimulationControlID = 0
+wsSimulationControlIdx :: Idx
+wsSimulationControlIdx = 0
 
 -- LocalVariables
-cf0ID, cf1ID, executingTimeID, elapsedInternalTimeID, resumeCodeID :: ID
-cf0ID = 0
-cf1ID = 1
-executingTimeID = 2
-elapsedInternalTimeID = 3
-resumeCodeID = 4
+cf0Idx, cf1Idx, executingTimeIdx, elapsedInternalTimeIdx, resumeCodeIdx :: Idx
+cf0Idx = 0
+cf1Idx = 1
+executingTimeIdx = 2
+elapsedInternalTimeIdx = 3
+resumeCodeIdx = 4
 
 -- LocalCache
-retainCodeID, jumpOffsetID, spCodeID :: ID
-retainCodeID = 0
-jumpOffsetID = 1
-spCodeID = 4
+retainCodeIdx, jumpOffsetIdx, spCodeIdx :: Idx
+retainCodeIdx = 0
+jumpOffsetIdx = 1
+spCodeIdx = 4

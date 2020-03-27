@@ -37,77 +37,59 @@ cacheMaker SpoolTree {..} World {..} = S.foldr cacheMakerSub blankCache vpSet
  where
   blankCache = (IM.empty, IM.empty, IM.empty)
   cacheMakerSub vp aCache = case vp of
-    (AtWorld time idx) ->
-      let
-        mValue                   = getHValueFromWS worldState time idx
-        (hCache, dCache, vCache) = aCache
-        newHCache =
-          setHCache time idx R mValue hCache
-      in
-        (newHCache, dCache, vCache)
+    (AtWrld time idx) ->
+      let mValue                   = getHValueFromWS worldState time idx
+          (hCache, dCache, vCache) = aCache
+          newHCache                = setHCache time idx R mValue hCache
+      in  (newHCache, dCache, vCache)
     (AtTime time idx) ->
-      let
-        mValue = getHValueFromWS worldState (worldTime + time) idx
-        (hCache, dCache, vCache) = aCache
-        newHCache =
-          setHCache worldTime idx R mValue hCache
-      in
-        (newHCache, dCache, vCache)
+      let mValue = getHValueFromWS worldState (worldTime + time) idx
+          (hCache, dCache, vCache) = aCache
+          newHCache = setHCache worldTime idx R mValue hCache
+      in  (newHCache, dCache, vCache)
     (AtDict idx) ->
       let mValue                   = getDValueFromWS worldState idx
           (hCache, dCache, vCache) = aCache
           newDCache                = setRWMVMap idx R mValue dCache
       in  (hCache, newDCache, vCache)
-    (AtNDict name) ->
-      notYetImpl "cacheMaker :=: AtNDict"
-    (AtVar idx) ->
+    (AtNDic nKey) -> notYetImpl "cacheMaker :=: AtNDict"
+    (AtVars idx) ->
       let mValue                   = getVValueFromWS worldState idx
           (hCache, dCache, vCache) = aCache
           newVCache                = setRWMVMap idx R mValue vCache
       in  (hCache, dCache, newVCache)
-    (AtLocal _) -> aCache
-    (AtCache _) -> aCache
+    (AtLocl _) -> aCache
+    (AtCach _) -> aCache
     (AtHere _) -> aCache
-    AtNull -> aCache
-    _ ->
-      error $ "[ERROR]<cacheMaker> Not compatible for " ++ show vp
+    AtNull     -> aCache
+    _          -> error $ "[ERROR]<cacheMaker> Not compatible for " ++ show vp
 
 -- TODO: Add NDict after adding NDict field
 setEnv
-  :: World
-  -> VPosition
-  -> (Maybe Value -> RWMV)
-  -> Maybe Value
-  -> Env
-  -> Env
+  :: World -> VPosition -> (Maybe Value -> RWMV) -> Maybe Value -> Env -> Env
 setEnv World {..} = setEnvBy worldTime
 
 -- TODO: Add NDict after adding NDict field
 setEnvBy
-  :: Time
-  -> VPosition
-  -> (Maybe Value -> RWMV)
-  -> Maybe Value
-  -> Env
-  -> Env
-setEnvBy _ vp@(AtWorld time idx) mode mValue ((hCache, dCache, vCache), localVars, localCache, rg)
+  :: Time -> VPosition -> (Maybe Value -> RWMV) -> Maybe Value -> Env -> Env
+setEnvBy _ vp@(AtWrld time idx) mode mValue ((hCache, dCache, vCache), localVars, localCache, rg)
   = ((newHCache, dCache, vCache), localVars, localCache, rg)
   where newHCache = setHCache time idx mode mValue hCache
 setEnvBy worldTime vp@(AtTime time idx) mode mValue ((hCache, dCache, vCache), localVars, localCache, rg)
   = ((newHCache, dCache, vCache), localVars, localCache, rg)
-  where newHCache = setHCache (worldTime+time) idx mode mValue hCache
+  where newHCache = setHCache (worldTime + time) idx mode mValue hCache
 setEnvBy _ (AtDict idx) mode mValue ((hCache, dCache, vCache), localVars, localCache, rg)
   = ((hCache, newDCache, vCache), localVars, localCache, rg)
   where newDCache = setRWMVMap idx mode mValue dCache
-setEnvBy _ (AtNDict name) mode mValue ((hCache, dCache, vCache), localVars, localCache, rg)
+setEnvBy _ (AtNDic nKey) mode mValue ((hCache, dCache, vCache), localVars, localCache, rg)
   = notYetImpl "setEnvBy:=:AtNDict"
-setEnvBy _ (AtVar idx) mode mValue ((hCache, dCache, vCache), localVars, localCache, rg)
+setEnvBy _ (AtVars idx) mode mValue ((hCache, dCache, vCache), localVars, localCache, rg)
   = ((hCache, dCache, newVCache), localVars, localCache, rg)
   where newVCache = setRWMVMap idx mode mValue vCache
-setEnvBy _ (AtLocal idx) mode mValue (wCache, localVars, localCache, rg) =
+setEnvBy _ (AtLocl idx) mode mValue (wCache, localVars, localCache, rg) =
   (wCache, newLocalVars, localCache, rg)
   where newLocalVars = setVMap idx mValue localVars
-setEnvBy _ (AtCache idx) mode mValue (wCache, localVars, localCache, rg) =
+setEnvBy _ (AtCach idx) mode mValue (wCache, localVars, localCache, rg) =
   (wCache, localVars, newLocalCache, rg)
   where newLocalCache = setVMap idx mValue localCache
 setEnvBy _ _ _ _ cState = cState
@@ -115,7 +97,7 @@ setEnvBy _ _ _ _ cState = cState
 
 setHCache
   :: Time
-  -> ID
+  -> Idx
   -> (Maybe Value -> RWMV)
   -> Maybe Value
   -> HistoricCache
@@ -126,10 +108,10 @@ setHCache time idx mode mValue hCache = newHCache
   newRWMVMap = setRWMVMap idx mode mValue rwmvMap
   newHCache  = IM.insert time newRWMVMap hCache
 
-setRWMVMap :: ID -> (Maybe Value -> RWMV) -> Maybe Value -> RWMVMap -> RWMVMap
+setRWMVMap :: Idx -> (Maybe Value -> RWMV) -> Maybe Value -> RWMVMap -> RWMVMap
 setRWMVMap idx mode mValue = IM.insert idx (mode mValue)
 
-setVMap :: ID -> Maybe Value -> ValueMap -> ValueMap
+setVMap :: Idx -> Maybe Value -> ValueMap -> ValueMap
 setVMap idx mValue = IM.update (const mValue) idx
 
 
@@ -137,20 +119,22 @@ getEnv :: World -> VPosition -> Env -> Value
 getEnv World {..} = getEnvBy worldTime
 
 getEnvBy :: Time -> VPosition -> Env -> Value
-getEnvBy _ vp@(AtWorld time idx) ((hCache, _, _), _, _, _) =
+getEnvBy _ vp@(AtWrld time idx) ((hCache, _, _), _, _, _) =
   getHCache time idx hCache
 getEnvBy worldTime vp@(AtTime time idx) ((hCache, _, _), _, _, _) =
-  getHCache (worldTime+time) idx hCache
+  getHCache (worldTime + time) idx hCache
 getEnvBy _ (AtDict idx) ((_, dCache, _), _, _, _) = getRWMVMap idx dCache
 -- TODO: Need to implement
-getEnvBy _ (AtNDict name) ((_, dCache, _), _, _, _) = notYetImpl "getEnvBy:=:AtNDict"
-getEnvBy _ (AtVar idx) ((_, _, vCache), _, _, _) = getRWMVMap idx vCache
-getEnvBy _ (AtLocal idx) (_, localVars, _, _) = getVMap idx localVars
-getEnvBy _ (AtCache idx) (_, _, localCache, _) = getVMap idx localCache
+getEnvBy _ (AtNDic nKey) ((_, dCache, _), _, _, _) =
+  notYetImpl "getEnvBy:=:AtNDict"
+getEnvBy _ (AtVars idx) ((_, _, vCache), _, _, _) = getRWMVMap idx vCache
+getEnvBy _ (AtLocl idx) (_, localVars, _, _) = getVMap idx localVars
+getEnvBy _ (AtCach idx) (_, _, localCache, _) = getVMap idx localCache
 getEnvBy _ (AtHere v) (_, _, _, _) = v
-getEnvBy _ AtNull (_, _, _, _) = error "[ERROR]<getEnvBy :=: AtNull> Can't access AtNull"
+getEnvBy _ AtNull (_, _, _, _) =
+  error "[ERROR]<getEnvBy :=: AtNull> Can't access AtNull"
 
-getHCache :: Time -> ID -> HistoricCache -> Value
+getHCache :: Time -> Idx -> HistoricCache -> Value
 getHCache time idx hCache = fromMaybe
   (ErrValue "[ERROR]<getHCacheSub> No such Value")
   found
@@ -158,7 +142,7 @@ getHCache time idx hCache = fromMaybe
   found :: Maybe Value
   found = IM.lookup time hCache >>= IM.lookup idx >>= runRW
 
-getRWMVMap :: ID -> RWMVMap -> Value
+getRWMVMap :: Idx -> RWMVMap -> Value
 getRWMVMap idx rwmvMap = fromMaybe
   (ErrValue "[ERROR]<getRWMVMap> No such Value")
   found
@@ -166,7 +150,7 @@ getRWMVMap idx rwmvMap = fromMaybe
   found :: Maybe Value
   found = IM.lookup idx rwmvMap >>= runRW
 
-getVMap :: ID -> ValueMap -> Value
+getVMap :: Idx -> ValueMap -> Value
 getVMap id vMap = fromMaybe (ErrValue "[ERROR]<getVMap> No such Value") found
  where
   found :: Maybe Value
@@ -185,7 +169,7 @@ cacheCommitter (hCache, dCache, vCache) aWorldState@WorldState {..} =
   newWorldDict    = updateValuesToValueMap worldDict (unwrapFromRWMV dCache)
   newWorldVars    = updateValuesToValueMap worldDict (unwrapFromRWMV vCache)
 
-unwrapFromRWMV :: RWMVMap -> [(ID, Maybe Value)]
+unwrapFromRWMV :: RWMVMap -> [(Idx, Maybe Value)]
 unwrapFromRWMV = map (second runRW) . filter (notR . snd) . IM.toList
 
 -- NOTE: HistoricCache could have values in a time-slot which HistoricTable may not have
