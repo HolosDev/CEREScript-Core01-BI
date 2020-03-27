@@ -50,3 +50,23 @@ Serialized Execution
     * cacheCommitter' :: `WorldState -> [WorldCache] -> WorldState`
 
 
+## How to avoid Variable ID collision
+
+### Allocate pre-divided Variable ID range for each SpoolTree
+
+#### Issues
+
+* Q: How to check already allocated Variable?
+  * A: Interpreter gives `World` to every interpreting function.
+* When a region is fulfilled, what can I do?
+  * A: Currently, we do nothing. But we can know that situation by using sub-IntMap's size.
+
+#### Protocol
+
+* Use left-side in range finding function in `containers-hack`
+* Follow avoiding hash collision protocol
+  * Get a new random number
+  * If a new ID is already used, then return the first
+  * Else, use it
+
+

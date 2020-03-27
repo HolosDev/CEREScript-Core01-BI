@@ -5,11 +5,12 @@ Concepts and Limitations
 
 * Concept
   * No `ValueContainer`, but only `Value`
+  * Implement `SpoolForest` Manager
 * Limitation
-  * No Spool Ignitor
+  * No SpoolIgnitor
   * Use current Time-Slot data only
 
 ## No Spool Ignitor
 
-This interpreter does not provide Spool Ignitor for each spool.
-Instead of Ignitor, Initializer does it.
+This interpreter does not provide SpoolIgnitor for each spool.
+Instead of Ignitor, Initializer does equivalent task.
