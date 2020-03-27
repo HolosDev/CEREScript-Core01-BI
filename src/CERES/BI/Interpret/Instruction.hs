@@ -76,9 +76,37 @@ crsConvertValueWith
 crsConvertValueWith World {..} SI {..} cState@(wc@(hCache, dCache, vCache), localVars, localCache, rg) vpA vpB
   = undefined
 
-crsRandom :: World -> SpoolInstance -> Env -> VPosition -> VPosition -> Env
-crsRandom World {..} SI {..} cState@(wc@(hCache, dCache, vCache), localVars, localCache, rg) vpA vpB
-  = undefined
+crsRandom :: World -> SpoolInstance -> Env -> VPosition -> ValueType -> Env
+crsRandom aWorld SI {..} cState@(wc@(hCache, dCache, vCache), localVars, localCache, rg) vp vType
+  = setEnv aWorld vp W (Just rValue) (wc, localVars, localCache, nextRG)
+ where
+  (rValue, nextRG) = randomValue vType rg
+
+crsRandomBy :: World -> SpoolInstance -> Env -> VPosition -> VPosition -> Env
+crsRandomBy aWorld aSI cState@(wc@(hCache, dCache, vCache), localVars, localCache, rg) vpA vpB
+  = crsRandom aWorld aSI cState vpA vt
+ where
+  vt = getValueType . getEnv aWorld vpB $ cState
+
+crsRandomWith :: World -> SpoolInstance -> Env -> VPosition -> ValueType -> VPosition -> VPosition -> VPosition -> Env
+crsRandomWith World {..} SI {..} cState@(wc@(hCache, dCache, vCache), localVars, localCache, rg) vpA vType vpC vpD vpE
+  = notYetImpl "crsRandomWith"
+
+crsRandomWithBy :: World -> SpoolInstance -> Env -> VPosition -> VPosition -> VPosition -> VPosition -> VPosition -> Env
+crsRandomWithBy World {..} SI {..} cState@(wc@(hCache, dCache, vCache), localVars, localCache, rg) vpA vpB vpC vpD vpE
+  = notYetImpl "crsRandomWith"
+
+randomValueBy :: Value -> RG -> (Value, RG)
+randomValueBy v = randomValue (getValueType v)
+
+randomValue :: ValueType -> RG -> (Value, RG)
+randomValue vType rg = case vType of
+    VTInt -> first IntValue . nextInt $ rg
+    VTDbl -> first DblValue . nextDouble $ rg
+    VTBool -> first (BoolValue . odd) . nextWord64 $ rg
+    VTAtom -> (AtomValue, rg)
+    VTStr -> (ErrValue "[ERROR]<crsRandom :=: VTStr> Not proper value type for RNG", rg)
+    VTErr -> (ErrValue "[ERROR]<crsRandom :=: VTErr> Not proper value type for RNG", rg)
 
 crsElapsedTime :: World -> SpoolInstance -> Env -> VPosition -> VPosition -> Env
 crsElapsedTime World {..} SI {..} cState@(wc@(hCache, dCache, vCache), localVars, localCache, rg) vpA vpB
@@ -88,9 +116,10 @@ crsElapsedTime World {..} SI {..} cState@(wc@(hCache, dCache, vCache), localVars
   -- NOTE: 2. If elapsedTime + executingTime > worldTSSize, then store executingTime in localVariables and end interpreting up
   -- NOTE: 3. Else, do interpret, and modify (+executingTime) elapsedTime
   -- NOTE: Calculate executingTime not runCEREScript but here, because length of executingTime is depends on an instruction
-  (executingTime, rg1) = first (`rem` worldTSSize) . nextInt $ rg
+  (executingTime, rg1) = first fromIntegral . bitmaskWithRejection64 (fromIntegral worldTSSize) $ rg
   elapsedTime = maybe 0 getInt . IM.lookup elapsedInternalTimeID $ localVars
-  doSkip               = elapsedTime + executingTime > worldTSSize
+  newElapsedTime = elapsedTime + executingTime
+  doSkip               = newElapsedTime > worldTSSize
   elapsedInternalTime  = maybe False getBool $ IM.lookup resumeCodeID localVars
 
 crsSPControl :: World -> SpoolInstance -> Env -> VPosition -> Env
@@ -101,7 +130,11 @@ crsSIControl :: World -> SpoolInstance -> Env -> VPosition -> VPosition -> Env
 crsSIControl World {..} SI {..} cState@(wc@(hCache, dCache, vCache), localVars, localCache, rg) vpA vpB
   = undefined
 
+
+-- NOTE: crsSIInit does not initiate SI by itself, but would be done by `runSpoolInstance`
 crsSIInit
   :: World -> SpoolInstance -> Env -> VPosition -> VPosition -> VPosition -> Env
 crsSIInit World {..} SI {..} cState@(wc@(hCache, dCache, vCache), localVars, localCache, rg) vpA vpB vpC
   = undefined
+ where
+  spoolID = undefined

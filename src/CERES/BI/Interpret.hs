@@ -76,6 +76,7 @@ runSpoolTree aWorld@World {..} aSpoolTree@SpoolTree {..} =
   joint aList (s, aWorldCache) = (s : aList, aWorldCache)
 
 
+-- TODO: How to avoid SpoolInstance ID collision
 runSpoolInstance
   :: World -> SpoolInstance -> WorldCache -> ((SIIS, SpoolInstance), WorldCache)
 runSpoolInstance world@World {..} si@SI {..} wCache =
@@ -157,18 +158,21 @@ runCEREScript aWorld@World {..} aSI@SI {..} = runCEREScriptSub
 runInstruction :: World -> SpoolInstance -> Env -> CERES -> Env
 runInstruction aWorld aSI cState aCERES
   = case aCERES of
-    (CRSInitVariable      vpA vpB)     -> crsInitVariable     aWorld aSI cState vpA vpB
-    (CRSInitVariableAt    vpA vpB)     -> crsInitVariableAt   aWorld aSI cState vpA vpB
-    (CRSSetValue          vpA vpB)     -> crsSetValue         aWorld aSI cState vpA vpB
-    (CRSDeleteVariable    vp)          -> crsDeleteVariable   aWorld aSI cState vp
-    (CRSModifyValue       vpA vpB cOp) -> crsModifyValue      aWorld aSI cState vpA vpB cOp
-    (CRSCopyValue         vpA vpB)     -> crsCopyValue        aWorld aSI cState vpA vpB
-    (CRSConvertValue      vp vt)       -> crsConvertValue     aWorld aSI cState vp vt
-    (CRSConvertValueBy    vpA vpB)     -> crsConvertValueBy   aWorld aSI cState vpA vpB
-    (CRSConvertValueWith  vpA vpB)     -> crsConvertValueWith aWorld aSI cState vpA vpB
-    (CRSRandom            vpA vpB)     -> crsRandom           aWorld aSI cState vpA vpB
-    (CRSElapseTime        vpA vpB)     -> crsElapsedTime      aWorld aSI cState vpA vpB
-    (CRSSPControl         vp)          -> crsSPControl        aWorld aSI cState vp
-    (CRSSIControl         vpA vpB)     -> crsSIControl        aWorld aSI cState vpA vpB
-    (CRSSIInit            vpA vpB vpC) -> crsSIInit           aWorld aSI cState vpA vpB vpC
+    (CRSInitVariable      vpA vpB)             -> crsInitVariable     aWorld aSI cState vpA vpB
+    (CRSInitVariableAt    vpA vpB)             -> crsInitVariableAt   aWorld aSI cState vpA vpB
+    (CRSSetValue          vpA vpB)             -> crsSetValue         aWorld aSI cState vpA vpB
+    (CRSDeleteVariable    vp)                  -> crsDeleteVariable   aWorld aSI cState vp
+    (CRSModifyValue       vpA vpB cOp)         -> crsModifyValue      aWorld aSI cState vpA vpB cOp
+    (CRSCopyValue         vpA vpB)             -> crsCopyValue        aWorld aSI cState vpA vpB
+    (CRSConvertValue      vp vt)               -> crsConvertValue     aWorld aSI cState vp vt
+    (CRSConvertValueBy    vpA vpB)             -> crsConvertValueBy   aWorld aSI cState vpA vpB
+    (CRSConvertValueWith  vpA vpB)             -> crsConvertValueWith aWorld aSI cState vpA vpB
+    (CRSRandom            vp  vt)              -> crsRandom           aWorld aSI cState vp vt
+    (CRSRandomBy          vpA vpB)             -> crsRandomBy         aWorld aSI cState vpA vpB
+    (CRSRandomWith        vpA vt vpC vpD vpE)  -> crsRandomWith       aWorld aSI cState vpA vt vpC vpD vpE
+    (CRSRandomWithBy      vpA vpB vpC vpD vpE) -> crsRandomWithBy     aWorld aSI cState vpA vpB vpC vpD vpE
+    (CRSElapseTime        vpA vpB)             -> crsElapsedTime      aWorld aSI cState vpA vpB
+    (CRSSPControl         vp)                  -> crsSPControl        aWorld aSI cState vp
+    (CRSSIControl         vpA vpB)             -> crsSIControl        aWorld aSI cState vpA vpB
+    (CRSSIInit            vpA vpB vpC)         -> crsSIInit           aWorld aSI cState vpA vpB vpC
     _ -> error "[ERROR]<runInstruction :=: otherwise> Can't be reached"
