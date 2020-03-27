@@ -44,13 +44,16 @@ siAggregatorSub aSI@SI {..} aSpoolForest = newSpoolTree : dList
     stJoiner stA stB =
       SpoolTree (S.union (vpSet stA) (vpSet stB)) (siList stA ++ siList stB)
 
-siisExecutor :: Time -> SpoolInstanceTable -> [(SIIS, SpoolInstance)] -> SpoolInstanceTable
-siisExecutor worldTime theSITable siList = foldr siisExecutorSub theSITable siList
+siisExecutor
+  :: Time -> SpoolInstanceTable -> [(SIIS, SpoolInstance)] -> SpoolInstanceTable
+siisExecutor worldTime theSITable siList = foldr siisExecutorSub
+                                                 theSITable
+                                                 siList
  where
   siisExecutorSub (SIJump offset, si) aSITable = newSITable
    where
-    theTime = worldTime + offset
-    targetSIs = maybe IM.empty sis . IM.lookup theTime $ aSITable
-    newSIRow = SIRow theTime . IM.insert theTime si $ targetSIs
+    theTime    = worldTime + offset
+    targetSIs  = maybe IM.empty sis . IM.lookup theTime $ aSITable
+    newSIRow   = SIRow theTime . IM.insert theTime si $ targetSIs
     newSITable = IM.insert theTime newSIRow theSITable
   siisExecutorSub _ aSITable = aSITable
