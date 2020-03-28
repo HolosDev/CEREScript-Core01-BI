@@ -27,8 +27,8 @@ data World = World
   , worldValueList :: ValueList
   , worldState     :: WorldState
   , worldSITable   :: SpoolInstanceTable
-  , worldTime      :: Time
-  , worldTSSize    :: InternalTime
+  , worldTime      :: {-# UNPACK #-} !Time
+  , worldTSSize    :: {-# UNPACK #-} !InternalTime
   } deriving Show
 
 -- | ValueList remembers type of each Variable
@@ -47,7 +47,7 @@ data WorldState = WorldState
 type TimeSpan = Maybe (Time, Time)
 type HistoricTable = IntMap EpochRow
 data EpochRow = EpochRow
-  { valueRowTime :: Time
+  { valueRowTime :: {-# UNPACK #-} !Time
   , values       :: Values
   } deriving Show
 type Values = ValueMap
@@ -59,13 +59,13 @@ type Spools = IntMap Spool
 type Spool = CERESSpool
 
 data CERESSpool = CERESSpool
-  { csID       :: ID -- NOTE: ID of Spool code, not instance
-  , csName     :: Name
+  { csID       :: {-# UNPACK #-} !ID -- NOTE: ID of Spool code, not instance
+  , csName     :: {-# UNPACK #-} !Name
   , csScript   :: CEREScript
   -- TODO: Not sure this could be static or dynamic
   , readVP     :: Set VPosition
   , writeVP    :: Set VPosition
-  , csPriority :: Priority
+  , csPriority :: {-# UNPACK #-} !Priority
   , csInitLocalVars :: ValueMap
   , csInitLocalCache :: ValueMap
   } deriving (Eq, Ord, Show, Read)
@@ -78,11 +78,11 @@ data SpoolInstanceRow = SIRow
 type SpoolInstances = IntMap SpoolInstance
 
 data SpoolInstance = SI
-  { siID         :: ID
-  , siName       :: Name
+  { siID         :: {-# UNPACK #-} !ID
+  , siName       :: {-# UNPACK #-} !Name
   , siVPS        :: Set VPosition -- Only World, Dict, Var
   , siLocalVars  :: LocalVariables
-  , siSpoolID    :: ID
+  , siSpoolID    :: {-# UNPACK #-} !ID
   , siRestScript :: CEREScript
   , siRG         :: RG
   , siF          :: World -> World
