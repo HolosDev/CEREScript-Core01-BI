@@ -5,6 +5,7 @@ packages:
 #- /AoDw/CEREScript/CEREScript-Core01
 
 extra-deps:
+- text-trie-0.2.5.0
 - github: HolosDev/CEREScript-Core01
 #- git: https://gitlab.com/holosdev/CEREScript-Core01
   commit: 28d8113e9e9b532b5761fa41bbfd66a6e2a79d6c

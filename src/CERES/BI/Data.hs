@@ -10,6 +10,8 @@ import           Data.Text                      ( Text )
 import qualified Data.Text                     as T
 import qualified Data.Text.Lazy                as TL
 import qualified Data.Text.Lazy.IO             as TL
+import           Data.Trie.Text                 ( Trie )
+import qualified Data.Trie.Text                as Trie
 
 import           TextShow
 
@@ -17,8 +19,8 @@ import           Data.CERES.Script
 import           Data.CERES.Type
 import           Data.CERES.Value
 
-import           CERES.BI.Type
 import           CERES.BI.Data.Environment
+import           CERES.BI.Type
 
 
 -- | World stores everything
@@ -40,6 +42,7 @@ data WorldState = WorldState
   { evaluatedSpan :: TimeSpan
   , worldHistory  :: HistoricTable
   , worldDict     :: Dictionary
+  , worldNDic     :: NDictionary
   , worldVars     :: Variables
   , worldRG       :: RG
   } deriving Show
@@ -52,6 +55,7 @@ data EpochRow = EpochRow
   } deriving Show
 type Values = ValueMap
 type Dictionary = ValueMap
+type NDictionary = Trie Value
 type Variables = ValueMap
 
 -- | Spools contains every spool code

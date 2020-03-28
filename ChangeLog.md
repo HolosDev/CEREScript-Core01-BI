@@ -18,6 +18,12 @@ Changelog for CEREScript-Core01-BI
 * Move Move `get*Cache` and `set*Cache` functions to `CERES.BI.Data.*`
 
 
+## 0.7.0.0 -- 2020-03-29
+
+### Added
+* Add `NDic` field to `WorldState`
+
+
 ## 0.6.0.0 -- 2020-03-28
 
 ### Added

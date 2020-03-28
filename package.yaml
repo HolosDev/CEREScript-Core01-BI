@@ -19,6 +19,7 @@ dependencies:
 - splitmix
 - text
 - text-show
+- text-trie
 - CEREScript-Core01
 
 default-extensions:
