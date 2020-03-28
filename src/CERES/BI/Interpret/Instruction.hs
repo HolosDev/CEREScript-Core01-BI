@@ -117,10 +117,10 @@ crsElapsedTime World {..} SI {..} cState@(wc@(hCache, dCache, vCache), localVars
   -- NOTE: 3. Else, do interpret, and modify (+executingTime) elapsedTime
   -- NOTE: Calculate executingTime not runCEREScript but here, because length of executingTime is depends on an instruction
   (executingTime, rg1) = first fromIntegral . bitmaskWithRejection64 (fromIntegral worldTSSize) $ rg
-  elapsedTime = maybe 0 getInt . IM.lookup elapsedInternalTimeID $ localVars
+  elapsedTime = maybe 0 getInt . IM.lookup elapsedInternalTimeIdx $ localVars
   newElapsedTime = elapsedTime + executingTime
   doSkip               = newElapsedTime > worldTSSize
-  elapsedInternalTime  = maybe False getBool $ IM.lookup resumeCodeID localVars
+  elapsedInternalTime  = maybe False getBool $ IM.lookup resumeCodeIdx localVars
 
 crsSPControl :: World -> SpoolInstance -> Env -> VPosition -> Env
 crsSPControl World {..} SI {..} cState@(wc@(hCache, dCache, vCache), localVars, localCache, rg) vp
