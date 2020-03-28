@@ -6,7 +6,6 @@ import qualified Data.IntMap                   as IM
 import qualified Data.Text.IO                  as T
 import qualified Data.Trie.Text                as Trie
 
-import           System.Random.SplitMix
 
 import           CERES.Operate
 import           Data.CERES.Script
@@ -17,6 +16,7 @@ import           Data.CERES.Value
 import           CERES.BI.Data
 import           CERES.BI.Data.Environment
 import           CERES.BI.Interpret
+import           CERES.BI.Util.Random
 
 
 main :: IO ()
@@ -36,10 +36,11 @@ initializer = do
   T.putStrLn " - = Set WorldState"
   T.putStrLn " - = + Set HistoricTable"
   let iHistoricTable = IM.empty
-  let rGen = mkSMGen .fromIntegral $ 0
-  let iWorldState = WorldState Nothing iHistoricTable iValueMap iValueMap rGen
   let iValueMap      = IM.empty
   let iTrie          = Trie.empty
+  let rGen           = mkGenFromInt 0
+  let iWorldState =
+        WorldState Nothing iHistoricTable iValueMap iTrie iValueMap rGen
   T.putStrLn " - = Set SpoolInstances"
   let iSITable = IM.empty
   let iWorld = World iSpools iValueList iWorldState iSITable 0 256

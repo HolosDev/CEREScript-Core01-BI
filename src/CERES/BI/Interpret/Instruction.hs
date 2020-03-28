@@ -6,7 +6,6 @@ import           Data.IntMap                    ( IntMap )
 import qualified Data.IntMap                   as IM
 import           Data.Maybe
 
-import           System.Random.SplitMix
 
 import           CERES.Operate
 import           Data.CERES.Script
@@ -24,6 +23,8 @@ import           CERES.BI.Interpret.Cache
 import           CERES.BI.Interpret.Spool
 
 import           CERES.BI.Type
+
+import           CERES.BI.Util.Random
 
 import           Debug
 
@@ -116,7 +117,7 @@ crsElapsedTime World {..} SI {..} cState@(wc@(hCache, dCache, vCache), localVars
   -- NOTE: 2. If elapsedTime + executingTime > worldTSSize, then store executingTime in localVariables and end interpreting up
   -- NOTE: 3. Else, do interpret, and modify (+executingTime) elapsedTime
   -- NOTE: Calculate executingTime not runCEREScript but here, because length of executingTime is depends on an instruction
-  (executingTime, rg1) = first fromIntegral . bitmaskWithRejection64 (fromIntegral worldTSSize) $ rg
+  (executingTime, rg1) = bmwrInt worldTSSize rg
   elapsedTime = maybe 0 getInt . IM.lookup elapsedInternalTimeIdx $ localVars
   newElapsedTime = elapsedTime + executingTime
   doSkip               = newElapsedTime > worldTSSize

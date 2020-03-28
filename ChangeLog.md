@@ -5,7 +5,6 @@ Changelog for CEREScript-Core01-BI
 
 ### Add
 * Implement each `crs*` instruction function
-* Add `Util.Random` module for random function aliases
 
 
 ### Change
@@ -21,6 +20,7 @@ Changelog for CEREScript-Core01-BI
 ## 0.7.0.0 -- 2020-03-29
 
 ### Added
+* Add `Util.Random` module for random function aliases
 * Add `NDic` field to `WorldState`
 
 

@@ -1,7 +1,13 @@
-module CERES.BI.Type where
+module CERES.BI.Type
+  ( module CERES.BI.Type
+  , CERES.BI.Util.Random.RG
+  , CERES.BI.Util.Random.GSeed
+  )
+where
 
-import           System.Random.SplitMix
+
+import           CERES.BI.Util.Random
+
 
 -- NOTE: Alias for abstract PRNG type
-type RG = SMGen
 type InternalTime = Int
