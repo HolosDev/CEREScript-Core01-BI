@@ -38,7 +38,8 @@ getHValueFromVT :: HistoricTable -> Time -> Idx -> Maybe Value
 getHValueFromVT worldHistory time idx =
   IM.lookup time worldHistory >>= (IM.lookup idx . values)
 
-getHValuesFromWS :: WorldState -> [(Time, Idx)] -> [[((Time, Idx), Maybe Value)]]
+getHValuesFromWS
+  :: WorldState -> [(Time, Idx)] -> [[((Time, Idx), Maybe Value)]]
 getHValuesFromWS WorldState {..} = getHValuesFromVT worldHistory
 
 getHValuesFromVT
@@ -59,7 +60,8 @@ getHValuesFromVTSub aHistoricTable indices = getHValuesFromVTSubSub aValues
   theTime = fst . head $ indices
   aValues = maybe IM.empty values (IM.lookup theTime aHistoricTable)
 
-getHValuesFromVTSubSub :: Values -> [(Time, Idx)] -> [((Time, Idx), Maybe Value)]
+getHValuesFromVTSubSub
+  :: Values -> [(Time, Idx)] -> [((Time, Idx), Maybe Value)]
 getHValuesFromVTSubSub aValues =
   map (\(t, idx) -> ((t, idx), IM.lookup idx aValues))
 

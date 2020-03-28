@@ -134,6 +134,7 @@ runCEREScript aWorld@World {..} aSI@SI {..} = runCEREScriptSub
       else runCEREScriptSub (nextWC, nextLocalVars, nextLocalCache, nextRG)
                             nextCEREScript
     -- NOTE: si == True, then end runCEREScript
+
    where
     (newWC, newLocalVars, newLocalCache, newRG) =
       runInstruction aWorld aSI cState ceres
@@ -141,10 +142,10 @@ runCEREScript aWorld@World {..} aSI@SI {..} = runCEREScriptSub
     spCode        = maybe "" getStr $ IM.lookup spCodeIdx newLocalCache
     sp            = spCode == "Stop" || spCode == "Pause"
     retentionCode = case spCode of
-      "Stop"    -> "Abolish"
+      "Stop"  -> "Abolish"
       -- TODO: Not sure do I need to identify whether this is "Pause"
-      "Pause"   -> "Retain"
-      _ -> maybe "Retain" getStr $ IM.lookup retainCodeIdx newLocalCache
+      "Pause" -> "Retain"
+      _       -> maybe "Retain" getStr $ IM.lookup retainCodeIdx newLocalCache
     -- TODO: Check the instruction is executed or not
     resumeFlag     = maybe False getBool $ IM.lookup resumeCodeIdx newLocalVars
     nextCEREScript = if resumeFlag then (ceres : cScript) else cScript
