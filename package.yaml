@@ -21,6 +21,7 @@ dependencies:
 - text-show
 - text-trie
 - CEREScript-Core01
+- random-wrapper
 
 default-extensions:
 - OverloadedStrings
