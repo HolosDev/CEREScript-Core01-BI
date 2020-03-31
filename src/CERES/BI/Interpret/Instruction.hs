@@ -32,20 +32,20 @@ import           Debug
 
 crsInitVariable
   :: World -> SpoolInstance -> Env -> VPosition -> VPosition -> Env
-crsInitVariable World {..} SI {..} cState@(wc@(hCache, dCache, vCache), localVars, localCache, rg) vpA vpB
+crsInitVariable World {..} SI {..} cState@(wc@(hCache, dCache, nCache, vCache), localVars, localCache, rg) vpA vpB
   = undefined
 
 crsInitVariableAt
   :: World -> SpoolInstance -> Env -> VPosition -> VPosition -> Env
-crsInitVariableAt World {..} SI {..} cState@(wc@(hCache, dCache, vCache), localVars, localCache, rg) vpA vpB
+crsInitVariableAt World {..} SI {..} cState@(wc@(hCache, dCache, nCache, vCache), localVars, localCache, rg) vpA vpB
   = undefined
 
 crsSetValue :: World -> SpoolInstance -> Env -> VPosition -> VPosition -> Env
-crsSetValue World {..} SI {..} cState@(wc@(hCache, dCache, vCache), localVars, localCache, rg) vpA vpB
+crsSetValue World {..} SI {..} cState@(wc@(hCache, dCache, nCache, vCache), localVars, localCache, rg) vpA vpB
   = undefined
 
 crsDeleteVariable :: World -> SpoolInstance -> Env -> VPosition -> Env
-crsDeleteVariable World {..} SI {..} cState@(wc@(hCache, dCache, vCache), localVars, localCache, rg) vp
+crsDeleteVariable World {..} SI {..} cState@(wc@(hCache, dCache, nCache, vCache), localVars, localCache, rg) vp
   = undefined
 
 crsModifyValue
@@ -56,46 +56,46 @@ crsModifyValue
   -> VPosition
   -> CERESOperator
   -> Env
-crsModifyValue World {..} SI {..} cState@(wc@(hCache, dCache, vCache), localVars, localCache, rg) vpA vpB cOp
+crsModifyValue World {..} SI {..} cState@(wc@(hCache, dCache, nCache, vCache), localVars, localCache, rg) vpA vpB cOp
   = undefined
 
 crsCopyValue :: World -> SpoolInstance -> Env -> VPosition -> VPosition -> Env
-crsCopyValue World {..} SI {..} cState@(wc@(hCache, dCache, vCache), localVars, localCache, rg) vpA vpB
+crsCopyValue World {..} SI {..} cState@(wc@(hCache, dCache, nCache, vCache), localVars, localCache, rg) vpA vpB
   = undefined
 
 crsConvertValue
   :: World -> SpoolInstance -> Env -> VPosition -> ValueType -> Env
-crsConvertValue World {..} SI {..} cState@(wc@(hCache, dCache, vCache), localVars, localCache, rg) vp vt
+crsConvertValue World {..} SI {..} cState@(wc@(hCache, dCache, nCache, vCache), localVars, localCache, rg) vp vt
   = undefined
 
 crsConvertValueBy
   :: World -> SpoolInstance -> Env -> VPosition -> VPosition -> Env
-crsConvertValueBy World {..} SI {..} cState@(wc@(hCache, dCache, vCache), localVars, localCache, rg) vpA vpB
+crsConvertValueBy World {..} SI {..} cState@(wc@(hCache, dCache, nCache, vCache), localVars, localCache, rg) vpA vpB
   = undefined
 
 crsConvertValueWith
   :: World -> SpoolInstance -> Env -> VPosition -> VPosition -> Env
-crsConvertValueWith World {..} SI {..} cState@(wc@(hCache, dCache, vCache), localVars, localCache, rg) vpA vpB
+crsConvertValueWith World {..} SI {..} cState@(wc@(hCache, dCache, nCache, vCache), localVars, localCache, rg) vpA vpB
   = undefined
 
 crsRandom :: World -> SpoolInstance -> Env -> VPosition -> ValueType -> Env
-crsRandom aWorld SI {..} cState@(wc@(hCache, dCache, vCache), localVars, localCache, rg) vp vType
+crsRandom aWorld SI {..} cState@(wc@(hCache, dCache, nCache, vCache), localVars, localCache, rg) vp vType
   = setEnv aWorld vp W (Just rValue) (wc, localVars, localCache, nextRG)
  where
   (rValue, nextRG) = randomValue vType rg
 
 crsRandomBy :: World -> SpoolInstance -> Env -> VPosition -> VPosition -> Env
-crsRandomBy aWorld aSI cState@(wc@(hCache, dCache, vCache), localVars, localCache, rg) vpA vpB
+crsRandomBy aWorld aSI cState@(wc@(hCache, dCache, nCache, vCache), localVars, localCache, rg) vpA vpB
   = crsRandom aWorld aSI cState vpA vt
  where
   vt = getValueType . getEnv aWorld vpB $ cState
 
 crsRandomWith :: World -> SpoolInstance -> Env -> VPosition -> ValueType -> VPosition -> VPosition -> VPosition -> Env
-crsRandomWith World {..} SI {..} cState@(wc@(hCache, dCache, vCache), localVars, localCache, rg) vpA vType vpC vpD vpE
+crsRandomWith World {..} SI {..} cState@(wc@(hCache, dCache, nCache, vCache), localVars, localCache, rg) vpA vType vpC vpD vpE
   = notYetImpl "crsRandomWith"
 
 crsRandomWithBy :: World -> SpoolInstance -> Env -> VPosition -> VPosition -> VPosition -> VPosition -> VPosition -> Env
-crsRandomWithBy World {..} SI {..} cState@(wc@(hCache, dCache, vCache), localVars, localCache, rg) vpA vpB vpC vpD vpE
+crsRandomWithBy World {..} SI {..} cState@(wc@(hCache, dCache, nCache, vCache), localVars, localCache, rg) vpA vpB vpC vpD vpE
   = notYetImpl "crsRandomWith"
 
 randomValueBy :: Value -> RG -> (Value, RG)
@@ -111,7 +111,7 @@ randomValue vType rg = case vType of
     VTErr -> (ErrValue "[ERROR]<crsRandom :=: VTErr> Not proper value type for RNG", rg)
 
 crsElapsedTime :: World -> SpoolInstance -> Env -> VPosition -> VPosition -> Env
-crsElapsedTime World {..} SI {..} cState@(wc@(hCache, dCache, vCache), localVars, localCache, rg) vpA vpB
+crsElapsedTime World {..} SI {..} cState@(wc@(hCache, dCache, nCache, vCache), localVars, localCache, rg) vpA vpB
   = undefined
  where
   -- NOTE: 1. Estimate next instruction's executing internal time
@@ -125,18 +125,18 @@ crsElapsedTime World {..} SI {..} cState@(wc@(hCache, dCache, vCache), localVars
   elapsedInternalTime  = maybe False getBool $ IM.lookup resumeCodeIdx localVars
 
 crsSPControl :: World -> SpoolInstance -> Env -> VPosition -> Env
-crsSPControl World {..} SI {..} cState@(wc@(hCache, dCache, vCache), localVars, localCache, rg) vp
+crsSPControl World {..} SI {..} cState@(wc@(hCache, dCache, nCache, vCache), localVars, localCache, rg) vp
   = undefined
 
 crsSIControl :: World -> SpoolInstance -> Env -> VPosition -> VPosition -> Env
-crsSIControl World {..} SI {..} cState@(wc@(hCache, dCache, vCache), localVars, localCache, rg) vpA vpB
+crsSIControl World {..} SI {..} cState@(wc@(hCache, dCache, nCache, vCache), localVars, localCache, rg) vpA vpB
   = undefined
 
 
 -- NOTE: crsSIInit does not initiate SI by itself, but would be done by `runSpoolInstance`
 crsSIInit
   :: World -> SpoolInstance -> Env -> VPosition -> VPosition -> VPosition -> Env
-crsSIInit World {..} SI {..} cState@(wc@(hCache, dCache, vCache), localVars, localCache, rg) vpA vpB vpC
+crsSIInit World {..} SI {..} cState@(wc@(hCache, dCache, nCache, vCache), localVars, localCache, rg) vpA vpB vpC
   = undefined
  where
   spoolID = undefined

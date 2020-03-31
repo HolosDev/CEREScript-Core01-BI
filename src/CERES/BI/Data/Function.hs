@@ -13,6 +13,8 @@ import           Data.List                      ( groupBy
                                                 , sortBy
                                                 )
 import           Data.Maybe
+import qualified Data.Text.Lazy                as TL
+import qualified Data.Trie.Text                as Trie
 
 
 updateWorldState
@@ -149,3 +151,35 @@ updateValuesToVar ws@WorldState {..} ivList =
 
 updateValuesToValueMap :: ValueMap -> [(Idx, Maybe Value)] -> ValueMap
 updateValuesToValueMap = foldr (\(i, v) -> IM.update (const v) i)
+
+
+
+
+getNValueFromWS :: WorldState -> NKey -> Maybe Value
+getNValueFromWS WorldState {..} = getValueFromValueNMap worldNDic
+
+getValueFromValueNMap :: ValueNMap -> NKey -> Maybe Value
+getValueFromValueNMap valueNMap nKey = Trie.lookup (TL.toStrict nKey) valueNMap
+
+getNValuesFromWS :: WorldState -> [NKey] -> [(NKey, Maybe Value)]
+getNValuesFromWS WorldState {..} = getValuesFromValueNMap worldNDic
+
+getValuesFromValueNMap :: ValueNMap -> [NKey] -> [(NKey, Maybe Value)]
+getValuesFromValueNMap valueNMap = map (\nKey -> (nKey, Trie.lookup (TL.toStrict nKey) valueNMap))
+
+
+updateNValueToWS :: WorldState -> NKey -> Maybe Value -> WorldState
+updateNValueToWS ws@WorldState {..} nKey aMValue =
+  ws { worldNDic = updateValueToValueNMap worldNDic nKey aMValue }
+
+updateValueToValueNMap :: ValueNMap -> NKey -> Maybe Value -> ValueNMap
+updateValueToValueNMap valueNMap nKey aMValue = case aMValue of
+  (Just aValue) -> Trie.adjust (const aValue) (TL.toStrict nKey) valueNMap
+  _ -> Trie.delete (TL.toStrict nKey) valueNMap
+
+updateValuesToNDic :: WorldState -> [(NKey, Maybe Value)] -> WorldState
+updateValuesToNDic ws@WorldState {..} ivList =
+  ws { worldNDic = updateValuesToValueNMap worldNDic ivList }
+
+updateValuesToValueNMap :: ValueNMap -> [(NKey, Maybe Value)] -> ValueNMap
+updateValuesToValueNMap = foldr (\(n, v) b -> updateValueToValueNMap b n v)

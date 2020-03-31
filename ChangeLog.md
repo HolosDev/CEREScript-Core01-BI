@@ -25,6 +25,7 @@ Changelog for CEREScript-Core01-BI
 
 ### Changed
 * Move `Cache` modifier to `CERES.BI.Data.Cache.Function`
+* Refactor and Add new features for `NDic` compatibility
 * Use `random-wrapper` package instead of internal wrapper module
 
 ### Removed

@@ -2,13 +2,11 @@ module CERES.BI.Data.Environment where
 
 
 import           Data.Map                       ( Map )
-import qualified Data.Map                      as M
 import           Data.IntMap                    ( IntMap )
-import qualified Data.IntMap                   as IM
 import           Data.Text.Lazy                 ( Text )
 import qualified Data.Text.Lazy                as TL
+import           Data.Trie.Text                 ( Trie )
 import           Data.Set                       ( Set )
-import qualified Data.Set                      as S
 import           Data.Maybe
 
 import           TextShow
@@ -30,11 +28,14 @@ import           CERES.BI.Type
 -- TODO: Value -> ValueContainer
 type RWMV = RW (Maybe Value)
 type RWMVMap = IntMap RWMV
+type RWMVNMap = Trie RWMV
 
-type WorldCache = (HistoricCache, DictionaryCache, VariableCache)
+type WorldCache
+  = (HistoricCache, DictionaryCache, NDictionaryCache, VariableCache)
 -- | HistoricCache (Map Time (Map ID (Maybe Value)))
 type HistoricCache = IntMap RWMVMap
 type DictionaryCache = RWMVMap
+type NDictionaryCache = RWMVNMap
 type VariableCache = RWMVMap
 
 type LocalVariables = ValueMap

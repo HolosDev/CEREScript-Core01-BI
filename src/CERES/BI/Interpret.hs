@@ -126,9 +126,9 @@ runCEREScript
   :: World -> SpoolInstance -> Env -> CEREScript -> (Env, CEREScript)
 runCEREScript aWorld@World {..} aSI@SI {..} = runCEREScriptSub
  where
-  runCEREScriptSub cState@(wc@(hCache, dCache, vCache), localVars, localCache, rg) []
+  runCEREScriptSub cState@(wc@(hCache, dCache, nCache, vCache), localVars, localCache, rg) []
     = (cState, [])
-  runCEREScriptSub cState@(wc@(hCache, dCache, vCache), localVars, localCache, rg) (ceres : cScript)
+  runCEREScriptSub cState@(wc@(hCache, dCache, nCache, vCache), localVars, localCache, rg) (ceres : cScript)
     = if sp
       then ((nextWC, nextLocalVars, nextLocalCache, nextRG), nextCEREScript)
       else runCEREScriptSub (nextWC, nextLocalVars, nextLocalCache, nextRG)

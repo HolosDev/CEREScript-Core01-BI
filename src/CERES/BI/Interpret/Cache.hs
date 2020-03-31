@@ -1,14 +1,12 @@
 module CERES.BI.Interpret.Cache where
 
-import           Data.IntMap                    ( IntMap )
 import qualified Data.IntMap                   as IM
-import           Data.Map                       ( Map )
 import qualified Data.Map                      as M
 import           Data.Maybe
 import           Data.List                      ( nub
                                                 , partition
                                                 )
-import           Data.Set                       ( Set )
+import qualified Data.Trie.Text                as Trie
 import qualified Data.Set                      as S
 
 import           CERES.Operate
@@ -35,29 +33,33 @@ import           Util
 cacheMaker :: SpoolTree -> World -> WorldCache
 cacheMaker SpoolTree {..} World {..} = S.foldr cacheMakerSub blankCache vpSet
  where
-  blankCache = (IM.empty, IM.empty, IM.empty)
+  blankCache = (IM.empty, IM.empty, Trie.empty, IM.empty)
   cacheMakerSub vp aCache = case vp of
     (AtWrld time idx) ->
       let mValue                   = getHValueFromWS worldState time idx
-          (hCache, dCache, vCache) = aCache
+          (hCache, dCache, nCache, vCache) = aCache
           newHCache                = setHCache time idx R mValue hCache
-      in  (newHCache, dCache, vCache)
+      in  (newHCache, dCache, nCache, vCache)
     (AtTime time idx) ->
       let mValue = getHValueFromWS worldState (worldTime + time) idx
-          (hCache, dCache, vCache) = aCache
+          (hCache, dCache, nCache, vCache) = aCache
           newHCache = setHCache worldTime idx R mValue hCache
-      in  (newHCache, dCache, vCache)
+      in  (newHCache, dCache, nCache, vCache)
     (AtDict idx) ->
       let mValue                   = getDValueFromWS worldState idx
-          (hCache, dCache, vCache) = aCache
+          (hCache, dCache, nCache, vCache) = aCache
           newDCache                = setRWMVMap idx R mValue dCache
-      in  (hCache, newDCache, vCache)
-    (AtNDic nKey) -> notYetImpl "cacheMaker :=: AtNDict"
+      in  (hCache, newDCache, nCache, vCache)
+    (AtNDic nKey) ->
+      let mValue                   = getNValueFromWS worldState nKey
+          (hCache, dCache, nCache, vCache) = aCache
+          newNCache                = setRWMVNMap nKey R mValue nCache
+      in  (hCache, dCache, newNCache, vCache)
     (AtVars idx) ->
       let mValue                   = getVValueFromWS worldState idx
-          (hCache, dCache, vCache) = aCache
+          (hCache, dCache, nCache, vCache) = aCache
           newVCache                = setRWMVMap idx R mValue vCache
-      in  (hCache, dCache, newVCache)
+      in  (hCache, dCache, nCache, newVCache)
     (AtLocl _) -> aCache
     (AtCach _) -> aCache
     (AtHere _) -> aCache
@@ -69,7 +71,7 @@ cacheMaker SpoolTree {..} World {..} = S.foldr cacheMakerSub blankCache vpSet
 -- TODO: This style is for foldr, we may change this better
 -- TODO: Change this for when many WorldCache is given as List or etc.
 cacheCommitter :: WorldCache -> WorldState -> WorldState
-cacheCommitter (hCache, dCache, vCache) aWorldState@WorldState {..} =
+cacheCommitter (hCache, dCache, nCache, vCache) aWorldState@WorldState {..} =
   newWorldState
  where
   newWorldState =
