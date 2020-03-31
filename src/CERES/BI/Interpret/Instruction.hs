@@ -15,6 +15,7 @@ import           Data.CERES.Value
 import           Data.CERES.Value.Method
 
 import           CERES.BI.Data
+import           CERES.BI.Data.Cache.Function
 import           CERES.BI.Data.Constants
 import           CERES.BI.Data.Environment
 import           CERES.BI.Data.Function

@@ -23,9 +23,12 @@ Changelog for CEREScript-Core01-BI
 * Add `Util.Random` module for random function aliases
 * Add `NDic` field to `WorldState`
 
+### Changed
+* Move `Cache` modifier to `CERES.BI.Data.Cache.Function`
 
 ### Removed
 * Remove module `CERES.BI.Data.Spool`
+
 
 ## 0.6.0.0 -- 2020-03-28
 
