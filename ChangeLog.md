@@ -24,6 +24,9 @@ Changelog for CEREScript-Core01-BI
 * Add `NDic` field to `WorldState`
 
 
+### Removed
+* Remove module `CERES.BI.Data.Spool`
+
 ## 0.6.0.0 -- 2020-03-28
 
 ### Added
