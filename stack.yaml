@@ -10,5 +10,5 @@ extra-deps:
 - github: HolosDev/CEREScript-Core01
 #- git: https://gitlab.com/holosdev/CEREScript-Core01
   commit: 1ba4d2d8707c6e915625204f3d74279ed7104bfd
-- github: QuietJoon/random-wrapper
-  commit: 2515a5a0fde0e155097fe5d35b4f90c761e86e04
+- github: QuietJoon/random-adaptor
+  commit: f2f7578027ec2a855a59f7a10f4afeaa0f870b37

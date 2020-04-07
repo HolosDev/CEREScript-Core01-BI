@@ -17,7 +17,7 @@ Changelog for CEREScript-Core01-BI
 * Move Move `get*Cache` and `set*Cache` functions to `CERES.BI.Data.*`
 
 
-## 0.7.0.0 -- 2020-03-29
+## 0.7.0.0 -- 2020-04-XX
 
 ### Added
 * Add `Util.Random` module for random function aliases
@@ -26,7 +26,7 @@ Changelog for CEREScript-Core01-BI
 ### Changed
 * Move `Cache` modifier to `CERES.BI.Data.Cache.Function`
 * Refactor and Add new features for `NDic` compatibility
-* Use `random-wrapper` package instead of internal wrapper module
+* Use `random-adaptor` package instead of homemade adaptor module
 
 ### Removed
 * Remove module `CERES.BI.Data.Spool`

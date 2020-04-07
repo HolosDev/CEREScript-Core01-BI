@@ -4,4 +4,4 @@ module CERES.BI.Util.Random
 where
 
 
-import           Util.Wrapper.Random.SplitMix  as Random
+import           Util.Adaptor.Random.SplitMix  as Random

@@ -16,12 +16,12 @@ dependencies:
 - base >= 4.7 && < 5
 - array
 - containers
+- random-adaptor
 - splitmix
 - text
 - text-show
 - text-trie
 - CEREScript-Core01
-- random-wrapper
 
 default-extensions:
 - OverloadedStrings
