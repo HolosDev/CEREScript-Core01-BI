@@ -83,25 +83,30 @@ runSpoolInstance world@World {..} si@SI {..} wCache =
   ((siis, newSI), newWorldCache)
  where
   -- TODO: Change `StrValue "Retain"` as a named constant
-  iLocalCache = csInitLocalVars $ worldSpools IM.! siSpoolID
+  iLTCache = csInitLocalTemp $ worldSpools IM.! siSpoolID
   isResume    = maybe False getBool $ IM.lookup resumeCodeIdx siLocalVars
-  iLocalVars =
+  iLVCache =
     -- TODO: Not sure to initialize ExecutingTime variable
     (if isResume then id else IM.insert executingTimeIdx (IntValue 0))
       . IM.insert resumeCodeIdx (BoolValue False)
       $ siLocalVars
-  ((newWorldCache, newLocalVars, newLocalCache, newRG), restCEREScript) =
-    runCEREScript world si (wCache, iLocalVars, iLocalCache, siRG) siRestScript
-  siisCode = maybe "Retain" getStr $ IM.lookup retainCodeIdx newLocalCache
-  (doAbolish, doInit, nextLocalVars) = case siisCode of
-    "Retain"  -> (False, False, newLocalVars)
-    "Forget"  -> (False, False, blankVM)
+  -- FIXME
+  iLNVCache = undefined
+  -- FIXME
+  iLNTCache = undefined
+  iLocalCache = (iLVCache, iLNVCache, iLTCache, iLNTCache)
+  ((newWorldCache, (newLVCache, newLNVCache, newLTCache, newLNTCache), newRG), restCEREScript) =
+    runCEREScript world si (wCache, iLocalCache, siRG) siRestScript
+  siisCode = maybe "Retain" getStr $ IM.lookup retainCodeIdx newLTCache
+  (doAbolish, doInit, nextLocalVars, nextLocalNVars) = case siisCode of
+    "Retain"  -> (False, False, newLVCache, newLNVCache)
+    "Forget"  -> (False, False, blankVM, blankVNM)
     -- FIXME: Add SI initiation logic
-    "Init"    -> (False, True, blankVM)
-    "Abolish" -> (True, False, blankVM)
+    "Init"    -> (False, True, blankVM, blankVNM)
+    "Abolish" -> (True, False, blankVM, blankVNM)
     _ -> error "[ERROR]<runSpoolInstance :=: _> Undefined Retention Code"
   -- NOTE: SIJump takes relative time-slot
-  jumpTarget = maybe 1 getInt $ IM.lookup jumpOffsetIdx newLocalCache
+  jumpTarget = maybe 1 getInt $ IM.lookup jumpOffsetIdx newLTCache
   siis       = if doAbolish || null (restCEREScript :: CEREScript)
     then SIEnd
     else SIJump jumpTarget
@@ -126,33 +131,34 @@ runCEREScript
   :: World -> SpoolInstance -> Env -> CEREScript -> (Env, CEREScript)
 runCEREScript aWorld@World {..} aSI@SI {..} = runCEREScriptSub
  where
-  runCEREScriptSub cState@(wc@(hCache, dCache, nCache, vCache), localVars, localCache, rg) []
-    = (cState, [])
-  runCEREScriptSub cState@(wc@(hCache, dCache, nCache, vCache), localVars, localCache, rg) (ceres : cScript)
+  runCEREScriptSub cState [] = (cState, [])
+  runCEREScriptSub cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), lc@(lVCache, lNVCache, lTCache, lNTCache), rg) (ceres : cScript)
     = if sp
-      then ((nextWC, nextLocalVars, nextLocalCache, nextRG), nextCEREScript)
-      else runCEREScriptSub (nextWC, nextLocalVars, nextLocalCache, nextRG)
-                            nextCEREScript
+      then ((nextWC, nextLC, nextRG), nextCEREScript)
+      else runCEREScriptSub (nextWC, nextLC, nextRG) nextCEREScript
     -- NOTE: si == True, then end runCEREScript
 
    where
-    (newWC, newLocalVars, newLocalCache, newRG) =
-      runInstruction aWorld aSI cState ceres
+    (newWC, newLC, newRG) = runInstruction aWorld aSI cState ceres
     -- TODO: Check Stop or Pause
-    spCode        = maybe "" getStr $ IM.lookup spCodeIdx newLocalCache
+    spCode        = maybe "" getStr $ IM.lookup spCodeIdx newLTCache
     sp            = spCode == "Stop" || spCode == "Pause"
     retentionCode = case spCode of
       "Stop"  -> "Abolish"
       -- TODO: Not sure do I need to identify whether this is "Pause"
       "Pause" -> "Retain"
-      _       -> maybe "Retain" getStr $ IM.lookup retainCodeIdx newLocalCache
+      _       -> maybe "Retain" getStr $ IM.lookup retainCodeIdx newLTCache
     -- TODO: Check the instruction is executed or not
-    resumeFlag     = maybe False getBool $ IM.lookup resumeCodeIdx newLocalVars
+    resumeFlag     = maybe False getBool $ IM.lookup resumeCodeIdx newLVCache
     nextCEREScript = if resumeFlag then (ceres : cScript) else cScript
+    (newLVCache, newLNVCache, newLTCache, newLNTCache) = newLC
     nextWC         = newWC
-    nextLocalVars =
-      IM.insert retainCodeIdx (StrValue retentionCode) newLocalVars
-    nextLocalCache = newLocalCache
+    nextLVCache =
+      IM.insert retainCodeIdx (StrValue retentionCode) newLVCache
+    nextLNVCache = newLNVCache
+    nextLTCache = newLTCache
+    nextLNTCache = newLNTCache
+    nextLC = (nextLVCache, nextLNVCache, nextLTCache, nextLNTCache)
     nextRG         = newRG
 
 

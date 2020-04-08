@@ -31,17 +31,28 @@ type RWMVMap = IntMap RWMV
 type RWMVNMap = Trie RWMV
 
 type WorldCache
-  = (HistoricalCache, DictionaryCache, NDictionaryCache, VariableCache)
+  = ( HistoricalCache
+    , NHistoricalCache
+    , DictionaryCache
+    , NDictionaryCache
+    , VariableCache
+    , NVariableCache
+    )
 -- | HistoricalCache (Map Time (Map ID (Maybe Value)))
 type HistoricalCache = IntMap RWMVMap
+type NHistoricalCache = IntMap RWMVNMap
 type DictionaryCache = RWMVMap
 type NDictionaryCache = RWMVNMap
 type VariableCache = RWMVMap
+type NVariableCache = RWMVNMap
 
+type LocalCache = (LocalVariables, LocalNVariables, LocalTemp, LocalNTemp)
 type LocalVariables = ValueMap
-type LocalCache = ValueMap
+type LocalNVariables = ValueNMap
+type LocalTemp = ValueMap
+type LocalNTemp = ValueNMap
 
-type Env = (WorldCache, LocalVariables, LocalCache, RG)
+type Env = (WorldCache, LocalCache, RG)
 
 data RW a = R a | W a | RW a deriving (Eq, Ord)
 

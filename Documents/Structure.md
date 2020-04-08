@@ -3,26 +3,27 @@ Structure
 
 ## Data Storage
 
-### World
+### World, NWorld
 
 Global state with time.
 
 `HistoricalTable` takes every EpochRow.
+`NHistoricalTable` takes every NEpochRow.
 
-### Dict
+### Dict, NDict, Vars, NVars
 
 A global state without time.
 
-### (AtTime)
+### (AtTime, AtNTime)
 
 Not independent storage.
-Based on WorldState.
+Based on `HistoricalTable` and `NHistoricalTable`.
 
-### Local
+### LocalVars, LocalNVars
 
 Storage which belongs to a spool instance which is lasting after a time slot.
 
-### Cache
+### LocalTemp, LocalNTemp
 
 Storage which belongs to a spool instance which is not lasting after a time slot.
 Stores temporal/focused variable only.
@@ -32,33 +33,41 @@ Stores temporal/focused variable only.
 No storage.
 Stored in an instruction itself.
 
-## Instruction
+### (AtNull)
 
-### AtWorld
+When you don't want to give any target VP to storing instruction.
+
+## VariablePosition
+
+### AtWorld, AtNWorld
 
 A global state with absolute time definition.
 Without time notation, the time is set to 0.
 
-### AtDict
+### AtDict, AtNDict, AtVars, AtNVars
 
 A global state without time.
 
-### AtTime
+### AtTime, AtNTime
 
  A global state with relative time definition.
 Without time notation, the time is set to `current`.
 
-### AtLocal
+### AtLVars, AtLNVars
 
 Local state which limited in a spool instance.
 
-### AtCache
+### AtLTemp, AtLNTemp
 
 Local state which limited in a spool instance in a time-slot.
 
 ### AtHere
 
 Just for using it, not for storing.
+
+### AtNull
+
+Do nothing with the VP
 
 
 ## Value retention in a Table
@@ -86,7 +95,7 @@ Without explicit `DeleteVariable` instruction, a new Time-Slot would copy every 
   * True: do not get a new executingTime
   * otherwise: get a new executingTime
 
-### LocalCache
+### LocalTemp
 
 Stores only variables which should not be inherited after time-slot
 

@@ -20,12 +20,11 @@ Changelog for CEREScript-Core01-BI
 ## 0.7.0.0 -- 2020-04-XX
 
 ### Added
-* Add `Util.Random` module for random function aliases
-* Add `NDic` field to `WorldState`
+* Add more storage in WorldState which have NKey as a primary key
 
 ### Changed
 * Move `Cache` modifier to `CERES.BI.Data.Cache.Function`
-* Refactor and Add new features for `NDic` compatibility
+* Overhaul structures for new `NKey` storage compatibility
 * Use `random-adaptor` package instead of homemade adaptor module
 * Rename `HistoricTable` to `HistoricalTable`
 

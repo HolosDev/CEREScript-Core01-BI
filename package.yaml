@@ -1,10 +1,10 @@
 name:                CEREScript-Core01-BI
-version:             0.6.0.0
+version:             0.7.0.0
 github:              "HolosDev/CEREScript-Core01-BI"
 license:             OtherLicense
 author:              "YongJoon Joe"
 maintainer:          "YongJoon Joe <developer@quietjoon.net>"
-copyright:           "2019-2020 Holos Works/MiRiS Project"
+copyright:           "2019-2020 Holos Works / PPUZZL Group"
 
 extra-source-files:
 - README.md

@@ -35,27 +35,27 @@ setEnv World {..} = setEnvBy worldTime
 -- TODO: Add NDict after adding NDict field
 setEnvBy
   :: Time -> VPosition -> (Maybe Value -> RWMV) -> Maybe Value -> Env -> Env
-setEnvBy _ vp@(AtWrld time idx) mode mValue ((hCache, dCache, nCache, vCache), localVars, localCache, rg)
-  = ((newHCache, dCache, nCache, vCache), localVars, localCache, rg)
+setEnvBy _ vp@(VP AtWorld ~(VIIT idx time)) mode mValue ((hCache, nHCache, dCache, nDCache, vCache, nVCache), localCache, rg)
+  = ((newHCache, nHCache, dCache, nDCache, vCache, nVCache), localCache, rg)
   where newHCache = setHCache time idx mode mValue hCache
-setEnvBy worldTime vp@(AtTime time idx) mode mValue ((hCache, dCache, nCache, vCache), localVars, localCache, rg)
-  = ((newHCache, dCache, nCache, vCache), localVars, localCache, rg)
+setEnvBy worldTime vp@(VP AtTime ~(VIIT idx time)) mode mValue ((hCache, nHCache, dCache, nDCache, vCache, nVCache), localCache, rg)
+  = ((newHCache, nHCache, dCache, nDCache, vCache, nVCache), localCache, rg)
   where newHCache = setHCache (worldTime + time) idx mode mValue hCache
-setEnvBy _ (AtDict idx) mode mValue ((hCache, dCache, nCache, vCache), localVars, localCache, rg)
-  = ((hCache, newDCache, nCache, vCache), localVars, localCache, rg)
+setEnvBy _ (VP AtDict ~(VII idx)) mode mValue ((hCache, nHCache, dCache, nDCache, vCache, nVCache), localCache, rg)
+  = ((hCache, nHCache, newDCache, nDCache, vCache, nVCache), localCache, rg)
   where newDCache = setRWMVMap idx mode mValue dCache
-setEnvBy _ (AtNDic nKey) mode mValue ((hCache, dCache, nCache, vCache), localVars, localCache, rg)
-  = ((hCache, dCache, newNCache, vCache), localVars, localCache, rg)
-  where newNCache = setRWMVNMap nKey mode mValue nCache
-setEnvBy _ (AtVars idx) mode mValue ((hCache, dCache, nCache, vCache), localVars, localCache, rg)
-  = ((hCache, dCache, nCache, newVCache), localVars, localCache, rg)
+setEnvBy _ (VP AtNDict ~(VIN nKey)) mode mValue ((hCache, nHCache, dCache, nDCache, vCache, nVCache), localCache, rg)
+  = ((hCache, nHCache, dCache, newNDCache, vCache, nVCache), localCache, rg)
+  where newNDCache = setRWMVNMap nKey mode mValue nDCache
+setEnvBy _ (VP AtVars ~(VII idx)) mode mValue ((hCache, nHCache, dCache, nDCache, vCache, nVCache), localCache, rg)
+  = ((hCache, nHCache, dCache, nDCache, newVCache, nVCache), localCache, rg)
   where newVCache = setRWMVMap idx mode mValue vCache
-setEnvBy _ (AtLocl idx) mode mValue (wCache, localVars, localCache, rg) =
-  (wCache, newLocalVars, localCache, rg)
-  where newLocalVars = setVMap idx mValue localVars
-setEnvBy _ (AtCach idx) mode mValue (wCache, localVars, localCache, rg) =
-  (wCache, localVars, newLocalCache, rg)
-  where newLocalCache = setVMap idx mValue localCache
+setEnvBy _ (VP AtLVars ~(VII idx)) mode mValue (wCache, (lVCache, lNVCache, lTCache, lNTCache), rg)
+  = (wCache, (newLVCache, lNVCache, lTCache, lNTCache), rg)
+  where newLVCache = setVMap idx mValue lVCache
+setEnvBy _ (VP AtLTemp ~(VII idx)) mode mValue (wCache, (lVCache, lNVCache, lTCache, lNTCache), rg)
+  = (wCache, (lVCache, lNVCache, newLTCache, lNTCache), rg)
+  where newLTCache = setVMap idx mValue lTCache
 setEnvBy _ _ _ _ cState = cState
 
 
@@ -75,8 +75,9 @@ setHCache time idx mode mValue hCache = newHCache
 setRWMVMap :: Idx -> (Maybe Value -> RWMV) -> Maybe Value -> RWMVMap -> RWMVMap
 setRWMVMap idx mode mValue = IM.insert idx (mode mValue)
 
-setRWMVNMap :: NKey -> (Maybe Value -> RWMV) -> Maybe Value -> RWMVNMap -> RWMVNMap
-setRWMVNMap nKey mode mValue = Trie.insert (TL.toStrict nKey) (mode mValue)
+setRWMVNMap
+  :: NKey -> (Maybe Value -> RWMV) -> Maybe Value -> RWMVNMap -> RWMVNMap
+setRWMVNMap nKey mode mValue = Trie.insert nKey (mode mValue)
 
 setVMap :: Idx -> Maybe Value -> ValueMap -> ValueMap
 setVMap idx mValue = IM.update (const mValue) idx
@@ -86,18 +87,23 @@ getEnv :: World -> VPosition -> Env -> Value
 getEnv World {..} = getEnvBy worldTime
 
 getEnvBy :: Time -> VPosition -> Env -> Value
-getEnvBy _ vp@(AtWrld time idx) ((hCache, _, _, _), _, _, _) =
+getEnvBy _ vp@(VP AtWorld ~(VIIT idx time)) ((hCache, _, _, _, _, _), _, _) =
   getHCache time idx hCache
-getEnvBy worldTime vp@(AtTime time idx) ((hCache, _, _, _), _, _, _) =
-  getHCache (worldTime + time) idx hCache
-getEnvBy _ (AtDict idx) ((_, dCache, _, _), _, _, _) = getRWMVMap idx dCache
+getEnvBy worldTime vp@(VP AtTime ~(VIIT idx time)) ((hCache, _, _, _, _, _), _, _)
+  = getHCache (worldTime + time) idx hCache
+getEnvBy _ (VP AtDict ~(VII idx)) ((_, _, dCache, _, _, _), _, _) =
+  getRWMVMap idx dCache
 -- TODO: Need to implement
-getEnvBy _ (AtNDic nKey) ((_, _, nCache, _), _, _, _) = getRWMVNMap nKey nCache
-getEnvBy _ (AtVars idx) ((_, _, _, vCache), _, _, _) = getRWMVMap idx vCache
-getEnvBy _ (AtLocl idx) (_, localVars, _, _) = getVMap idx localVars
-getEnvBy _ (AtCach idx) (_, _, localCache, _) = getVMap idx localCache
-getEnvBy _ (AtHere v) (_, _, _, _) = v
-getEnvBy _ AtNull (_, _, _, _) =
+getEnvBy _ (VP AtNDict ~(VIN nKey)) ((_, _, _, nCache, _, _), _, _) =
+  getRWMVNMap nKey nCache
+getEnvBy _ (VP AtVars ~(VII idx)) ((_, _, _, _, vCache, _), _, _) =
+  getRWMVMap idx vCache
+getEnvBy _ (VP AtLVars ~(VII idx)) (_, (localVars, _, _, _), _) =
+  getVMap idx localVars
+getEnvBy _ (VP AtLTemp ~(VII idx)) (_, (_, _, localCache, _), _) =
+  getVMap idx localCache
+getEnvBy _ (VP AtHere ~(VIV v)) (_, _, _) = v
+getEnvBy _ (VP AtNull _) (_, _, _) =
   error "[ERROR]<getEnvBy :=: AtNull> Can't access AtNull"
 
 getHCache :: Time -> Idx -> HistoricalCache -> Value
@@ -122,7 +128,7 @@ getRWMVNMap nKey rwmvnMap = fromMaybe
   found
  where
   found :: Maybe Value
-  found = Trie.lookup (TL.toStrict nKey) rwmvnMap >>= runRW
+  found = Trie.lookup nKey rwmvnMap >>= runRW
 
 getVMap :: Idx -> ValueMap -> Value
 getVMap id vMap = fromMaybe (ErrValue "[ERROR]<getVMap> No such Value") found

@@ -1,5 +1,6 @@
 module CERES.BI.Data where
 
+import           Data.Function
 import           Data.IntMap                    ( IntMap )
 import qualified Data.IntMap                   as IM
 import           Data.Map                       ( Map )
@@ -41,38 +42,55 @@ type SpoolInstanceTable = IntMap SpoolInstanceRow
 data WorldState = WorldState
   { evaluatedSpan :: TimeSpan
   , worldHistory  :: HistoricalTable
+  , worldNHistory :: NHistoricalTable
   , worldDict     :: Dictionary
-  , worldNDic     :: NDictionary
+  , worldNDict    :: NDictionary
   , worldVars     :: Variables
+  , worldNVars    :: NVariables
   , worldRG       :: RG
   } deriving Show
 
 type TimeSpan = Maybe (Time, Time)
 type HistoricalTable = IntMap EpochRow
+type NHistoricalTable = IntMap NEpochRow
 data EpochRow = EpochRow
-  { valueRowTime :: {-# UNPACK #-} !Time
-  , values       :: Values
+  { eRowTime :: {-# UNPACK #-} !Time
+  , values   :: Values
   } deriving Show
+data NEpochRow = NEpochRow
+  { nERowTime :: {-# UNPACK #-} !Time
+  , nValues   :: NValues
+  } deriving Show
+
 type Values = ValueMap
-type Dictionary = ValueMap
-type NDictionary = Trie Value
-type Variables = ValueMap
+type NValues = ValueNMap
+type Dictionary = Values
+type NDictionary = NValues
+type Variables = Values
+type NVariables = NValues
 
 -- | Spools contains every spool code
 type Spools = IntMap Spool
 type Spool = CERESSpool
 
 data CERESSpool = CERESSpool
-  { csID       :: {-# UNPACK #-} !ID -- NOTE: ID of Spool code, not instance
-  , csName     :: {-# UNPACK #-} !Name
-  , csScript   :: CEREScript
-  -- TODO: Not sure this could be static or dynamic
-  , readVP     :: Set VPosition
-  , writeVP    :: Set VPosition
-  , csPriority :: {-# UNPACK #-} !Priority
-  , csInitLocalVars :: ValueMap
-  , csInitLocalCache :: ValueMap
-  } deriving (Eq, Ord, Show, Read)
+  { csID             :: {-# UNPACK #-} !ID -- NOTE: ID of Spool code, not instance
+  , csName           :: {-# UNPACK #-} !Name
+  , csScript         :: CEREScript
+  , readVP           :: Set VPosition -- TODO: Not sure this could be static or dynamic
+  , writeVP          :: Set VPosition -- TODO: Not sure this could be static or dynamic
+  , csPriority       :: {-# UNPACK #-} !Priority
+  , csInitLocalVars  :: ValueMap
+  , csInitLocalNVars :: ValueNMap
+  , csInitLocalTemp  :: ValueMap
+  , csInitLocalNTemp :: ValueNMap
+  } deriving (Show)
+
+instance Eq CERESSpool where
+  (==) = (==) `on` csID
+
+instance Ord CERESSpool where
+  compare = compare `on` csID
 
 data SpoolInstanceRow = SIRow
   { siRowTime :: Time
@@ -84,24 +102,40 @@ type SpoolInstances = IntMap SpoolInstance
 data SpoolInstance = SI
   { siID         :: {-# UNPACK #-} !ID
   , siName       :: {-# UNPACK #-} !Name
+  , siPriority   :: {-# UNPACK #-} !Priority
   , siVPS        :: Set VPosition -- Only World, Dict, Var
   , siLocalVars  :: LocalVariables
+  , siLocalNVars :: LocalNVariables
   , siSpoolID    :: {-# UNPACK #-} !ID
   , siRestScript :: CEREScript
   , siRG         :: RG
   , siF          :: World -> World
   }
 
+instance Eq SpoolInstance where
+  (==) = (==) `on` siID
+
+instance Ord SpoolInstance where
+  compare siA siB =
+    if pCompared == EQ
+      then (compare `on` siID) siA siB
+      else pCompared
+   where
+    pCompared :: Ordering
+    pCompared = (compare `on` siPriority) siA siB
+
 instance Show SpoolInstance where
   show = TL.unpack . showtl
 
 instance TextShow SpoolInstance where
-  showb (SI id name _ _ sID _ _ _) =
+  showb (SI id name pr _ _ _ sID _ _ _) =
     fromLazyText "SI("
       <> showb id
       <> fromLazyText "): "
       <> fromLazyText name
-      <> fromLazyText " Based on Spool("
+      <> fromLazyText " <"
+      <> showb pr
+      <> fromLazyText "> Based on Spool("
       <> showb sID
       <> ")"
 
