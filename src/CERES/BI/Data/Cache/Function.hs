@@ -64,8 +64,8 @@ setHCache
   -> Idx
   -> (Maybe Value -> RWMV)
   -> Maybe Value
-  -> HistoricCache
-  -> HistoricCache
+  -> HistoricalCache
+  -> HistoricalCache
 setHCache time idx mode mValue hCache = newHCache
  where
   rwmvMap    = fromMaybe IM.empty (IM.lookup time hCache)
@@ -100,7 +100,7 @@ getEnvBy _ (AtHere v) (_, _, _, _) = v
 getEnvBy _ AtNull (_, _, _, _) =
   error "[ERROR]<getEnvBy :=: AtNull> Can't access AtNull"
 
-getHCache :: Time -> Idx -> HistoricCache -> Value
+getHCache :: Time -> Idx -> HistoricalCache -> Value
 getHCache time idx hCache = fromMaybe
   (ErrValue "[ERROR]<getHCacheSub> No such Value")
   found

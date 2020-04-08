@@ -20,7 +20,7 @@ import qualified Data.Trie.Text                as Trie
 
 
 updateWorldState
-  :: WorldState -> HistoricTable -> Dictionary -> Variables -> WorldState
+  :: WorldState -> HistoricalTable -> Dictionary -> Variables -> WorldState
 updateWorldState ws newWorldHistory newWorldDict newWorldVars = ws
   { worldHistory = newWorldHistory
   , worldDict    = newWorldDict
@@ -38,7 +38,7 @@ updateWorld aWorld newWorldState newSITable newWorldTime = aWorld
 getHValueFromWS :: WorldState -> Time -> Idx -> Maybe Value
 getHValueFromWS worldState = getHValueFromVT (worldHistory worldState)
 
-getHValueFromVT :: HistoricTable -> Time -> Idx -> Maybe Value
+getHValueFromVT :: HistoricalTable -> Time -> Idx -> Maybe Value
 getHValueFromVT worldHistory time idx =
   IM.lookup time worldHistory >>= (IM.lookup idx . values)
 
@@ -47,7 +47,7 @@ getHValuesFromWS
 getHValuesFromWS WorldState {..} = getHValuesFromVT worldHistory
 
 getHValuesFromVT
-  :: HistoricTable -> [(Time, Idx)] -> [[((Time, Idx), Maybe Value)]]
+  :: HistoricalTable -> [(Time, Idx)] -> [[((Time, Idx), Maybe Value)]]
 getHValuesFromVT worldHistory indices = map
   (getHValuesFromVTSub worldHistory)
   grouped
@@ -57,12 +57,12 @@ getHValuesFromVT worldHistory indices = map
   grouped = groupBy ((==) `on` getTime) sorted
 
 getHValuesFromVTSub
-  :: HistoricTable -> [(Time, Idx)] -> [((Time, Idx), Maybe Value)]
-getHValuesFromVTSub aHistoricTable indices = getHValuesFromVTSubSub aValues
+  :: HistoricalTable -> [(Time, Idx)] -> [((Time, Idx), Maybe Value)]
+getHValuesFromVTSub aHistoricalTable indices = getHValuesFromVTSubSub aValues
                                                                     indices
  where
   theTime = fst . head $ indices
-  aValues = maybe IM.empty values (IM.lookup theTime aHistoricTable)
+  aValues = maybe IM.empty values (IM.lookup theTime aHistoricalTable)
 
 getHValuesFromVTSubSub
   :: Values -> [(Time, Idx)] -> [((Time, Idx), Maybe Value)]
@@ -75,37 +75,37 @@ updateValueToWS worldState time idx aMValue = worldState
   { worldHistory = updateValueToVT (worldHistory worldState) time idx aMValue
   }
 
-updateValueToVT :: HistoricTable -> Time -> Idx -> Maybe Value -> HistoricTable
-updateValueToVT worldHistory time idx aMValue = newHistoricTable
+updateValueToVT :: HistoricalTable -> Time -> Idx -> Maybe Value -> HistoricalTable
+updateValueToVT worldHistory time idx aMValue = newHistoricalTable
  where
   baseValues       = maybe IM.empty values . IM.lookup time $ worldHistory
   newEpochRow      = EpochRow time (IM.update (const aMValue) idx baseValues)
-  newHistoricTable = IM.insert time newEpochRow worldHistory
+  newHistoricalTable = IM.insert time newEpochRow worldHistory
 
-updateValuesToWS :: WorldState -> [((Time, Idx), Maybe Value)] -> HistoricTable
+updateValuesToWS :: WorldState -> [((Time, Idx), Maybe Value)] -> HistoricalTable
 updateValuesToWS WorldState {..} = updateValuesToVT worldHistory
 
 updateValuesToVT
-  :: HistoricTable -> [((Time, Idx), Maybe Value)] -> HistoricTable
-updateValuesToVT worldHistory ivList = newHistoricTable
+  :: HistoricalTable -> [((Time, Idx), Maybe Value)] -> HistoricalTable
+updateValuesToVT worldHistory ivList = newHistoricalTable
  where
   getTime          = fst . fst
   sorted           = sortBy (compare `on` getTime) ivList
   grouped          = groupBy ((==) `on` getTime) sorted
-  newHistoricTable = foldr updateValuesToVTSub worldHistory grouped
+  newHistoricalTable = foldr updateValuesToVTSub worldHistory grouped
 
 -- TODO: Should be parallel when update existing element
 -- NOTE: But, inserting new element should be serialized
 updateValuesToVTSub
-  :: [((Time, Idx), Maybe Value)] -> HistoricTable -> HistoricTable
-updateValuesToVTSub ivList aHistoricTable = newHistoricTable
+  :: [((Time, Idx), Maybe Value)] -> HistoricalTable -> HistoricalTable
+updateValuesToVTSub ivList aHistoricalTable = newHistoricalTable
  where
   theTime = fst . fst . head $ ivList
   aEpochRow =
-    fromMaybe (EpochRow theTime IM.empty) (IM.lookup theTime aHistoricTable)
+    fromMaybe (EpochRow theTime IM.empty) (IM.lookup theTime aHistoricalTable)
   newEpochRow =
     aEpochRow { values = updateValuesToVTSubSub (values aEpochRow) ivList }
-  newHistoricTable = IM.insert theTime newEpochRow aHistoricTable
+  newHistoricalTable = IM.insert theTime newEpochRow aHistoricalTable
 
 updateValuesToVTSubSub :: Values -> [((Time, Idx), Maybe Value)] -> Values
 updateValuesToVTSubSub =

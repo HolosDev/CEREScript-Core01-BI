@@ -80,22 +80,22 @@ cacheCommitter (hCache, dCache, nCache, vCache) aWorldState@WorldState {..} =
   newWorldDict    = updateValuesToValueMap worldDict (unwrapFromRWMV dCache)
   newWorldVars    = updateValuesToValueMap worldDict (unwrapFromRWMV vCache)
 
--- NOTE: HistoricCache could have values in a time-slot which HistoricTable may not have
+-- NOTE: HistoricalCache could have values in a time-slot which HistoricalTable may not have
 -- NOTE: Anyway, every values should alive
 -- TODO: Optimize unique key generator
 -- TODO: Optimize with/without updateValuesToVT
-updateWorldHistoryFromCache :: HistoricTable -> HistoricCache -> HistoricTable
-updateWorldHistoryFromCache historicTable hCache = IM.map newRow uniqueTimes
+updateWorldHistoryFromCache :: HistoricalTable -> HistoricalCache -> HistoricalTable
+updateWorldHistoryFromCache historicalTable hCache = IM.map newRow uniqueTimes
  where
   uniqueTimes =
     IM.fromList
       .  map (\x -> (x, x))
       .  nub
-      $  IM.keys historicTable
+      $  IM.keys historicalTable
       ++ IM.keys hCache
   newRow time = EpochRow time newValues
    where
-    baseRow     = maybe IM.empty values . IM.lookup time $ historicTable
+    baseRow     = maybe IM.empty values . IM.lookup time $ historicalTable
     targetCache = fromMaybe IM.empty . IM.lookup time $ hCache
     unwrapped   = unwrapFromRWMV targetCache
     newValues   = updateValuesToValueMap baseRow unwrapped

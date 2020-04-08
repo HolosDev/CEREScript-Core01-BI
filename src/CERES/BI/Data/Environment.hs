@@ -31,9 +31,9 @@ type RWMVMap = IntMap RWMV
 type RWMVNMap = Trie RWMV
 
 type WorldCache
-  = (HistoricCache, DictionaryCache, NDictionaryCache, VariableCache)
--- | HistoricCache (Map Time (Map ID (Maybe Value)))
-type HistoricCache = IntMap RWMVMap
+  = (HistoricalCache, DictionaryCache, NDictionaryCache, VariableCache)
+-- | HistoricalCache (Map Time (Map ID (Maybe Value)))
+type HistoricalCache = IntMap RWMVMap
 type DictionaryCache = RWMVMap
 type NDictionaryCache = RWMVNMap
 type VariableCache = RWMVMap

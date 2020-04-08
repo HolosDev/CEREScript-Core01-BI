@@ -40,7 +40,7 @@ type SpoolInstanceTable = IntMap SpoolInstanceRow
 -- No Branch World yet
 data WorldState = WorldState
   { evaluatedSpan :: TimeSpan
-  , worldHistory  :: HistoricTable
+  , worldHistory  :: HistoricalTable
   , worldDict     :: Dictionary
   , worldNDic     :: NDictionary
   , worldVars     :: Variables
@@ -48,7 +48,7 @@ data WorldState = WorldState
   } deriving Show
 
 type TimeSpan = Maybe (Time, Time)
-type HistoricTable = IntMap EpochRow
+type HistoricalTable = IntMap EpochRow
 data EpochRow = EpochRow
   { valueRowTime :: {-# UNPACK #-} !Time
   , values       :: Values

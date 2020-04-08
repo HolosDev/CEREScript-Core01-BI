@@ -27,6 +27,7 @@ Changelog for CEREScript-Core01-BI
 * Move `Cache` modifier to `CERES.BI.Data.Cache.Function`
 * Refactor and Add new features for `NDic` compatibility
 * Use `random-adaptor` package instead of homemade adaptor module
+* Rename `HistoricTable` to `HistoricalTable`
 
 ### Removed
 * Remove module `CERES.BI.Data.Spool`

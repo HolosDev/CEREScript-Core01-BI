@@ -7,7 +7,7 @@ Structure
 
 Global state with time.
 
-`HistoricTable` takes every EpochRow.
+`HistoricalTable` takes every EpochRow.
 
 ### Dict
 

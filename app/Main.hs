@@ -34,13 +34,13 @@ initializer = do
   T.putStrLn " - = Set ValueList"
   let iValueList = IM.empty
   T.putStrLn " - = Set WorldState"
-  T.putStrLn " - = + Set HistoricTable"
-  let iHistoricTable = IM.empty
+  T.putStrLn " - = + Set HistoricalTable"
+  let iHistoricalTable = IM.empty
   let iValueMap      = IM.empty
   let iTrie          = Trie.empty
   let rGen           = mkGenFromInt 0
   let iWorldState =
-        WorldState Nothing iHistoricTable iValueMap iTrie iValueMap rGen
+        WorldState Nothing iHistoricalTable iValueMap iTrie iValueMap rGen
   T.putStrLn " - = Set SpoolInstances"
   let iSITable = IM.empty
   let iWorld = World iSpools iValueList iWorldState iSITable 0 256
