@@ -7,6 +7,8 @@ import           Data.CERES.Value
 import           CERES.BI.Data
 import           CERES.BI.Data.Constants
 
+
+import           Data.Function
 import           Data.IntMap                    ( IntMap )
 import qualified Data.IntMap                   as IM
 import           Data.List                      ( groupBy
@@ -51,8 +53,8 @@ getHValuesFromVT worldHistory indices = map
   grouped
  where
   getTime = fst
-  sorted  = sortBy (\x y -> compare (getTime x) (getTime y)) indices
-  grouped = groupBy (\x y -> getTime x == getTime y) sorted
+  sorted  = sortBy (compare `on` getTime) indices
+  grouped = groupBy ((==) `on` getTime) sorted
 
 getHValuesFromVTSub
   :: HistoricTable -> [(Time, Idx)] -> [((Time, Idx), Maybe Value)]
@@ -88,8 +90,8 @@ updateValuesToVT
 updateValuesToVT worldHistory ivList = newHistoricTable
  where
   getTime          = fst . fst
-  sorted           = sortBy (\x y -> compare (getTime x) (getTime y)) ivList
-  grouped          = groupBy (\x y -> getTime x == getTime y) sorted
+  sorted           = sortBy (compare `on` getTime) ivList
+  grouped          = groupBy ((==) `on` getTime) sorted
   newHistoricTable = foldr updateValuesToVTSub worldHistory grouped
 
 -- TODO: Should be parallel when update existing element
