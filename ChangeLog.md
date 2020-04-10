@@ -21,6 +21,7 @@ Changelog for CEREScript-Core01-BI
 
 ### Added
 * Add more storage in WorldState which have NKey as a primary key
+* Implement `Maker s f a` type for SI initiation
 
 ### Changed
 * Move `Cache` modifier to `CERES.BI.Data.Cache.Function`
@@ -28,6 +29,7 @@ Changelog for CEREScript-Core01-BI
 * Use `random-adaptor` package instead of homemade adaptor module
 * Rename `HistoricTable` to `HistoricalTable`
 * Revise definition of SpoolInstance
+* Revise definition of CERESSpool with `Maker s f a`
 
 ### Removed
 * Remove module `CERES.BI.Data.Spool`

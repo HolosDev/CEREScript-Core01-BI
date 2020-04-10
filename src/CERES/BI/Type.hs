@@ -6,8 +6,14 @@ module CERES.BI.Type
 where
 
 
+import           Data.Maybe
+
+-- NOTE: Alias for abstract PRNG type
 import           CERES.BI.Util.Random
 
 
--- NOTE: Alias for abstract PRNG type
+data Maker s f a = Maker { mDef :: a, mF :: f, mMaker :: s -> f -> Maybe a }
+
+runMaker Maker {..} s = fromMaybe mDef (mMaker s mF)
+
 type InternalTime = Int

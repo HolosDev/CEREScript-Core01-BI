@@ -21,6 +21,8 @@ import           CERES.BI.Interpret.Cache
 import           CERES.BI.Interpret.Instruction
 import           CERES.BI.Interpret.Spool
 
+import           CERES.BI.Type
+
 import           Debug
 
 
@@ -95,7 +97,7 @@ runSpoolInstance world@World {..} si@SI {..} wCache =
   -- FIXME
   iLNTCache   = undefined
   iLocalCache = (iLVCache, iLNVCache, iLTCache, iLNTCache)
-  ((newWorldCache, (newLVCache, newLNVCache, newLTCache, newLNTCache), newRG), restCEREScript)
+  (newCache@(newWorldCache, (newLVCache, newLNVCache, newLTCache, newLNTCache), newRG), restCEREScript)
     = runCEREScript world si (wCache, iLocalCache, siRG) siRestScript
   siisCode = maybe "Retain" getStr $ IM.lookup retainCodeIdx newLTCache
   (doAbolish, doInit, nextLocalVars, nextLocalNVars) = case siisCode of
@@ -119,7 +121,7 @@ runSpoolInstance world@World {..} si@SI {..} wCache =
           ++ show siSpoolID
           ++ ") in worldSpools"
           )
-          csScript
+          (\s -> runMaker (csScript s) (world,newCache))
         $ IM.lookup siSpoolID worldSpools
   newSI = si { siLocalVars  = nextLocalVars
              , siRestScript = nextCEREScript

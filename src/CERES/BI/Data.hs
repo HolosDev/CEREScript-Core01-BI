@@ -74,23 +74,34 @@ type Spools = IntMap Spool
 type Spool = CERESSpool
 
 data CERESSpool = CERESSpool
-  { csID             :: {-# UNPACK #-} !ID -- NOTE: ID of Spool code, not instance
-  , csName           :: {-# UNPACK #-} !Name
-  , csScript         :: CEREScript
-  , readVP           :: Set VPosition -- TODO: Not sure this could be static or dynamic
-  , writeVP          :: Set VPosition -- TODO: Not sure this could be static or dynamic
-  , csPriority       :: {-# UNPACK #-} !Priority
-  , csInitLocalVars  :: ValueMap
-  , csInitLocalNVars :: ValueNMap
-  , csInitLocalTemp  :: ValueMap
-  , csInitLocalNTemp :: ValueNMap
-  } deriving (Show)
+  { csID              :: {-# UNPACK #-} !ID -- NOTE: ID of Spool code, not instance
+  , csName            :: Name
+  , csScript          :: Maker (World,Env) CEREScript CEREScript
+  , csSINameMaker     :: Maker (World,Env) CEREScript Name
+  , csSIReadVPMaker   :: Maker (World,Env) CEREScript (Set VPosition) -- TODO: Not sure this could be static or dynamic
+  , csSIWriteVPMaker  :: Maker (World,Env) CEREScript (Set VPosition) -- TODO: Not sure this could be static or dynamic
+  , csSIPriorityMaker :: Maker (World,Env) CEREScript Priority
+  , csInitLocalVars   :: ValueMap
+  , csInitLocalNVars  :: ValueNMap
+  , csInitLocalTemp   :: ValueMap
+  , csInitLocalNTemp  :: ValueNMap
+  }
 
 instance Eq CERESSpool where
   (==) = (==) `on` csID
 
 instance Ord CERESSpool where
   compare = compare `on` csID
+
+instance Show CERESSpool where
+  show = TL.unpack . showtl
+
+instance TextShow CERESSpool where
+  showb CERESSpool {..} =
+    fromLazyText "Spool("
+      <> showb csID
+      <> fromLazyText "): "
+      <> fromLazyText csName
 
 data SpoolInstanceRow = SIRow
   { siRowTime :: Time
