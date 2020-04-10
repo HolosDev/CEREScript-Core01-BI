@@ -127,15 +127,15 @@ instance Show SpoolInstance where
   show = TL.unpack . showtl
 
 instance TextShow SpoolInstance where
-  showb (SI id name pr _ _ _ sID _ _ _) =
+  showb SI {..} =
     fromLazyText "SI("
-      <> showb id
+      <> showb siID
       <> fromLazyText "): "
-      <> fromLazyText name
+      <> fromLazyText siName
       <> fromLazyText " <"
-      <> showb pr
+      <> showb siPriority
       <> fromLazyText "> Based on Spool("
-      <> showb sID
+      <> showb siSpoolID
       <> ")"
 
 type SIIS = SpoolInstanceInheritStatus

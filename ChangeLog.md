@@ -27,6 +27,7 @@ Changelog for CEREScript-Core01-BI
 * Overhaul structures for new `NKey` storage compatibility
 * Use `random-adaptor` package instead of homemade adaptor module
 * Rename `HistoricTable` to `HistoricalTable`
+* Revise definition of SpoolInstance
 
 ### Removed
 * Remove module `CERES.BI.Data.Spool`
