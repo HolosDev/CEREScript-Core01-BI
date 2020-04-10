@@ -101,9 +101,9 @@ type SpoolInstances = IntMap SpoolInstance
 
 data SpoolInstance = SI
   { siID         :: {-# UNPACK #-} !ID
-  , siName       :: {-# UNPACK #-} !Name
+  , siName       :: Name
   , siPriority   :: {-# UNPACK #-} !Priority
-  , siVPS        :: Set VPosition -- Only World, Dict, Var
+  , siRWVPSet    :: Set VPosition -- Only World, Dict, Var
   , siLocalVars  :: LocalVariables
   , siLocalNVars :: LocalNVariables
   , siSpoolID    :: {-# UNPACK #-} !ID

@@ -33,11 +33,11 @@ siAggregator World {..} = IM.foldr siAggregatorSub [] theSIs
 siAggregatorSub :: SpoolInstance -> SpoolForest -> SpoolForest
 siAggregatorSub aSI@SI {..} aSpoolForest = newSpoolTree : dList
  where
-  (dList, jList) = partition (S.disjoint siVPS . vpSet) aSpoolForest
+  (dList, jList) = partition (S.disjoint siRWVPSet . vpSet) aSpoolForest
   newSpoolTree
-    | null jList       = SpoolTree siVPS [aSI]
-    | length jList > 1 = SpoolTree (S.union jVPSet siVPS) (aSI : jSIList)
-    | otherwise        = SpoolTree (S.union oVPSet siVPS) (aSI : oSIList)
+    | null jList       = SpoolTree siRWVPSet [aSI]
+    | length jList > 1 = SpoolTree (S.union jVPSet siRWVPSet) (aSI : jSIList)
+    | otherwise        = SpoolTree (S.union oVPSet siRWVPSet) (aSI : oSIList)
    where
     SpoolTree oVPSet oSIList = head jList
     SpoolTree jVPSet jSIList = foldr stJoiner (SpoolTree S.empty []) dList
