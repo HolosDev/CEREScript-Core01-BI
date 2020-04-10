@@ -84,19 +84,19 @@ runSpoolInstance world@World {..} si@SI {..} wCache =
  where
   -- TODO: Change `StrValue "Retain"` as a named constant
   iLTCache = csInitLocalTemp $ worldSpools IM.! siSpoolID
-  isResume    = maybe False getBool $ IM.lookup resumeCodeIdx siLocalVars
+  isResume = maybe False getBool $ IM.lookup resumeCodeIdx siLocalVars
   iLVCache =
     -- TODO: Not sure to initialize ExecutingTime variable
     (if isResume then id else IM.insert executingTimeIdx (IntValue 0))
       . IM.insert resumeCodeIdx (BoolValue False)
       $ siLocalVars
   -- FIXME
-  iLNVCache = undefined
+  iLNVCache   = undefined
   -- FIXME
-  iLNTCache = undefined
+  iLNTCache   = undefined
   iLocalCache = (iLVCache, iLNVCache, iLTCache, iLNTCache)
-  ((newWorldCache, (newLVCache, newLNVCache, newLTCache, newLNTCache), newRG), restCEREScript) =
-    runCEREScript world si (wCache, iLocalCache, siRG) siRestScript
+  ((newWorldCache, (newLVCache, newLNVCache, newLTCache, newLNTCache), newRG), restCEREScript)
+    = runCEREScript world si (wCache, iLocalCache, siRG) siRestScript
   siisCode = maybe "Retain" getStr $ IM.lookup retainCodeIdx newLTCache
   (doAbolish, doInit, nextLocalVars, nextLocalNVars) = case siisCode of
     "Retain"  -> (False, False, newLVCache, newLNVCache)
@@ -138,12 +138,13 @@ runCEREScript aWorld@World {..} aSI@SI {..} = runCEREScriptSub
       else runCEREScriptSub (nextWC, nextLC, nextRG) nextCEREScript
     -- NOTE: si == True, then end runCEREScript
 
+
    where
     (newWC, newLC, newRG) = runInstruction aWorld aSI cState ceres
     -- TODO: Check Stop or Pause
-    spCode        = maybe "" getStr $ IM.lookup spCodeIdx newLTCache
-    sp            = spCode == "Stop" || spCode == "Pause"
-    retentionCode = case spCode of
+    spCode                = maybe "" getStr $ IM.lookup spCodeIdx newLTCache
+    sp                    = spCode == "Stop" || spCode == "Pause"
+    retentionCode         = case spCode of
       "Stop"  -> "Abolish"
       -- TODO: Not sure do I need to identify whether this is "Pause"
       "Pause" -> "Retain"
@@ -153,12 +154,11 @@ runCEREScript aWorld@World {..} aSI@SI {..} = runCEREScriptSub
     nextCEREScript = if resumeFlag then (ceres : cScript) else cScript
     (newLVCache, newLNVCache, newLTCache, newLNTCache) = newLC
     nextWC         = newWC
-    nextLVCache =
-      IM.insert retainCodeIdx (StrValue retentionCode) newLVCache
-    nextLNVCache = newLNVCache
-    nextLTCache = newLTCache
-    nextLNTCache = newLNTCache
-    nextLC = (nextLVCache, nextLNVCache, nextLTCache, nextLNTCache)
+    nextLVCache    = IM.insert retainCodeIdx (StrValue retentionCode) newLVCache
+    nextLNVCache   = newLNVCache
+    nextLTCache    = newLTCache
+    nextLNTCache   = newLNTCache
+    nextLC         = (nextLVCache, nextLNVCache, nextLTCache, nextLNTCache)
     nextRG         = newRG
 
 

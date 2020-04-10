@@ -116,10 +116,9 @@ instance Eq SpoolInstance where
   (==) = (==) `on` siID
 
 instance Ord SpoolInstance where
-  compare siA siB =
-    if pCompared == EQ
-      then (compare `on` siID) siA siB
-      else pCompared
+  compare siA siB = if pCompared == EQ
+    then (compare `on` siID) siA siB
+    else pCompared
    where
     pCompared :: Ordering
     pCompared = (compare `on` siPriority) siA siB
