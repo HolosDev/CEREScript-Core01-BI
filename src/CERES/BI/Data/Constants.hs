@@ -19,14 +19,14 @@ wsSimulationControlIdx = 0
 
 -- LocalVariables
 cf0Idx, cf1Idx, executingTimeIdx, elapsedInternalTimeIdx, resumeCodeIdx :: Idx
-cf0Idx = 0
-cf1Idx = 1
-executingTimeIdx = 2
-elapsedInternalTimeIdx = 3
-resumeCodeIdx = 4
+cf0Idx = -1
+cf1Idx = -2
+executingTimeIdx = -3
+elapsedInternalTimeIdx = -4
+resumeCodeIdx = -5
 
 -- LocalCache
 retainCodeIdx, jumpOffsetIdx, spCodeIdx :: Idx
-retainCodeIdx = 0
-jumpOffsetIdx = 1
-spCodeIdx = 4
+retainCodeIdx = -1
+jumpOffsetIdx = -2
+spCodeIdx = -4
