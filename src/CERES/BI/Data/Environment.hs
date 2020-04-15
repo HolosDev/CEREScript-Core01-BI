@@ -58,7 +58,7 @@ type Env = (WorldCache, LocalCache, RG)
 data RW a = R a | W a | RW a deriving (Eq, Ord)
 
 instance (Show a, TextShow a) => Show (RW a) where
-  show = TL.unpack . showtl
+  show = toString . showb
 
 instance TextShow a => TextShow (RW a) where
   showb (R  a) = fromLazyText "[R  " <> showb a <> fromLazyText "]"

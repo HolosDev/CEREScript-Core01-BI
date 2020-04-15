@@ -95,7 +95,7 @@ instance Ord CERESSpool where
   compare = compare `on` csID
 
 instance Show CERESSpool where
-  show = TL.unpack . showtl
+  show = toString . showb
 
 instance TextShow CERESSpool where
   showb CERESSpool {..} =
@@ -136,7 +136,7 @@ instance Ord SpoolInstance where
     pCompared = (compare `on` siPriority) siA siB
 
 instance Show SpoolInstance where
-  show = TL.unpack . showtl
+  show = toString . showb
 
 instance TextShow SpoolInstance where
   showb SI {..} =
