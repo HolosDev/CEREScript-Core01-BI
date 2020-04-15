@@ -1,10 +1,9 @@
 module CERES.BI.Data.Constants where
 
 
-import           Data.CERES.Script
+import           Data.CERES.Data
 import           Data.CERES.Operator
 import           Data.CERES.Type
-import           Data.CERES.Value
 
 import           CERES.BI.Data
 

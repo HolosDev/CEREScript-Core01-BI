@@ -7,11 +7,10 @@ import           Data.List                      ( partition )
 import           Data.Set                       ( Set )
 import qualified Data.Set                      as S
 
-import           CERES.Operate
-import           Data.CERES.Script
+
+import           Data.CERES.Data
 import           Data.CERES.Operator
 import           Data.CERES.Type
-import           Data.CERES.Value
 
 import           CERES.BI.Data
 import           CERES.BI.Data.Constants

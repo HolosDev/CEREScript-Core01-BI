@@ -78,7 +78,7 @@ Do nothing with the VP
 
 ## Value retention in a Table
 
-The `Value` or `ValueContainer` does not require retention description to keep it.
+The `Value` or `ValueContainer` does not require a retention description to keep it.
 Without explicit `DeleteVariable` instruction, a new Time-Slot would copy every value in the last Time-Slot.
 
 ## Reserved Storage
@@ -135,3 +135,43 @@ Stores only variables which should not be inherited after time-slot
   * Should remove number limitation by an array
 
 ### LocalNTemp
+
+* "RegisterSize": Number of Register to initiate
+  * If the variable does not exist, the interpreter does not allocate it.
+
+## Trick Data Storage
+
+Trick Data Storage covers a lot of things.
+By `AtTricky`, the script could access many things.
+
+### Register
+
+**Unstable features for days.**
+
+The Register would be implemented in ST monad.
+Any Register would be initialized with `AtomValue` at first.
+
+
+
+### Interpreter Info
+
+`AtTricky VIN "TreeID"`: Get the TreeID from the TREE Interpreter
+`AtTricky VIN ""`: 
+`AtTricky VIN ""`: 
+`AtTricky VIN ""`: 
+
+### SpoolInfo
+
+`AtTricky VIIN $CSID "$FEILDNAME"`: Get info of a CERESSpool from CERESSpool map
+
+### SpoolInstance Info
+
+`AtTricky VIN "SIID"`: Get the Spool Instance's ID
+`AtTricky VIN "SIName"`: Get the Spool Instance's name
+`AtTricky VIN "ElapsedTime"`: Get the elapsed time of the current Time-Slot by `InternalTime` unit
+`AtTricky VIN "RemnantTime"`: Get the remnant time of the current Time-Slot by `InternalTime` unit
+
+#### Get Info from other SI
+
+Not preferable.
+When want to share information, the info should be placed in Global State.

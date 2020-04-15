@@ -1,5 +1,6 @@
 module CERES.BI.Data where
 
+
 import           Data.Function
 import           Data.IntMap                    ( IntMap )
 import qualified Data.IntMap                   as IM
@@ -16,9 +17,9 @@ import qualified Data.Trie.Text                as Trie
 
 import           TextShow
 
-import           Data.CERES.Script
+
+import           Data.CERES.Data
 import           Data.CERES.Type
-import           Data.CERES.Value
 
 import           CERES.BI.Data.Environment
 import           CERES.BI.Type

@@ -11,12 +11,13 @@ import           Data.Maybe
 
 import           TextShow
 
+
 import           CERES.Operate
-import           Data.CERES.Script
+
+import           Data.CERES.Data
+import           Data.CERES.Data.Error
 import           Data.CERES.Operator
 import           Data.CERES.Type
-import           Data.CERES.Value
-import           Data.CERES.Value.Error
 
 import           CERES.BI.Type
 

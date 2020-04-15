@@ -1,5 +1,6 @@
 module CERES.BI.Interpret.Cache where
 
+
 import qualified Data.IntMap                   as IM
 import qualified Data.Map                      as M
 import           Data.Maybe
@@ -9,12 +10,12 @@ import           Data.List                      ( nub
 import qualified Data.Trie.Text                as Trie
 import qualified Data.Set                      as S
 
+
 import           CERES.Operate
-import           Data.CERES.Script
+
+import           Data.CERES.Data
 import           Data.CERES.Operator
 import           Data.CERES.Type
-import           Data.CERES.Value
-import           Data.CERES.VariablePosition
 
 import           CERES.BI.Data
 import           CERES.BI.Data.Cache.Function

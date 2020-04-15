@@ -1,13 +1,6 @@
 module CERES.BI.Data.Function where
 
 
-import           Data.CERES.Type
-import           Data.CERES.Value
-
-import           CERES.BI.Data
-import           CERES.BI.Data.Constants
-
-
 import           Data.Function
 import           Data.IntMap                    ( IntMap )
 import qualified Data.IntMap                   as IM
@@ -17,6 +10,13 @@ import           Data.List                      ( groupBy
 import           Data.Maybe
 import qualified Data.Text.Lazy                as TL
 import qualified Data.Trie.Text                as Trie
+
+
+import           Data.CERES.Data
+import           Data.CERES.Type
+
+import           CERES.BI.Data
+import           CERES.BI.Data.Constants
 
 
 updateWorldState

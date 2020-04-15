@@ -5,12 +5,11 @@ import           Data.IntMap                    ( IntMap )
 import qualified Data.IntMap                   as IM
 import           Data.Maybe
 
-import           CERES.Operate
-import           Data.CERES.Script
+
+import           Data.CERES.Data
+import           Data.CERES.Data.Method
 import           Data.CERES.Operator
 import           Data.CERES.Type
-import           Data.CERES.Value
-import           Data.CERES.Value.Method
 
 import           CERES.BI.Data
 import           CERES.BI.Data.Constants

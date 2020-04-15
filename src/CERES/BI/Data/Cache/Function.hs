@@ -1,5 +1,6 @@
 module CERES.BI.Data.Cache.Function where
 
+
 import           Data.Bifunctor
 import           Data.IntMap                    ( IntMap )
 import qualified Data.IntMap                   as IM
@@ -15,10 +16,9 @@ import qualified Data.Trie.Text                as Trie
 
 import           TextShow
 
-import           Data.CERES.Script
+
+import           Data.CERES.Data
 import           Data.CERES.Type
-import           Data.CERES.Value
-import           Data.CERES.VariablePosition
 
 import           CERES.BI.Data
 import           CERES.BI.Data.Environment

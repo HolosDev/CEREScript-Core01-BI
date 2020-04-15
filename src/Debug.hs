@@ -1,5 +1,6 @@
 module Debug where
 
+
 import           Data.Text                     as T
 import           Data.Text.Lazy                as TL
 

@@ -26,6 +26,7 @@ Changelog for CEREScript-Core01-BI
 ### Changed
 * Move `Cache` modifier to `CERES.BI.Data.Cache.Function`
 * Overhaul structures for new `NKey` storage compatibility
+* Overhaul import modules and refactoring with CEREScript-Core01 version up (v0.16.1.0)
 * Use `random-adaptor` package instead of homemade adaptor module
 * Rename `HistoricTable` to `HistoricalTable`
 * Revise definition of SpoolInstance
