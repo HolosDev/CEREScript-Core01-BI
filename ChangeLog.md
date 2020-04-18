@@ -5,7 +5,7 @@ Changelog for CEREScript-Core01-BI
 
 ### Add
 * Implement each `crs*` instruction function
-
+* Handling Partial Variable Index
 
 ### Change
 * Change design for backpack compatibility
@@ -13,8 +13,9 @@ Changelog for CEREScript-Core01-BI
 * Use ValueContainer instead of Value
 * Implement parallel `updateValuesToVT`
 * Use `getValues*` instead of using `foldr` in `cacheMaker`
-* Implement better `Eq` instance for handling `AtWorld` and `AtTime` simultaneously
 * Move Move `get*Cache` and `set*Cache` functions to `CERES.BI.Data.*`
+* Change default GHC version and Stackage for 8.8.*
+* Change default GHC version and Stackage for 8.10.*
 
 
 ## 0.7.0.0 -- 2020-04-XX
