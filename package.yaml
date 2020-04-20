@@ -33,7 +33,7 @@ library:
 executables:
   CEREScript-Core01-BI-exe:
     main:                Main.hs
-    source-dirs:         app
+    source-dirs:         apps/init
     ghc-options:
     - -threaded
     - -rtsopts
