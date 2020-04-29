@@ -3,7 +3,7 @@ version:             0.7.0.0
 github:              "HolosDev/CEREScript-Core01-BI"
 license:             OtherLicense
 author:              "YongJoon Joe"
-maintainer:          "YongJoon Joe <developer@quietjoon.net>"
+maintainer:          "Holos Works <developer@holos.dev>"
 copyright:           "2019-2020 Holos Works / PPUZZL Group"
 
 extra-source-files:
