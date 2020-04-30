@@ -2,13 +2,13 @@ resolver: lts-14.27
 
 packages:
 - .
-#- /AoDw/CEREScript/CEREScript-Core01
+#- /AoDw/CEREScript/CEREScript-SS
 
 extra-deps:
 - text-trie-0.2.5.0
 - splitmix-0.0.4
-- github: HolosDev/CEREScript-Core01
-#- git: https://gitlab.com/holosdev/CEREScript-Core01
+- github: HolosDev/CEREScript-SS
+#- git: https://gitlab.com/holosdev/CEREScript-SS
   commit: a9f6158d2726e43e40216f0a17efe07864aae59b
 - github: QuietJoon/random-adaptor
   commit: f2f7578027ec2a855a59f7a10f4afeaa0f870b37

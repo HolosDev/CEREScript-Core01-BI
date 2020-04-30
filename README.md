@@ -1,11 +1,11 @@
-CEREScript-Core01-BI
+CEREScript-SS-BI
 ====
 
-Basic Interpreter of CEREScript-Core01
+Basic Interpreter of CEREScript-SS
 
-This is not a reference interpreter, but is for understanding of CEREScript-Core01 and CoMPleT Engine.
+This is not a reference interpreter, but is for understanding of CEREScript-SS and CoMPleT Engine.
 
 
 ## Information
 
-* Forked from CEREScript-Core01, to split code of Script and Interpreter.
+* Forked from CEREScript-SS, to split code of Script and Interpreter.

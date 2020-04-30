@@ -1,4 +1,4 @@
-Changelog for CEREScript-Core01-BI
+Changelog for CEREScript-SS-BI
 ====
 
 ## Unreleased changes
@@ -27,7 +27,7 @@ Changelog for CEREScript-Core01-BI
 ### Changed
 * Move `Cache` modifier to `CERES.BI.Data.Cache.Function`
 * Overhaul structures for new `NKey` storage compatibility
-* Overhaul import modules and refactoring with CEREScript-Core01 version up (v0.16.1.0)
+* Overhaul import modules and refactoring with CEREScript-SS version up (v0.16.1.0)
 * Use `random-adaptor` package instead of homemade adaptor module
 * Rename `HistoricTable` to `HistoricalTable`
 * Revise definition of SpoolInstance
@@ -43,13 +43,13 @@ Changelog for CEREScript-Core01-BI
 * Implement missing instruction functions template
 
 ### Changed
-* Update dependency of CEREScript-Core 0.11.0.0
+* Update dependency of old CEREScript-Core 0.11.0.0
 
 
 ## 0.5.0.0 -- 2020-03-26
 
 ### Changed
-* Update dependency of CEREScript-Core 0.10.0.0
+* Update dependency of old CEREScript-Core 0.10.0.0
 
 
 ## 0.4.0.0 -- 2020-03-12
@@ -59,7 +59,7 @@ Changelog for CEREScript-Core01-BI
 * Define RG type and move to `CERES.BI.Type`
 
 ### Changed
-* Update dependency of CEREScript-Core 0.9.0.0
+* Update dependency of old CEREScript-Core 0.9.0.0
 * Change old function name `get*` and `set*` to `get*By` and `set*By`
 
 
@@ -112,7 +112,7 @@ Changelog for CEREScript-Core01-BI
 ## 0.1.0.0 -- 2020-03-06
 
 ### Added
-* Inherit codes from CEREScript-Core01
+* Inherit codes from CEREScript-SS
 * Implement basic tree-forest aggregation algorithm
 * Implement basic cacheMaker
 
