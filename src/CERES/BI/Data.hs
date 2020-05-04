@@ -99,10 +99,10 @@ instance Show CERESSpool where
 
 instance TextShow CERESSpool where
   showb CERESSpool {..} =
-    fromLazyText "Spool("
+    fromText "Spool("
       <> showb csID
-      <> fromLazyText "): "
-      <> fromLazyText csName
+      <> fromText "): "
+      <> fromText csName
 
 data SpoolInstanceRow = SIRow
   { siRowTime :: Time
@@ -140,13 +140,13 @@ instance Show SpoolInstance where
 
 instance TextShow SpoolInstance where
   showb SI {..} =
-    fromLazyText "SI("
+    fromText "SI("
       <> showb siID
-      <> fromLazyText "): "
-      <> fromLazyText siName
-      <> fromLazyText " <"
+      <> fromText "): "
+      <> fromText siName
+      <> fromText " <"
       <> showb siPriority
-      <> fromLazyText "> Based on Spool("
+      <> fromText "> Based on Spool("
       <> showb siSpoolID
       <> ")"
 
