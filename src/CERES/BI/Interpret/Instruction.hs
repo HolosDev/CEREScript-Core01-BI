@@ -32,25 +32,25 @@ import           Debug
 
 crsInitVariable
   :: World -> SpoolInstance -> Env -> VPosition -> VPosition -> Env
-crsInitVariable World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), rg) vpA vpB
+crsInitVariable World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), tCache, rg) vpA vpB
   = undefined
 
 crsInitVariableAt
   :: World -> SpoolInstance -> Env -> VPosition -> VPosition -> Env
-crsInitVariableAt World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), rg) vpA vpB
+crsInitVariableAt World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), tCache, rg) vpA vpB
   = undefined
 
 crsSetValue :: World -> SpoolInstance -> Env -> VPosition -> VPosition -> Env
-crsSetValue World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), rg) vpA vpB
+crsSetValue World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), tCache, rg) vpA vpB
   = undefined
 
 crsDeleteVariable :: World -> SpoolInstance -> Env -> VPosition -> Env
-crsDeleteVariable World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), rg) vp
+crsDeleteVariable World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), tCache, rg) vp
   = undefined
 
 crsModifyValue1
   :: World -> SpoolInstance -> Env -> VPosition -> CERESOperator -> Env
-crsModifyValue1 World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), rg) vp cOp
+crsModifyValue1 World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), tCache, rg) vp cOp
   = undefined
 
 crsModifyValue2
@@ -61,7 +61,7 @@ crsModifyValue2
   -> VPosition
   -> CERESOperator
   -> Env
-crsModifyValue2 World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), rg) vpA vpB cOp
+crsModifyValue2 World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), tCache, rg) vpA vpB cOp
   = undefined
 
 crsModifyValue3
@@ -73,58 +73,58 @@ crsModifyValue3
   -> CERESOperator
   -> VPosition
   -> Env
-crsModifyValue3 World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), rg) vpA vpB cOp vpC
+crsModifyValue3 World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), tCache, rg) vpA vpB cOp vpC
   = undefined
 
 crsCopyValue :: World -> SpoolInstance -> Env -> VPosition -> VPosition -> Env
-crsCopyValue World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), rg) vpA vpB
+crsCopyValue World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), tCache, rg) vpA vpB
   = undefined
 
 crsConvertValue
   :: World -> SpoolInstance -> Env -> VPosition -> ValueType -> Env
-crsConvertValue World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), rg) vp vt
+crsConvertValue World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), tCache, rg) vp vt
   = undefined
 
 crsConvertValueBy
   :: World -> SpoolInstance -> Env -> VPosition -> VPosition -> Env
-crsConvertValueBy World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), rg) vpA vpB
+crsConvertValueBy World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), tCache, rg) vpA vpB
   = undefined
 
 crsConvertValueWith
   :: World -> SpoolInstance -> Env -> VPosition -> VPosition -> Env
-crsConvertValueWith World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), rg) vpA vpB
+crsConvertValueWith World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), tCache, rg) vpA vpB
   = undefined
 
 crsReplaceText :: World -> SpoolInstance -> Env -> VPosition -> Env
-crsReplaceText World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), rg) vp
+crsReplaceText World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), tCache, rg) vp
   = undefined
 
 crsReplaceTextTo
   :: World -> SpoolInstance -> Env -> VPosition -> VPosition -> Env
-crsReplaceTextTo World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), rg) vpA vpB
+crsReplaceTextTo World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), tCache, rg) vpA vpB
   = undefined
 
 crsGetVPosition
   :: World -> SpoolInstance -> Env -> VPosition -> VPosition -> Env
-crsGetVPosition World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), rg) vpA vpB
+crsGetVPosition World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), tCache, rg) vpA vpB
   = undefined
 
 crsSetVPosition
   :: World -> SpoolInstance -> Env -> VPosition -> VPosition -> Env
-crsSetVPosition World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), rg) vpA vpB
+crsSetVPosition World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), tCache, rg) vpA vpB
   = undefined
 
 crsRandom :: World -> SpoolInstance -> Env -> VPosition -> ValueType -> Env
-crsRandom aWorld SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), rg) vp vType
+crsRandom aWorld SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), tCache, rg) vp vType
   = setEnv aWorld
            vp
            W
            (Just rValue)
-           (wc, (lVCache, lNVCache, lTCache, lNTCache), nextRG)
+           (wc, (lVCache, lNVCache, lTCache, lNTCache), tCache, nextRG)
   where (rValue, nextRG) = randomValue vType rg
 
 crsRandomBy :: World -> SpoolInstance -> Env -> VPosition -> VPosition -> Env
-crsRandomBy aWorld aSI cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), rg) vpA vpB
+crsRandomBy aWorld aSI cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), tCache, rg) vpA vpB
   = crsRandom aWorld aSI cState vpA vt
   where vt = getValueType . getEnv aWorld vpB $ cState
 
@@ -138,7 +138,7 @@ crsRandomWith
   -> VPosition
   -> VPosition
   -> Env
-crsRandomWith World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), rg) vpA vType vpC vpD vpE
+crsRandomWith World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), tCache, rg) vpA vType vpC vpD vpE
   = notYetImpl "crsRandomWith"
 
 crsRandomWithBy
@@ -151,7 +151,7 @@ crsRandomWithBy
   -> VPosition
   -> VPosition
   -> Env
-crsRandomWithBy World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), rg) vpA vpB vpC vpD vpE
+crsRandomWithBy World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), tCache, rg) vpA vpB vpC vpD vpE
   = notYetImpl "crsRandomWith"
 
 randomValueBy :: Value -> RG -> (Value, RG)
@@ -169,7 +169,7 @@ randomValue vType rg = case vType of
     (ErrValue "[ERROR]<crsRandom :=: VTErr> Not proper value type for RNG", rg)
 
 crsElapsedTime :: World -> SpoolInstance -> Env -> VPosition -> VPosition -> Env
-crsElapsedTime World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), rg) vpA vpB
+crsElapsedTime World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), tCache, rg) vpA vpB
   = undefined
  where
   -- NOTE: 1. Estimate next instruction's executing internal time
@@ -178,16 +178,16 @@ crsElapsedTime World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, 
   -- NOTE: Calculate executingTime not runCEREScript but here, because length of executingTime is depends on an instruction
   (executingTime, rg1) = bmwrInt worldTSSize rg
   elapsedTime = maybe 0 getInt . IM.lookup elapsedInternalTimeIdx $ lVCache
-  newElapsedTime = elapsedTime + executingTime
+  newElapsedTime       = elapsedTime + executingTime
   doSkip               = newElapsedTime > worldTSSize
   elapsedInternalTime  = maybe False getBool $ IM.lookup resumeCodeIdx lVCache
 
 crsSPControl :: World -> SpoolInstance -> Env -> VPosition -> Env
-crsSPControl World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), rg) vp
+crsSPControl World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), tCache, rg) vp
   = undefined
 
 crsSIControl :: World -> SpoolInstance -> Env -> VPosition -> VPosition -> Env
-crsSIControl World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), rg) vpA vpB
+crsSIControl World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), tCache, rg) vpA vpB
   = undefined
 
 -- NOTE: crsSIInit does not initiate SI by itself, but would be done by `runSpoolInstance`
@@ -200,38 +200,38 @@ crsSIInit
   -> VPosition
   -> VPosition
   -> Env
-crsSIInit World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), lc@(lVCache, lNVCache, lTCache, lNTCache), rg) vpA vpB vpC vpD
+crsSIInit World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), lc@(lVCache, lNVCache, lTCache, lNTCache), tCache, rg) vpA vpB vpC vpD
   = undefined
   where spoolID = undefined
 
 crsSIEnd :: World -> SpoolInstance -> Env -> VPosition -> Env
-crsSIEnd World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), rg) vp
+crsSIEnd World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), tCache, rg) vp
   = undefined
 
 crsNoop :: World -> SpoolInstance -> Env -> Env
-crsNoop World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), rg)
+crsNoop World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), tCache, rg)
   = undefined
 
 crsLog :: World -> SpoolInstance -> Env -> VPosition -> VPosition -> Env
-crsLog World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), rg) vpA vpB
+crsLog World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), tCache, rg) vpA vpB
   = undefined
 
 crsParseScript :: World -> SpoolInstance -> Env -> VPosition -> VPosition -> Env
-crsParseScript World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), rg) vpA vpB
+crsParseScript World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), tCache, rg) vpA vpB
   = undefined
 
 crsToInterpreter0 :: World -> SpoolInstance -> Env -> CHeader -> Env
-crsToInterpreter0 World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), rg) iHeader
+crsToInterpreter0 World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), tCache, rg) iHeader
   = undefined
 
 crsToInterpreter1
   :: World -> SpoolInstance -> Env -> CHeader -> VPosition -> Env
-crsToInterpreter1 World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), rg) iHeader vpA
+crsToInterpreter1 World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), tCache, rg) iHeader vpA
   = undefined
 
 crsToInterpreter2
   :: World -> SpoolInstance -> Env -> CHeader -> VPosition -> VPosition -> Env
-crsToInterpreter2 World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), rg) iHeader vpA vpB
+crsToInterpreter2 World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), tCache, rg) iHeader vpA vpB
   = undefined
 
 crsToInterpreter3
@@ -243,7 +243,7 @@ crsToInterpreter3
   -> VPosition
   -> VPosition
   -> Env
-crsToInterpreter3 World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), rg) iHeader vpA vpB vpC
+crsToInterpreter3 World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), tCache, rg) iHeader vpA vpB vpC
   = undefined
 
 crsToInterpreter4
@@ -256,7 +256,7 @@ crsToInterpreter4
   -> VPosition
   -> VPosition
   -> Env
-crsToInterpreter4 World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), rg) iHeader vpA vpB vpC vpD
+crsToInterpreter4 World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), tCache, rg) iHeader vpA vpB vpC vpD
   = undefined
 
 crsToInterpreter5
@@ -270,7 +270,7 @@ crsToInterpreter5
   -> VPosition
   -> VPosition
   -> Env
-crsToInterpreter5 World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), rg) iHeader vpA vpB vpC vpD vpE
+crsToInterpreter5 World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), tCache, rg) iHeader vpA vpB vpC vpD vpE
   = undefined
 
 crsToInterpreter6
@@ -285,7 +285,7 @@ crsToInterpreter6
   -> VPosition
   -> VPosition
   -> Env
-crsToInterpreter6 World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), rg) iHeader vpA vpB vpC vpD vpE vpF
+crsToInterpreter6 World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), tCache, rg) iHeader vpA vpB vpC vpD vpE vpF
   = undefined
 
 crsToInterpreter7
@@ -301,7 +301,7 @@ crsToInterpreter7
   -> VPosition
   -> VPosition
   -> Env
-crsToInterpreter7 World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), rg) iHeader vpA vpB vpC vpD vpE vpF vpG
+crsToInterpreter7 World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), tCache, rg) iHeader vpA vpB vpC vpD vpE vpF vpG
   = undefined
 
 crsToInterpreter8
@@ -318,21 +318,21 @@ crsToInterpreter8
   -> VPosition
   -> VPosition
   -> Env
-crsToInterpreter8 World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), rg) iHeader vpA vpB vpC vpD vpE vpF vpG vpH
+crsToInterpreter8 World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), tCache, rg) iHeader vpA vpB vpC vpD vpE vpF vpG vpH
   = undefined
 
 
 crsExtend0 :: World -> SpoolInstance -> Env -> CHeader -> Env
-crsExtend0 World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), rg) iHeader
+crsExtend0 World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), tCache, rg) iHeader
   = undefined
 
 crsExtend1 :: World -> SpoolInstance -> Env -> CHeader -> VPosition -> Env
-crsExtend1 World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), rg) iHeader vpA
+crsExtend1 World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), tCache, rg) iHeader vpA
   = undefined
 
 crsExtend2
   :: World -> SpoolInstance -> Env -> CHeader -> VPosition -> VPosition -> Env
-crsExtend2 World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), rg) iHeader vpA vpB
+crsExtend2 World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), tCache, rg) iHeader vpA vpB
   = undefined
 
 crsExtend3
@@ -344,7 +344,7 @@ crsExtend3
   -> VPosition
   -> VPosition
   -> Env
-crsExtend3 World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), rg) iHeader vpA vpB vpC
+crsExtend3 World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), tCache, rg) iHeader vpA vpB vpC
   = undefined
 
 crsExtend4
@@ -357,7 +357,7 @@ crsExtend4
   -> VPosition
   -> VPosition
   -> Env
-crsExtend4 World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), rg) iHeader vpA vpB vpC vpD
+crsExtend4 World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), tCache, rg) iHeader vpA vpB vpC vpD
   = undefined
 
 crsExtend5
@@ -371,7 +371,7 @@ crsExtend5
   -> VPosition
   -> VPosition
   -> Env
-crsExtend5 World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), rg) iHeader vpA vpB vpC vpD vpE
+crsExtend5 World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), tCache, rg) iHeader vpA vpB vpC vpD vpE
   = undefined
 
 crsExtend6
@@ -386,7 +386,7 @@ crsExtend6
   -> VPosition
   -> VPosition
   -> Env
-crsExtend6 World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), rg) iHeader vpA vpB vpC vpD vpE vpF
+crsExtend6 World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), tCache, rg) iHeader vpA vpB vpC vpD vpE vpF
   = undefined
 
 crsExtend7
@@ -402,7 +402,7 @@ crsExtend7
   -> VPosition
   -> VPosition
   -> Env
-crsExtend7 World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), rg) iHeader vpA vpB vpC vpD vpE vpF vpG
+crsExtend7 World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), tCache, rg) iHeader vpA vpB vpC vpD vpE vpF vpG
   = undefined
 
 crsExtend8
@@ -419,5 +419,5 @@ crsExtend8
   -> VPosition
   -> VPosition
   -> Env
-crsExtend8 World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), rg) iHeader vpA vpB vpC vpD vpE vpF vpG vpH
+crsExtend8 World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), tCache, rg) iHeader vpA vpB vpC vpD vpE vpF vpG vpH
   = undefined

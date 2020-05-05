@@ -53,7 +53,9 @@ type LocalNVariables = ValueNMap
 type LocalTemp = ValueMap
 type LocalNTemp = ValueNMap
 
-type Env = (WorldCache, LocalCache, RG)
+type TrickCache = ValueNMap
+
+type Env = (WorldCache, LocalCache, TrickCache, RG)
 
 data RW a = R a | W a | RW a deriving (Eq, Ord)
 

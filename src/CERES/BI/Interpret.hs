@@ -96,8 +96,8 @@ runSpoolInstance world@World {..} si@SI {..} wCache =
   -- FIXME
   iLNTCache   = undefined
   iLocalCache = (iLVCache, iLNVCache, iLTCache, iLNTCache)
-  (newCache@(newWorldCache, (newLVCache, newLNVCache, newLTCache, newLNTCache), newRG), restCEREScript)
-    = runCEREScript world si (wCache, iLocalCache, siRG) siRestScript
+  (newCache@(newWorldCache, (newLVCache, newLNVCache, newLTCache, newLNTCache), newTrickCache, newRG), restCEREScript)
+    = runCEREScript world si (wCache, iLocalCache, blankVNM, siRG) siRestScript
   siisCode = maybe "Retain" getStr $ IM.lookup retainCodeIdx newLTCache
   (doAbolish, doInit, nextLocalVars, nextLocalNVars) = case siisCode of
     "Retain"  -> (False, False, newLVCache, newLNVCache)
@@ -120,7 +120,7 @@ runSpoolInstance world@World {..} si@SI {..} wCache =
           ++ show siSpoolID
           ++ ") in worldSpools"
           )
-          (\s -> runMaker (csScript s) (world,newCache))
+          (\s -> runMaker (csScript s) (world, newCache))
         $ IM.lookup siSpoolID worldSpools
   newSI = si { siLocalVars  = nextLocalVars
              , siRestScript = nextCEREScript
@@ -133,19 +133,18 @@ runCEREScript
 runCEREScript aWorld@World {..} aSI@SI {..} = runCEREScriptSub
  where
   runCEREScriptSub cState [] = (cState, [])
-  runCEREScriptSub cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), lc@(lVCache, lNVCache, lTCache, lNTCache), rg) (ceres : cScript)
+  runCEREScriptSub cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), lc@(lVCache, lNVCache, lTCache, lNTCache), tCache, rg) (ceres : cScript)
     = if sp
-      then ((nextWC, nextLC, nextRG), nextCEREScript)
-      else runCEREScriptSub (nextWC, nextLC, nextRG) nextCEREScript
+      then ((nextWC, nextLC, nextTCache, nextRG), nextCEREScript)
+      else runCEREScriptSub (nextWC, nextLC, nextTCache, nextRG) nextCEREScript
     -- NOTE: si == True, then end runCEREScript
 
-
    where
-    (newWC, newLC, newRG) = runInstruction aWorld aSI cState ceres
+    (newWC, newLC, newTCache, newRG) = runInstruction aWorld aSI cState ceres
     -- TODO: Check Stop or Pause
-    spCode                = maybe "" getStr $ IM.lookup spCodeIdx newLTCache
-    sp                    = spCode == "Stop" || spCode == "Pause"
-    retentionCode         = case spCode of
+    spCode = maybe "" getStr $ IM.lookup spCodeIdx newLTCache
+    sp                               = spCode == "Stop" || spCode == "Pause"
+    retentionCode                    = case spCode of
       "Stop"  -> "Abolish"
       -- TODO: Not sure do I need to identify whether this is "Pause"
       "Pause" -> "Retain"
@@ -160,6 +159,7 @@ runCEREScript aWorld@World {..} aSI@SI {..} = runCEREScriptSub
     nextLTCache    = newLTCache
     nextLNTCache   = newLNTCache
     nextLC         = (nextLVCache, nextLNVCache, nextLTCache, nextLNTCache)
+    nextTCache     = newTCache
     nextRG         = newRG
 
 
