@@ -26,6 +26,23 @@ data World = World
   , worldTSSize    :: {-# UNPACK #-} !InternalTime
   } deriving Show
 
+blankWorld = World
+  { worldSpools    = IM.empty
+  , worldValueList = IM.empty
+  , worldState     = WorldState { evaluatedSpan = Nothing
+                                , worldHistory  = IM.empty
+                                , worldNHistory = IM.empty
+                                , worldVars     = blankVM
+                                , worldNVars    = blankVNM
+                                , worldDict     = blankVM
+                                , worldNDict    = blankVNM
+                                , worldRG       = blankRG
+                                }
+  , worldSITable   = IM.empty
+  , worldTime      = 0
+  , worldTSSize    = 0
+  }
+
 -- | ValueList remembers type of each Variable
 type ValueList = IntMap ValueTyper
 type SpoolInstanceTable = IntMap SpoolInstanceRow
