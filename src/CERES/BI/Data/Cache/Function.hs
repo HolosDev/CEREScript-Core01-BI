@@ -264,7 +264,7 @@ getEnv _ (VP AtReg _) (_, _, _, _) =
   error "[ERROR]<getEnv :=: AtReg> Not yet implemented"
 getEnv _ (VP AtNull _) (_, _, _, _) =
   error "[ERROR]<getEnv :=: AtNull> Can't access AtNull"
-getEnv _ _ (_, _, _, _) = error "[ERROR]<getEnv> Can't be reached"
+getEnv _ vp _ = error $ "[ERROR]<getEnv> Can't be reached with " ++ show vp
 
 getHCache :: Time -> Idx -> HistoricalCache -> Maybe Value
 getHCache time idx hCache = IM.lookup time hCache >>= IM.lookup idx >>= runRW
