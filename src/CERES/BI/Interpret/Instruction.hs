@@ -165,8 +165,15 @@ randomValue vType rg = case vType of
   VTAtom -> (AtomValue, rg)
   VTStr ->
     (ErrValue "[ERROR]<crsRandom :=: VTStr> Not proper value type for RNG", rg)
+  VTArr ->
+    (ErrValue "[ERROR]<crsRandom :=: VTArr> Not proper value type for RNG", rg)
+  VTPtr ->
+    (ErrValue "[ERROR]<crsRandom :=: VTPtr> Not proper value type for RNG", rg)
+  VTScr ->
+    (ErrValue "[ERROR]<crsRandom :=: VTScr> Not proper value type for RNG", rg)
   VTErr ->
     (ErrValue "[ERROR]<crsRandom :=: VTErr> Not proper value type for RNG", rg)
+  _ -> error "[ERROR]<crsRandom> Can't be reached"
 
 crsElapsedTime :: World -> SpoolInstance -> Env -> VPosition -> VPosition -> Env
 crsElapsedTime World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), tCache, rg) vpA vpB
