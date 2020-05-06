@@ -4,16 +4,9 @@ module CERES.BI.Data.Cache.Function where
 import           Data.Bifunctor
 import           Data.IntMap                    ( IntMap )
 import qualified Data.IntMap                   as IM
-import           Data.Map                       ( Map )
-import qualified Data.Map                      as M
 import           Data.Maybe
-import           Data.Text                      ( Text )
-import qualified Data.Text                     as T
 import qualified Data.Text.Lazy                as TL
-import           Data.Trie.Text                 ( Trie )
 import qualified Data.Trie.Text                as Trie
-
-import           TextShow
 
 
 import           Data.CERES.Data

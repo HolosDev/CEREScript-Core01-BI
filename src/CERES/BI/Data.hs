@@ -4,14 +4,7 @@ module CERES.BI.Data where
 import           Data.Function
 import           Data.IntMap                    ( IntMap )
 import qualified Data.IntMap                   as IM
-import           Data.Map                       ( Map )
-import qualified Data.Map                      as M
 import           Data.Set                       ( Set )
-import qualified Data.Set                      as S
-import           Data.Text                      ( Text )
-import qualified Data.Text                     as T
-import           Data.Trie.Text                 ( Trie )
-import qualified Data.Trie.Text                as Trie
 
 import           TextShow
 

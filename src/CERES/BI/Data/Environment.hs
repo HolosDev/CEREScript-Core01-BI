@@ -1,21 +1,14 @@
 module CERES.BI.Data.Environment where
 
 
-import           Data.Map                       ( Map )
 import           Data.IntMap                    ( IntMap )
 import           Data.Trie.Text                 ( Trie )
-import           Data.Set                       ( Set )
-import           Data.Maybe
 
 import           TextShow
 
 
-import           CERES.Operate
-
 import           Data.CERES.Data
 import           Data.CERES.Data.Error
-import           Data.CERES.Operator
-import           Data.CERES.Type
 
 import           CERES.BI.Type
 

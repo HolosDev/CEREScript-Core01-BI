@@ -6,7 +6,6 @@ import           Data.Trie.Text                as Trie
 
 import           Data.CERES.Data
 import           Data.CERES.Type
-import           CERES.BI.Data
 
 
 vMapInsert :: Idx -> Value -> ValueMap -> ValueMap

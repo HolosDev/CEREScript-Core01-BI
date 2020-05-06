@@ -13,8 +13,6 @@ import qualified Data.Trie.Text                as Trie
 import qualified Data.Set                      as S
 
 
-import           CERES.Operate
-
 import           Data.CERES.Data
 import           Data.CERES.Operator
 import           Data.CERES.Type
@@ -28,7 +26,6 @@ import           CERES.BI.Data.Function
 import           CERES.BI.Interpret.Spool
 
 import           Debug
-import           Util
 
 
 -- TODO: Not using foldr, but Refactoring to use getValues* instead of getValue

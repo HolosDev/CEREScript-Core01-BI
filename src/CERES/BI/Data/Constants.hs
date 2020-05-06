@@ -2,7 +2,6 @@ module CERES.BI.Data.Constants where
 
 
 import           Data.CERES.Data
-import           Data.CERES.Operator
 import           Data.CERES.Type
 
 import           CERES.BI.Data

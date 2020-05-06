@@ -9,7 +9,6 @@ import qualified Data.Set                      as S
 
 
 import           Data.CERES.Data
-import           Data.CERES.Operator
 import           Data.CERES.Type
 
 import           CERES.BI.Data
