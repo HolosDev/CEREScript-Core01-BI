@@ -138,7 +138,6 @@ runCEREScript aWorld@World {..} aSI@SI {..} = runCEREScriptSub
       then ((nextWC, nextLC, nextTCache, nextRG), nextCEREScript)
       else runCEREScriptSub (nextWC, nextLC, nextTCache, nextRG) nextCEREScript
     -- NOTE: si == True, then end runCEREScript
-
    where
     (newWC, newLC, newTCache, newRG) = runInstruction aWorld aSI cState ceres
     -- TODO: Check Stop or Pause

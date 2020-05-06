@@ -195,23 +195,33 @@ getEnv World {..} vp@(VP AtNWorld (VIN nKey)) ((_, nHCache, _, _, _, _), _, _, _
 getEnv World {..} vp@(VP AtNWorld ~(VINT nKey time)) ((_, nHCache, _, _, _, _), _, _, _)
   = fromMaybe
     (error $ "[ERROR]<getEnv :=: AtNWorld[VINT]> No such value at " ++ show vp)
-    (recover (getNHCache time nKey nHCache) (getNHValueFromWS worldState time nKey))
+    (recover (getNHCache time nKey nHCache)
+             (getNHValueFromWS worldState time nKey)
+    )
 getEnv World {..} vp@(VP AtTime (VII idx)) ((hCache, _, _, _, _, _), _, _, _) =
   fromMaybe
     (error $ "[ERROR]<getEnv :=: AtTime[VII]> No such value at " ++ show vp)
-    (recover (getHCache worldTime idx hCache) (getHValueFromWS worldState worldTime idx))
+    (recover (getHCache worldTime idx hCache)
+             (getHValueFromWS worldState worldTime idx)
+    )
 getEnv World {..} vp@(VP AtTime ~(VIIT idx time)) ((hCache, _, _, _, _, _), _, _, _)
   = fromMaybe
     (error $ "[ERROR]<getEnv :=: AtTime[VIIT] > No such value at " ++ show vp)
-    (recover (getHCache (worldTime + time) idx hCache) (getHValueFromWS worldState (worldTime + time) idx))
+    (recover (getHCache (worldTime + time) idx hCache)
+             (getHValueFromWS worldState (worldTime + time) idx)
+    )
 getEnv World {..} vp@(VP AtNTime (VIN nKey)) ((_, nHCache, _, _, _, _), _, _, _)
   = fromMaybe
     (error $ "[ERROR]<getEnv :=: AtNTime[VIN]> No such value at " ++ show vp)
-    (recover (getNHCache worldTime nKey nHCache) (getNHValueFromWS worldState worldTime nKey))
+    (recover (getNHCache worldTime nKey nHCache)
+             (getNHValueFromWS worldState worldTime nKey)
+    )
 getEnv World {..} vp@(VP AtNTime ~(VINT nKey time)) ((_, nHCache, _, _, _, _), _, _, _)
   = fromMaybe
     (error $ "[ERROR]<getEnv :=: AtNTime[VINT]> No such value at " ++ show vp)
-    (recover (getNHCache (worldTime + time) nKey nHCache) (getNHValueFromWS worldState (worldTime+time) nKey))
+    (recover (getNHCache (worldTime + time) nKey nHCache)
+             (getNHValueFromWS worldState (worldTime + time) nKey)
+    )
 getEnv World {..} vp@(VP AtDict ~(VII idx)) ((_, _, dCache, _, _, _), _, _, _)
   = fromMaybe
     (error $ "[ERROR]<getEnv :=: AtDict[VII]> No such value at " ++ show vp)
@@ -270,10 +280,10 @@ getRWMVNMap :: NKey -> RWMVNMap -> Maybe Value
 getRWMVNMap nKey rwmvnMap = Trie.lookup nKey rwmvnMap >>= runRW
 
 getVMap :: Idx -> ValueMap -> Maybe Value
-getVMap idx vMap = IM.lookup idx vMap
+getVMap = IM.lookup
 
 getVNMap :: NKey -> ValueNMap -> Maybe Value
-getVNMap nKey vnMap = Trie.lookup nKey vnMap
+getVNMap = Trie.lookup
 
 unwrapFromRWMV :: RWMVMap -> [(Idx, Maybe Value)]
 unwrapFromRWMV = map (second runRW) . filter (notR . snd) . IM.toList
