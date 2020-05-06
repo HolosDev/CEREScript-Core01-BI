@@ -123,6 +123,7 @@ runSpoolInstance world@World {..} si@SI {..} wCache =
           (\s -> runMaker (csScript s) (world, newCache))
         $ IM.lookup siSpoolID worldSpools
   newSI = si { siLocalVars  = nextLocalVars
+             , siLocalNVars = nextLocalNVars
              , siRestScript = nextCEREScript
              , siRG         = newRG
              }
