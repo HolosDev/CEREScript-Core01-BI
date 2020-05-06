@@ -20,6 +20,7 @@ import           Data.CERES.Data
 import           Data.CERES.Type
 
 import           CERES.BI.Data
+import           CERES.BI.Data.Function
 import           CERES.BI.Data.Environment
 
 import           Debug
@@ -182,66 +183,66 @@ getEnv :: World -> VPosition -> Env -> Value
 getEnv World {..} vp@(VP AtWorld (VII idx)) ((hCache, _, _, _, _, _), _, _, _)
   = fromMaybe
     (error $ "[ERROR]<getEnv :=: AtWorld[VII]> No such value at " ++ show vp)
-    (getHCache 0 idx hCache >>= undefined)
+    (recover (getHCache 0 idx hCache) (getHValueFromWS worldState 0 idx))
 getEnv World {..} vp@(VP AtWorld ~(VIIT idx time)) ((hCache, _, _, _, _, _), _, _, _)
   = fromMaybe
     (error $ "[ERROR]<getEnv :=: AtWorld[VIIT]> No such value at " ++ show vp)
-    (getHCache time idx hCache >>= undefined)
+    (recover (getHCache time idx hCache) (getHValueFromWS worldState time idx))
 getEnv World {..} vp@(VP AtNWorld (VIN nKey)) ((_, nHCache, _, _, _, _), _, _, _)
   = fromMaybe
     (error $ "[ERROR]<getEnv :=: AtNWorld[VIN]> No such value at " ++ show vp)
-    (getNHCache 0 nKey nHCache >>= undefined)
+    (recover (getNHCache 0 nKey nHCache) (getNHValueFromWS worldState 0 nKey))
 getEnv World {..} vp@(VP AtNWorld ~(VINT nKey time)) ((_, nHCache, _, _, _, _), _, _, _)
   = fromMaybe
     (error $ "[ERROR]<getEnv :=: AtNWorld[VINT]> No such value at " ++ show vp)
-    (getNHCache time nKey nHCache >>= undefined)
+    (recover (getNHCache time nKey nHCache) (getNHValueFromWS worldState time nKey))
 getEnv World {..} vp@(VP AtTime (VII idx)) ((hCache, _, _, _, _, _), _, _, _) =
   fromMaybe
     (error $ "[ERROR]<getEnv :=: AtTime[VII]> No such value at " ++ show vp)
-    (getHCache worldTime idx hCache >>= undefined)
+    (recover (getHCache worldTime idx hCache) (getHValueFromWS worldState worldTime idx))
 getEnv World {..} vp@(VP AtTime ~(VIIT idx time)) ((hCache, _, _, _, _, _), _, _, _)
   = fromMaybe
     (error $ "[ERROR]<getEnv :=: AtTime[VIIT] > No such value at " ++ show vp)
-    (getHCache (worldTime + time) idx hCache >>= undefined)
+    (recover (getHCache (worldTime + time) idx hCache) (getHValueFromWS worldState (worldTime + time) idx))
 getEnv World {..} vp@(VP AtNTime (VIN nKey)) ((_, nHCache, _, _, _, _), _, _, _)
   = fromMaybe
     (error $ "[ERROR]<getEnv :=: AtNTime[VIN]> No such value at " ++ show vp)
-    (getNHCache worldTime nKey nHCache >>= undefined)
+    (recover (getNHCache worldTime nKey nHCache) (getNHValueFromWS worldState worldTime nKey))
 getEnv World {..} vp@(VP AtNTime ~(VINT nKey time)) ((_, nHCache, _, _, _, _), _, _, _)
   = fromMaybe
     (error $ "[ERROR]<getEnv :=: AtNTime[VINT]> No such value at " ++ show vp)
-    (getNHCache (worldTime + time) nKey nHCache >>= undefined)
+    (recover (getNHCache (worldTime + time) nKey nHCache) (getNHValueFromWS worldState (worldTime+time) nKey))
 getEnv World {..} vp@(VP AtDict ~(VII idx)) ((_, _, dCache, _, _, _), _, _, _)
   = fromMaybe
     (error $ "[ERROR]<getEnv :=: AtDict[VII]> No such value at " ++ show vp)
-    (getRWMVMap idx dCache >>= undefined)
+    (recover (getRWMVMap idx dCache) (getDValueFromWS worldState idx))
 getEnv World {..} vp@(VP AtNDict ~(VIN nKey)) ((_, _, _, nDCache, _, _), _, _, _)
   = fromMaybe
     (error $ "[ERROR]<getEnv :=: AtNDict[VIN]> No such value at " ++ show vp)
-    (getRWMVNMap nKey nDCache >>= undefined)
+    (recover (getRWMVNMap nKey nDCache) (getNDValueFromWS worldState nKey))
 getEnv World {..} vp@(VP AtVars ~(VII idx)) ((_, _, _, _, vCache, _), _, _, _)
   = fromMaybe
     (error $ "[ERROR]<getEnv :=: AtVars[VII]> No such value at " ++ show vp)
-    (getRWMVMap idx vCache >>= undefined)
+    (recover (getRWMVMap idx vCache) (getVValueFromWS worldState idx))
 getEnv World {..} vp@(VP AtNVars ~(VIN nKey)) ((_, _, _, _, _, nVCache), _, _, _)
   = fromMaybe
     (error $ "[ERROR]<getEnv :=: AtNVars[VIN]> No such value at " ++ show vp)
-    (getRWMVNMap nKey nVCache >>= undefined)
+    (recover (getRWMVNMap nKey nVCache) (getNVValueFromWS worldState nKey))
 getEnv _ vp@(VP AtLVars ~(VII idx)) (_, (localVars, _, _, _), _, _) = fromMaybe
   (error $ "[ERROR]<getEnv :=: AtLVars[VII]> No such value at " ++ show vp)
-  (getVMap idx localVars >>= undefined)
+  (getVMap idx localVars)
 getEnv _ vp@(VP AtLNVars ~(VIN nKey)) (_, (_, localNVars, _, _), _, _) =
   fromMaybe
     (error $ "[ERROR]<getEnv :=: AtLNVars[VIN]> No such value at " ++ show vp)
-    (getVNMap nKey localNVars >>= undefined)
+    (getVNMap nKey localNVars)
 getEnv _ vp@(VP AtLTemp ~(VII idx)) (_, (_, _, localCache, _), _, _) =
   fromMaybe
     (error $ "[ERROR]<getEnv :=: AtLTemp[VII] > No such value at " ++ show vp)
-    (getVMap idx localCache >>= undefined)
+    (getVMap idx localCache)
 getEnv _ vp@(VP AtLNTemp ~(VIN nKey)) (_, (_, _, _, localNCache), _, _) =
   fromMaybe
     (error $ "[ERROR]<getEnv :=: AtLNTemp[VIN] > No such value at " ++ show vp)
-    (getVNMap nKey localNCache >>= undefined)
+    (getVNMap nKey localNCache)
 getEnv _      vp@(VP AtHere   ~(VIV v)) (_, _, _, _) = v
 -- TODO: Need to implement
 getEnv aWorld vp@(VP AtTricky _       ) (_, _, _, _) = fromMaybe
