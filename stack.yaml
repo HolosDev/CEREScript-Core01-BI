@@ -2,7 +2,9 @@ resolver: lts-14.27
 
 packages:
 - .
-#- /AoDw/CEREScript/CEREScript-SS
+# In development
+#- /AoDw/CEREScript/CEREScript-SS00
+#- /AoDw/CEREScript/CEREScript-SS00-Parser
 
 extra-deps:
 - text-trie-0.2.5.0
