@@ -42,10 +42,10 @@ data WorldState = WorldState
   { evaluatedSpan :: TimeSpan
   , worldHistory  :: HistoricalTable
   , worldNHistory :: NHistoricalTable
-  , worldDict     :: Dictionary
-  , worldNDict    :: NDictionary
   , worldVars     :: Variables
   , worldNVars    :: NVariables
+  , worldDict     :: Dictionary
+  , worldNDict    :: NDictionary
   , worldRG       :: RG
   } deriving Show
 

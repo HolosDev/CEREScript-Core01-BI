@@ -21,12 +21,22 @@ import           CERES.Util
 
 
 updateWorldState
-  :: WorldState -> HistoricalTable -> Dictionary -> Variables -> WorldState
-updateWorldState ws newWorldHistory newWorldDict newWorldVars = ws
-  { worldHistory = newWorldHistory
-  , worldDict    = newWorldDict
-  , worldVars    = newWorldVars
-  }
+  :: WorldState
+  -> HistoricalTable
+  -> NHistoricalTable
+  -> Variables
+  -> NVariables
+  -> Dictionary
+  -> NDictionary
+  -> WorldState
+updateWorldState ws newHistoricalTable newNHistoricalTable newVars newNVars newDict newNDict
+  = ws { worldHistory  = newHistoricalTable
+       , worldNHistory = newNHistoricalTable
+       , worldVars     = newVars
+       , worldNVars    = newNVars
+       , worldDict     = newDict
+       , worldNDict    = newNDict
+       }
 
 updateWorld :: World -> WorldState -> SpoolInstanceTable -> Time -> World
 updateWorld aWorld newWorldState newSITable newWorldTime = aWorld
