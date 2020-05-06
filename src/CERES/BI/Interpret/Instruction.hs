@@ -5,6 +5,10 @@ import           Data.Bifunctor
 import           Data.IntMap                    ( IntMap )
 import qualified Data.IntMap                   as IM
 import           Data.Maybe
+import qualified Data.Text                     as T
+import qualified Data.Text.Lazy                as TL
+
+import           TextShow
 
 
 import           CERES.Operate
@@ -12,7 +16,9 @@ import           CERES.Operate
 import           Data.CERES.Data
 import           Data.CERES.Data.Method
 import           Data.CERES.Operator
+import           Data.CERES.Parser
 import           Data.CERES.Type
+import           Data.CERES.Variable.Parser
 
 import           CERES.BI.Data
 import           CERES.BI.Data.Cache.Function
@@ -106,8 +112,26 @@ crsReplaceTextTo World {..} SI {..} cState@(wc@(hCache, nHCache, vCache, nVCache
 
 crsGetVPosition
   :: World -> SpoolInstance -> Env -> VPosition -> VPosition -> Env
-crsGetVPosition World {..} SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), tCache, rg) vpA vpB
-  = undefined
+crsGetVPosition aWorld aSI cState vpA vpB = newCState
+ where
+  targetStr     = getEnv aWorld cState vpA
+  lazyTargetStr = TL.fromStrict . getStr $ targetStr
+  rTargetPtr    = parseVariablePosition lazyTargetStr
+  mTargetPtr    = getResult rTargetPtr
+  aMsg          = fromJust . getMessage $ rTargetPtr
+  newCState     = maybe
+    ( setEnv
+        aWorld
+        (VP AtTricky (VIN "DebugLog"))
+        W
+        (Just . StrValue $ T.append "Fail to read VariablePosition: "
+                                    (showt targetStr)
+        )
+    . setEnv aWorld vpB W (Just . ErrValue $ aMsg)
+    $ cState
+    )
+    (\p -> setEnv aWorld vpB W (Just . PtrValue $ p) cState)
+    mTargetPtr
 
 crsSetVPosition
   :: World -> SpoolInstance -> Env -> VPosition -> VPosition -> Env

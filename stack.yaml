@@ -11,8 +11,8 @@ extra-deps:
 - splitmix-0.0.4
 #- git: https://gitlab.com/holosdev/CEREScript-SS
 - github: HolosDev/CEREScript-SS
-  commit: 655ab9d0481f5543ed33ab926067c134b64271a8
+  commit: ccc21ca5ed498b2dfcc0845831da5e9c734fb3da
 - github: HolosDev/CEREScript-SS-Parser
-  commit: 260957c5a756063a53bfd03386c131e099bd6357
+  commit: b34bc879fb18b9cd2c16f4b074b1aa56a00806b7
 - github: QuietJoon/random-adaptor
   commit: f2f7578027ec2a855a59f7a10f4afeaa0f870b37
