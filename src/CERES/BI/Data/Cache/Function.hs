@@ -179,43 +179,75 @@ setVNMap nKey mValue vnMap =
 
 -- FIXME: Fix when refers non-cached value
 getEnv :: World -> VPosition -> Env -> Value
-getEnv _ vp@(VP AtWorld (VII idx)) ((hCache, _, _, _, _, _), _, _, _) =
-  getHCache 0 idx hCache
-getEnv _ vp@(VP AtWorld ~(VIIT idx time)) ((hCache, _, _, _, _, _), _, _, _) =
-  getHCache time idx hCache
-getEnv _ vp@(VP AtNWorld (VIN nKey)) ((_, nHCache, _, _, _, _), _, _, _) =
-  getNHCache 0 nKey nHCache
-getEnv _ vp@(VP AtNWorld ~(VINT nKey time)) ((_, nHCache, _, _, _, _), _, _, _)
-  = getNHCache time nKey nHCache
+getEnv World {..} vp@(VP AtWorld (VII idx)) ((hCache, _, _, _, _, _), _, _, _)
+  = fromMaybe
+    (error $ "[ERROR]<getEnv :=: AtWorld[VII]> No such value at " ++ show vp)
+    (getHCache 0 idx hCache >>= undefined)
+getEnv World {..} vp@(VP AtWorld ~(VIIT idx time)) ((hCache, _, _, _, _, _), _, _, _)
+  = fromMaybe
+    (error $ "[ERROR]<getEnv :=: AtWorld[VIIT]> No such value at " ++ show vp)
+    (getHCache time idx hCache >>= undefined)
+getEnv World {..} vp@(VP AtNWorld (VIN nKey)) ((_, nHCache, _, _, _, _), _, _, _)
+  = fromMaybe
+    (error $ "[ERROR]<getEnv :=: AtNWorld[VIN]> No such value at " ++ show vp)
+    (getNHCache 0 nKey nHCache >>= undefined)
+getEnv World {..} vp@(VP AtNWorld ~(VINT nKey time)) ((_, nHCache, _, _, _, _), _, _, _)
+  = fromMaybe
+    (error $ "[ERROR]<getEnv :=: AtNWorld[VINT]> No such value at " ++ show vp)
+    (getNHCache time nKey nHCache >>= undefined)
 getEnv World {..} vp@(VP AtTime (VII idx)) ((hCache, _, _, _, _, _), _, _, _) =
-  getHCache worldTime idx hCache
+  fromMaybe
+    (error $ "[ERROR]<getEnv :=: AtTime[VII]> No such value at " ++ show vp)
+    (getHCache worldTime idx hCache >>= undefined)
 getEnv World {..} vp@(VP AtTime ~(VIIT idx time)) ((hCache, _, _, _, _, _), _, _, _)
-  = getHCache (worldTime + time) idx hCache
+  = fromMaybe
+    (error $ "[ERROR]<getEnv :=: AtTime[VIIT] > No such value at " ++ show vp)
+    (getHCache (worldTime + time) idx hCache >>= undefined)
 getEnv World {..} vp@(VP AtNTime (VIN nKey)) ((_, nHCache, _, _, _, _), _, _, _)
-  = getNHCache worldTime nKey nHCache
+  = fromMaybe
+    (error $ "[ERROR]<getEnv :=: AtNTime[VIN]> No such value at " ++ show vp)
+    (getNHCache worldTime nKey nHCache >>= undefined)
 getEnv World {..} vp@(VP AtNTime ~(VINT nKey time)) ((_, nHCache, _, _, _, _), _, _, _)
-  = getNHCache (worldTime + time) nKey nHCache
-getEnv _ (VP AtDict ~(VII idx)) ((_, _, dCache, _, _, _), _, _, _) =
-  getRWMVMap idx dCache
-getEnv _ (VP AtNDict ~(VIN nKey)) ((_, _, _, nDCache, _, _), _, _, _) =
-  getRWMVNMap nKey nDCache
-getEnv _ (VP AtVars ~(VII idx)) ((_, _, _, _, vCache, _), _, _, _) =
-  getRWMVMap idx vCache
-getEnv _ (VP AtNVars ~(VIN nKey)) ((_, _, _, _, _, nVCache), _, _, _) =
-  getRWMVNMap nKey nVCache
-getEnv _ (VP AtLVars ~(VII idx)) (_, (localVars, _, _, _), _, _) =
-  getVMap idx localVars
-getEnv _ (VP AtLNVars ~(VIN nKey)) (_, (_, localNVars, _, _), _, _) =
-  getVNMap nKey localNVars
-getEnv _ (VP AtLTemp ~(VII idx)) (_, (_, _, localCache, _), _, _) =
-  getVMap idx localCache
-getEnv _ (VP AtLNTemp ~(VIN nKey)) (_, (_, _, _, localNCache), _, _) =
-  getVNMap nKey localNCache
-getEnv _ (VP AtHere ~(VIV v)) (_, _, _, _) = v
+  = fromMaybe
+    (error $ "[ERROR]<getEnv :=: AtNTime[VINT]> No such value at " ++ show vp)
+    (getNHCache (worldTime + time) nKey nHCache >>= undefined)
+getEnv World {..} vp@(VP AtDict ~(VII idx)) ((_, _, dCache, _, _, _), _, _, _)
+  = fromMaybe
+    (error $ "[ERROR]<getEnv :=: AtDict[VII]> No such value at " ++ show vp)
+    (getRWMVMap idx dCache >>= undefined)
+getEnv World {..} vp@(VP AtNDict ~(VIN nKey)) ((_, _, _, nDCache, _, _), _, _, _)
+  = fromMaybe
+    (error $ "[ERROR]<getEnv :=: AtNDict[VIN]> No such value at " ++ show vp)
+    (getRWMVNMap nKey nDCache >>= undefined)
+getEnv World {..} vp@(VP AtVars ~(VII idx)) ((_, _, _, _, vCache, _), _, _, _)
+  = fromMaybe
+    (error $ "[ERROR]<getEnv :=: AtVars[VII]> No such value at " ++ show vp)
+    (getRWMVMap idx vCache >>= undefined)
+getEnv World {..} vp@(VP AtNVars ~(VIN nKey)) ((_, _, _, _, _, nVCache), _, _, _)
+  = fromMaybe
+    (error $ "[ERROR]<getEnv :=: AtNVars[VIN]> No such value at " ++ show vp)
+    (getRWMVNMap nKey nVCache >>= undefined)
+getEnv _ vp@(VP AtLVars ~(VII idx)) (_, (localVars, _, _, _), _, _) = fromMaybe
+  (error $ "[ERROR]<getEnv :=: AtLVars[VII]> No such value at " ++ show vp)
+  (getVMap idx localVars >>= undefined)
+getEnv _ vp@(VP AtLNVars ~(VIN nKey)) (_, (_, localNVars, _, _), _, _) =
+  fromMaybe
+    (error $ "[ERROR]<getEnv :=: AtLNVars[VIN]> No such value at " ++ show vp)
+    (getVNMap nKey localNVars >>= undefined)
+getEnv _ vp@(VP AtLTemp ~(VII idx)) (_, (_, _, localCache, _), _, _) =
+  fromMaybe
+    (error $ "[ERROR]<getEnv :=: AtLTemp[VII] > No such value at " ++ show vp)
+    (getVMap idx localCache >>= undefined)
+getEnv _ vp@(VP AtLNTemp ~(VIN nKey)) (_, (_, _, _, localNCache), _, _) =
+  fromMaybe
+    (error $ "[ERROR]<getEnv :=: AtLNTemp[VIN] > No such value at " ++ show vp)
+    (getVNMap nKey localNCache >>= undefined)
+getEnv _      vp@(VP AtHere   ~(VIV v)) (_, _, _, _) = v
 -- TODO: Need to implement
-getEnv aWorld (VP AtTricky _) (_, _, _, _) =
-  error "[ERROR]<getEnv :=: AtTricky> Not yet implemented"
-getEnv _ (VP AtPtr _) (_, _, _, _) =
+getEnv aWorld vp@(VP AtTricky _       ) (_, _, _, _) = fromMaybe
+  (error $ "[ERROR]<getEnv :=: > No such value at " ++ show vp)
+  (Just $ error "[ERROR]<getEnv :=: AtTricky> Not yet implemented")
+getEnv aWorld (VP AtPtr _) (_, _, _, _) =
   error "[ERROR]<getEnv :=: AtPtr> Not yet implemented"
 getEnv _ (VP AtReg _) (_, _, _, _) =
   error "[ERROR]<getEnv :=: AtReg> Not yet implemented"
@@ -223,50 +255,28 @@ getEnv _ (VP AtNull _) (_, _, _, _) =
   error "[ERROR]<getEnv :=: AtNull> Can't access AtNull"
 getEnv _ _ (_, _, _, _) = error "[ERROR]<getEnv> Can't be reached"
 
-getHCache :: Time -> Idx -> HistoricalCache -> Value
-getHCache time idx hCache = fromMaybe
-  (ErrValue "[ERROR]<getHCache> No such Value")
-  found
- where
-  found :: Maybe Value
-  found = IM.lookup time hCache >>= IM.lookup idx >>= runRW
+getHCache :: Time -> Idx -> HistoricalCache -> Maybe Value
+getHCache time idx hCache = IM.lookup time hCache >>= IM.lookup idx >>= runRW
 
-getNHCache :: Time -> NKey -> NHistoricalCache -> Value
-getNHCache time nKey nHCache = fromMaybe
-  (ErrValue "[ERROR]<getNHCache> No such Value")
-  found
- where
-  found :: Maybe Value
-  found = IM.lookup time nHCache >>= Trie.lookup nKey >>= runRW
+getNHCache :: Time -> NKey -> NHistoricalCache -> Maybe Value
+getNHCache time nKey nHCache =
+  IM.lookup time nHCache >>= Trie.lookup nKey >>= runRW
 
-getRWMVMap :: Idx -> RWMVMap -> Value
-getRWMVMap idx rwmvMap = fromMaybe
-  (ErrValue "[ERROR]<getRWMVMap> No such Value")
-  found
- where
-  found :: Maybe Value
-  found = IM.lookup idx rwmvMap >>= runRW
+getRWMVMap :: Idx -> RWMVMap -> Maybe Value
+getRWMVMap idx rwmvMap = IM.lookup idx rwmvMap >>= runRW
 
-getRWMVNMap :: NKey -> RWMVNMap -> Value
-getRWMVNMap nKey rwmvnMap = fromMaybe
-  (ErrValue "[ERROR]<getRWMVNMap> No such Value")
-  found
- where
-  found :: Maybe Value
-  found = Trie.lookup nKey rwmvnMap >>= runRW
+getRWMVNMap :: NKey -> RWMVNMap -> Maybe Value
+getRWMVNMap nKey rwmvnMap = Trie.lookup nKey rwmvnMap >>= runRW
 
-getVMap :: Idx -> ValueMap -> Value
-getVMap idx vMap = fromMaybe (ErrValue "[ERROR]<getVMap> No such Value") found
- where
-  found :: Maybe Value
-  found = IM.lookup idx vMap
+getVMap :: Idx -> ValueMap -> Maybe Value
+getVMap idx vMap = IM.lookup idx vMap
 
-getVNMap :: NKey -> ValueNMap -> Value
-getVNMap nKey vnMap = fromMaybe (ErrValue "[ERROR]<getVNMap> No such Value")
-                                found
- where
-  found :: Maybe Value
-  found = Trie.lookup nKey vnMap
+getVNMap :: NKey -> ValueNMap -> Maybe Value
+getVNMap nKey vnMap = Trie.lookup nKey vnMap
 
 unwrapFromRWMV :: RWMVMap -> [(Idx, Maybe Value)]
 unwrapFromRWMV = map (second runRW) . filter (notR . snd) . IM.toList
+
+unwrapFromRWMVN :: RWMVNMap -> [(NKey, Maybe Value)]
+unwrapFromRWMVN =
+  map (bimap TL.toStrict runRW) . filter (notR . snd) . Trie.toList

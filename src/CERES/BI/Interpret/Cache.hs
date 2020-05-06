@@ -36,10 +36,20 @@ cacheMaker SpoolTree {..} World {..} = S.foldr cacheMakerSub blankCache vpSet
  where
   blankCache = (IM.empty, IM.empty, blankVM, blankVNM, blankVM, blankVNM)
   cacheMakerSub vp aCache = case vp of
+    (VP AtWorld (VII idx)) ->
+      let mValue    = getHValueFromWS worldState 0 idx
+          (hCache, nHCache, dCache, nDCache, vCache, nVCache) = aCache
+          newHCache = setHCache 0 idx R mValue hCache
+      in  (newHCache, nHCache, dCache, nDCache, vCache, nVCache)
     (VP AtWorld ~(VIIT idx time)) ->
       let mValue    = getHValueFromWS worldState time idx
           (hCache, nHCache, dCache, nDCache, vCache, nVCache) = aCache
           newHCache = setHCache time idx R mValue hCache
+      in  (newHCache, nHCache, dCache, nDCache, vCache, nVCache)
+    (VP AtTime (VII idx)) ->
+      let mValue    = getHValueFromWS worldState worldTime idx
+          (hCache, nHCache, dCache, nDCache, vCache, nVCache) = aCache
+          newHCache = setHCache worldTime idx R mValue hCache
       in  (newHCache, nHCache, dCache, nDCache, vCache, nVCache)
     (VP AtTime ~(VIIT idx time)) ->
       let mValue    = getHValueFromWS worldState (worldTime + time) idx
@@ -52,7 +62,7 @@ cacheMaker SpoolTree {..} World {..} = S.foldr cacheMakerSub blankCache vpSet
           newDCache = setRWMVMap idx R mValue dCache
       in  (hCache, nHCache, newDCache, nDCache, vCache, nVCache)
     (VP AtNDict ~(VIN nKey)) ->
-      let mValue     = getNValueFromWS worldState nKey
+      let mValue     = getNDValueFromWS worldState nKey
           (hCache, nHCache, dCache, nDCache, vCache, nVCache) = aCache
           newNDCache = setRWMVNMap nKey R mValue nDCache
       in  (hCache, nHCache, dCache, newNDCache, vCache, nVCache)
@@ -61,10 +71,24 @@ cacheMaker SpoolTree {..} World {..} = S.foldr cacheMakerSub blankCache vpSet
           (hCache, nHCache, dCache, nDCache, vCache, nVCache) = aCache
           newVCache = setRWMVMap idx R mValue vCache
       in  (hCache, nHCache, dCache, nDCache, newVCache, nVCache)
-    (VP AtLVars ~(VII idx)) -> aCache
-    (VP AtLTemp ~(VII idx)) -> aCache
-    (VP AtHere  _         ) -> aCache
-    (VP AtNull  _         ) -> aCache
+    (VP AtNVars ~(VIN nKey)) ->
+      let mValue     = getNVValueFromWS worldState nKey
+          (hCache, nHCache, dCache, nDCache, vCache, nVCache) = aCache
+          newNVCache = setRWMVNMap nKey R mValue nVCache
+      in  (hCache, nHCache, dCache, nDCache, vCache, newNVCache)
+    (VP AtPtr _) -> error $ "[ERROR]<cacheMaker :=: AtPtr> Not yet implemented"
+    (VP AtTricky _) ->
+      error $ "[ERROR]<cacheMaker :=: AtTricky> Not yet implemented"
+    (VP AtLVars _) ->
+      error $ "[ERROR]<cacheMaker :=: AtLVars> Can't be reached"
+    (VP AtLNVars _) ->
+      error $ "[ERROR]<cacheMaker :=: AtLNVars> Can't be reached"
+    (VP AtLTemp _) ->
+      error $ "[ERROR]<cacheMaker :=: AtLTemp> Can't be reached"
+    (VP AtLNTemp _) ->
+      error $ "[ERROR]<cacheMaker :=: AtLNTemp> Can't be reached"
+    (VP AtHere _) -> aCache
+    (VP AtNull _) -> aCache
     _ -> error $ "[ERROR]<cacheMaker> Not compatible for " ++ show vp
 
 
@@ -75,11 +99,19 @@ cacheCommitter :: WorldCache -> WorldState -> WorldState
 cacheCommitter (hCache, nHCache, dCache, nDCache, vCache, nVCache) aWorldState@WorldState {..}
   = newWorldState
  where
-  newWorldState = undefined
-    $ updateWorldState aWorldState newWorldHistory newWorldDict newWorldVars
+  newWorldState = undefined $ updateWorldState aWorldState
+                                               newWorldHistory
+                                               newWorldNHistory
+                                               newWorldDict
+                                               newWorldNDict
+                                               newWorldVars
+                                               newWorldNVars
   newWorldHistory = updateWorldHistoryFromCache worldHistory hCache
-  newWorldDict    = updateValuesToValueMap worldDict (unwrapFromRWMV dCache)
-  newWorldVars    = updateValuesToValueMap worldDict (unwrapFromRWMV vCache)
+  newWorldNHistory = updateWorldNHistoryFromCache worldNHistory nHCache
+  newWorldDict = updateValuesToValueMap worldDict (unwrapFromRWMV dCache)
+  newWorldNDict = updateValuesToValueNMap worldNDict (unwrapFromRWMVN nDCache)
+  newWorldVars = updateValuesToValueMap worldVars (unwrapFromRWMV vCache)
+  newWorldNVars = updateValuesToValueNMap worldNVars (unwrapFromRWMVN nVCache)
 
 -- NOTE: HistoricalCache could have values in a time-slot which HistoricalTable may not have
 -- NOTE: Anyway, every values should alive
@@ -101,3 +133,21 @@ updateWorldHistoryFromCache aHistoricalTable hCache = IM.map newRow uniqueTimes
     targetCache = fromMaybe blankVM . IM.lookup time $ hCache
     unwrapped   = unwrapFromRWMV targetCache
     newValues   = updateValuesToValueMap baseRow unwrapped
+
+updateWorldNHistoryFromCache
+  :: NHistoricalTable -> NHistoricalCache -> NHistoricalTable
+updateWorldNHistoryFromCache aNHistoricalTable nHCache = IM.map newRow
+                                                                uniqueTimes
+ where
+  uniqueTimes =
+    IM.fromList
+      .  map (\x -> (x, x))
+      .  nub
+      $  IM.keys aNHistoricalTable
+      ++ IM.keys nHCache
+  newRow time = NEpochRow time newNValues
+   where
+    baseRow     = maybe blankVNM nValues . IM.lookup time $ aNHistoricalTable
+    targetCache = fromMaybe blankVNM . IM.lookup time $ nHCache
+    unwrapped   = unwrapFromRWMVN targetCache
+    newNValues  = updateValuesToValueNMap baseRow unwrapped
