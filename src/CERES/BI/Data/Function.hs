@@ -17,6 +17,8 @@ import           Data.CERES.Type
 import           CERES.BI.Data
 import           CERES.BI.Data.Constants
 
+import           CERES.Util
+
 
 updateWorldState
   :: WorldState -> HistoricalTable -> Dictionary -> Variables -> WorldState
@@ -103,7 +105,7 @@ updateValuesToVTSub ivList aHistoricalTable = newHistoricalTable
  where
   theTime = fst . fst . head $ ivList
   aEpochRow =
-    fromMaybe (EpochRow theTime IM.empty) (IM.lookup theTime aHistoricalTable)
+    fromMaybe (EpochRow theTime blankVM) (IM.lookup theTime aHistoricalTable)
   newEpochRow =
     aEpochRow { values = updateValuesToVTSubSub (values aEpochRow) ivList }
   newHistoricalTable = IM.insert theTime newEpochRow aHistoricalTable
@@ -186,4 +188,4 @@ updateValuesToNDic ws@WorldState {..} ivList =
   ws { worldNDict = updateValuesToValueNMap worldNDict ivList }
 
 updateValuesToValueNMap :: ValueNMap -> [(NKey, Maybe Value)] -> ValueNMap
-updateValuesToValueNMap = foldr (\(n, v) b -> updateValueToValueNMap b n v)
+updateValuesToValueNMap = foldr (\(n, mV) -> vNMapUpdate n mV)

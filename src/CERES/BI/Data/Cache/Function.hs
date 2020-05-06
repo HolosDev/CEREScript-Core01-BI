@@ -158,7 +158,7 @@ setNHCache
   -> NHistoricalCache
 setNHCache time nKey mode mValue nHCache = newNHCache
  where
-  rwmvNMap    = fromMaybe Trie.empty (IM.lookup time nHCache)
+  rwmvNMap    = fromMaybe blankVNM (IM.lookup time nHCache)
   newRWMVNMap = setRWMVNMap nKey mode mValue rwmvNMap
   newNHCache  = IM.insert time newRWMVNMap nHCache
 

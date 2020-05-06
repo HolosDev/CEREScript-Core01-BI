@@ -61,9 +61,9 @@ instance (Show a, TextShow a) => Show (RW a) where
   show = toString . showb
 
 instance TextShow a => TextShow (RW a) where
-  showb (R  a) = fromLazyText "[R  " <> showb a <> fromLazyText "]"
-  showb (W  a) = fromLazyText "[W  " <> showb a <> fromLazyText "]"
-  showb (RW a) = fromLazyText "[RW " <> showb a <> fromLazyText "]"
+  showb (R  a) = fromText "[R  " <> showb a <> fromText "]"
+  showb (W  a) = fromText "[W  " <> showb a <> fromText "]"
+  showb (RW a) = fromText "[RW " <> showb a <> fromText "]"
 
 runRW :: RW a -> a
 runRW (R  a) = a

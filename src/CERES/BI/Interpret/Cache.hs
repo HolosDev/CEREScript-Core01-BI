@@ -34,7 +34,7 @@ import           Util
 cacheMaker :: SpoolTree -> World -> WorldCache
 cacheMaker SpoolTree {..} World {..} = S.foldr cacheMakerSub blankCache vpSet
  where
-  blankCache = (IM.empty, IM.empty, IM.empty, Trie.empty, IM.empty, Trie.empty)
+  blankCache = (IM.empty, IM.empty, blankVM, blankVNM, blankVM, blankVNM)
   cacheMakerSub vp aCache = case vp of
     (VP AtWorld ~(VIIT idx time)) ->
       let mValue    = getHValueFromWS worldState time idx
@@ -87,17 +87,17 @@ cacheCommitter (hCache, nHCache, dCache, nDCache, vCache, nVCache) aWorldState@W
 -- TODO: Optimize with/without updateValuesToVT
 updateWorldHistoryFromCache
   :: HistoricalTable -> HistoricalCache -> HistoricalTable
-updateWorldHistoryFromCache historicalTable hCache = IM.map newRow uniqueTimes
+updateWorldHistoryFromCache aHistoricalTable hCache = IM.map newRow uniqueTimes
  where
   uniqueTimes =
     IM.fromList
       .  map (\x -> (x, x))
       .  nub
-      $  IM.keys historicalTable
+      $  IM.keys aHistoricalTable
       ++ IM.keys hCache
   newRow time = EpochRow time newValues
    where
-    baseRow     = maybe IM.empty values . IM.lookup time $ historicalTable
-    targetCache = fromMaybe IM.empty . IM.lookup time $ hCache
+    baseRow     = maybe blankVM values . IM.lookup time $ aHistoricalTable
+    targetCache = fromMaybe blankVM . IM.lookup time $ hCache
     unwrapped   = unwrapFromRWMV targetCache
     newValues   = updateValuesToValueMap baseRow unwrapped

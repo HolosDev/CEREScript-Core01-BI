@@ -97,10 +97,7 @@ instance Show CERESSpool where
 
 instance TextShow CERESSpool where
   showb CERESSpool {..} =
-    fromText "Spool("
-      <> showb csID
-      <> fromText "): "
-      <> fromText csName
+    fromText "Spool(" <> showb csID <> fromText "): " <> fromText csName
 
 data SpoolInstanceRow = SIRow
   { siRowTime :: Time

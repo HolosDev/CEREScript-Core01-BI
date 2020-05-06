@@ -36,8 +36,8 @@ initializer = do
   T.putStrLn " - = + Set HistoricalTable"
   let iHistoricalTable = IM.empty
   let iNHistoricalTable = IM.empty
-  let iValueMap      = IM.empty
-  let iTrie          = Trie.empty
+  let iValueMap      = blankVM
+  let iTrie          = blankVNM
   let rGen           = mkGenFromInt 0
   let iWorldState =
         WorldState Nothing iHistoricalTable iNHistoricalTable iValueMap iTrie iValueMap iTrie rGen
