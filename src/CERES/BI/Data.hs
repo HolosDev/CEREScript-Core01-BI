@@ -10,8 +10,6 @@ import           Data.Set                       ( Set )
 import qualified Data.Set                      as S
 import           Data.Text                      ( Text )
 import qualified Data.Text                     as T
-import qualified Data.Text.Lazy                as TL
-import qualified Data.Text.Lazy.IO             as TL
 import           Data.Trie.Text                 ( Trie )
 import qualified Data.Trie.Text                as Trie
 

@@ -8,7 +8,6 @@ import           Data.List                      ( groupBy
                                                 , sortBy
                                                 )
 import           Data.Maybe
-import qualified Data.Text.Lazy                as TL
 import qualified Data.Trie.Text                as Trie
 
 

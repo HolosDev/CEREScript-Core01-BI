@@ -3,8 +3,6 @@ module CERES.BI.Data.Environment where
 
 import           Data.Map                       ( Map )
 import           Data.IntMap                    ( IntMap )
-import           Data.Text.Lazy                 ( Text )
-import qualified Data.Text.Lazy                as TL
 import           Data.Trie.Text                 ( Trie )
 import           Data.Set                       ( Set )
 import           Data.Maybe
