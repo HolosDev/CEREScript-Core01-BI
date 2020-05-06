@@ -172,90 +172,89 @@ setVNMap nKey mValue vnMap =
 
 
 -- FIXME: Fix when refers non-cached value
-getEnv :: World -> VPosition -> Env -> Value
-getEnv World {..} vp@(VP AtWorld (VII idx)) ((hCache, _, _, _, _, _), _, _, _)
+getEnv :: World -> Env -> VPosition -> Value
+getEnv World {..} ((hCache, _, _, _, _, _), _, _, _) vp@(VP AtWorld (VII idx))
   = fromMaybe
     (error $ "[ERROR]<getEnv :=: AtWorld[VII]> No such value at " ++ show vp)
     (recover (getHCache 0 idx hCache) (getHValueFromWS worldState 0 idx))
-getEnv World {..} vp@(VP AtWorld ~(VIIT idx time)) ((hCache, _, _, _, _, _), _, _, _)
+getEnv World {..} ((hCache, _, _, _, _, _), _, _, _) vp@(VP AtWorld ~(VIIT idx time))
   = fromMaybe
     (error $ "[ERROR]<getEnv :=: AtWorld[VIIT]> No such value at " ++ show vp)
     (recover (getHCache time idx hCache) (getHValueFromWS worldState time idx))
-getEnv World {..} vp@(VP AtNWorld (VIN nKey)) ((_, nHCache, _, _, _, _), _, _, _)
+getEnv World {..} ((_, nHCache, _, _, _, _), _, _, _) vp@(VP AtNWorld (VIN nKey))
   = fromMaybe
     (error $ "[ERROR]<getEnv :=: AtNWorld[VIN]> No such value at " ++ show vp)
     (recover (getNHCache 0 nKey nHCache) (getNHValueFromWS worldState 0 nKey))
-getEnv World {..} vp@(VP AtNWorld ~(VINT nKey time)) ((_, nHCache, _, _, _, _), _, _, _)
+getEnv World {..} ((_, nHCache, _, _, _, _), _, _, _) vp@(VP AtNWorld ~(VINT nKey time))
   = fromMaybe
     (error $ "[ERROR]<getEnv :=: AtNWorld[VINT]> No such value at " ++ show vp)
     (recover (getNHCache time nKey nHCache)
              (getNHValueFromWS worldState time nKey)
     )
-getEnv World {..} vp@(VP AtTime (VII idx)) ((hCache, _, _, _, _, _), _, _, _) =
+getEnv World {..} ((hCache, _, _, _, _, _), _, _, _) vp@(VP AtTime (VII idx)) =
   fromMaybe
     (error $ "[ERROR]<getEnv :=: AtTime[VII]> No such value at " ++ show vp)
     (recover (getHCache worldTime idx hCache)
              (getHValueFromWS worldState worldTime idx)
     )
-getEnv World {..} vp@(VP AtTime ~(VIIT idx time)) ((hCache, _, _, _, _, _), _, _, _)
+getEnv World {..} ((hCache, _, _, _, _, _), _, _, _) vp@(VP AtTime ~(VIIT idx time))
   = fromMaybe
     (error $ "[ERROR]<getEnv :=: AtTime[VIIT] > No such value at " ++ show vp)
     (recover (getHCache (worldTime + time) idx hCache)
              (getHValueFromWS worldState (worldTime + time) idx)
     )
-getEnv World {..} vp@(VP AtNTime (VIN nKey)) ((_, nHCache, _, _, _, _), _, _, _)
+getEnv World {..} ((_, nHCache, _, _, _, _), _, _, _) vp@(VP AtNTime (VIN nKey))
   = fromMaybe
     (error $ "[ERROR]<getEnv :=: AtNTime[VIN]> No such value at " ++ show vp)
     (recover (getNHCache worldTime nKey nHCache)
              (getNHValueFromWS worldState worldTime nKey)
     )
-getEnv World {..} vp@(VP AtNTime ~(VINT nKey time)) ((_, nHCache, _, _, _, _), _, _, _)
+getEnv World {..} ((_, nHCache, _, _, _, _), _, _, _) vp@(VP AtNTime ~(VINT nKey time))
   = fromMaybe
     (error $ "[ERROR]<getEnv :=: AtNTime[VINT]> No such value at " ++ show vp)
     (recover (getNHCache (worldTime + time) nKey nHCache)
              (getNHValueFromWS worldState (worldTime + time) nKey)
     )
-getEnv World {..} vp@(VP AtDict ~(VII idx)) ((_, _, dCache, _, _, _), _, _, _)
+getEnv World {..} ((_, _, dCache, _, _, _), _, _, _) vp@(VP AtDict ~(VII idx))
   = fromMaybe
     (error $ "[ERROR]<getEnv :=: AtDict[VII]> No such value at " ++ show vp)
     (recover (getRWMVMap idx dCache) (getDValueFromWS worldState idx))
-getEnv World {..} vp@(VP AtNDict ~(VIN nKey)) ((_, _, _, nDCache, _, _), _, _, _)
+getEnv World {..} ((_, _, _, nDCache, _, _), _, _, _) vp@(VP AtNDict ~(VIN nKey))
   = fromMaybe
     (error $ "[ERROR]<getEnv :=: AtNDict[VIN]> No such value at " ++ show vp)
     (recover (getRWMVNMap nKey nDCache) (getNDValueFromWS worldState nKey))
-getEnv World {..} vp@(VP AtVars ~(VII idx)) ((_, _, _, _, vCache, _), _, _, _)
+getEnv World {..} ((_, _, _, _, vCache, _), _, _, _) vp@(VP AtVars ~(VII idx))
   = fromMaybe
     (error $ "[ERROR]<getEnv :=: AtVars[VII]> No such value at " ++ show vp)
     (recover (getRWMVMap idx vCache) (getVValueFromWS worldState idx))
-getEnv World {..} vp@(VP AtNVars ~(VIN nKey)) ((_, _, _, _, _, nVCache), _, _, _)
+getEnv World {..} ((_, _, _, _, _, nVCache), _, _, _) vp@(VP AtNVars ~(VIN nKey))
   = fromMaybe
     (error $ "[ERROR]<getEnv :=: AtNVars[VIN]> No such value at " ++ show vp)
     (recover (getRWMVNMap nKey nVCache) (getNVValueFromWS worldState nKey))
-getEnv _ vp@(VP AtLVars ~(VII idx)) (_, (localVars, _, _, _), _, _) = fromMaybe
+getEnv _ (_, (localVars, _, _, _), _, _) vp@(VP AtLVars ~(VII idx)) = fromMaybe
   (error $ "[ERROR]<getEnv :=: AtLVars[VII]> No such value at " ++ show vp)
   (getVMap idx localVars)
-getEnv _ vp@(VP AtLNVars ~(VIN nKey)) (_, (_, localNVars, _, _), _, _) =
+getEnv _ (_, (_, localNVars, _, _), _, _) vp@(VP AtLNVars ~(VIN nKey)) =
   fromMaybe
     (error $ "[ERROR]<getEnv :=: AtLNVars[VIN]> No such value at " ++ show vp)
     (getVNMap nKey localNVars)
-getEnv _ vp@(VP AtLTemp ~(VII idx)) (_, (_, _, localCache, _), _, _) =
+getEnv _ (_, (_, _, localCache, _), _, _) vp@(VP AtLTemp ~(VII idx)) =
   fromMaybe
     (error $ "[ERROR]<getEnv :=: AtLTemp[VII] > No such value at " ++ show vp)
     (getVMap idx localCache)
-getEnv _ vp@(VP AtLNTemp ~(VIN nKey)) (_, (_, _, _, localNCache), _, _) =
+getEnv _ (_, (_, _, _, localNCache), _, _) vp@(VP AtLNTemp ~(VIN nKey)) =
   fromMaybe
     (error $ "[ERROR]<getEnv :=: AtLNTemp[VIN] > No such value at " ++ show vp)
     (getVNMap nKey localNCache)
-getEnv _      vp@(VP AtHere   ~(VIV v)) (_, _, _, _) = v
+getEnv _      (_, _, _, _) vp@(VP AtHere   ~(VIV v)) = v
 -- TODO: Need to implement
-getEnv aWorld vp@(VP AtTricky _       ) (_, _, _, _) = fromMaybe
+getEnv aWorld (_, _, _, _) vp@(VP AtTricky _       ) = fromMaybe
   (error $ "[ERROR]<getEnv :=: > No such value at " ++ show vp)
   (Just $ error "[ERROR]<getEnv :=: AtTricky> Not yet implemented")
-getEnv aWorld (VP AtPtr _) (_, _, _, _) =
-  error "[ERROR]<getEnv :=: AtPtr> Not yet implemented"
-getEnv _ (VP AtReg _) (_, _, _, _) =
+getEnv aWorld aEnv (VP AtPtr ~(VIV ~(PtrValue pVP))) = getEnv aWorld aEnv pVP
+getEnv _ (_, _, _, _) (VP AtReg _) =
   error "[ERROR]<getEnv :=: AtReg> Not yet implemented"
-getEnv _ (VP AtNull _) (_, _, _, _) =
+getEnv _ (_, _, _, _) (VP AtNull _) =
   error "[ERROR]<getEnv :=: AtNull> Can't access AtNull"
 getEnv _ vp _ = error $ "[ERROR]<getEnv> Can't be reached with " ++ show vp
 

@@ -126,7 +126,7 @@ crsRandom aWorld SI {..} cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, n
 crsRandomBy :: World -> SpoolInstance -> Env -> VPosition -> VPosition -> Env
 crsRandomBy aWorld aSI cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), (lVCache, lNVCache, lTCache, lNTCache), tCache, rg) vpA vpB
   = crsRandom aWorld aSI cState vpA vt
-  where vt = getValueType . getEnv aWorld vpB $ cState
+  where vt = getValueType . getEnv aWorld cState $ vpB
 
 crsRandomWith
   :: World
