@@ -1,6 +1,8 @@
 module CERES.BI.Interpret.Cache where
 
 
+import           Control.Parallel
+
 import qualified Data.IntMap                   as IM
 import qualified Data.Map                      as M
 import           Data.Maybe
@@ -99,13 +101,20 @@ cacheCommitter :: WorldCache -> WorldState -> WorldState
 cacheCommitter (hCache, nHCache, dCache, nDCache, vCache, nVCache) aWorldState@WorldState {..}
   = newWorldState
  where
-  newWorldState = undefined $ updateWorldState aWorldState
-                                               newWorldHistory
-                                               newWorldNHistory
-                                               newWorldDict
-                                               newWorldNDict
-                                               newWorldVars
-                                               newWorldNVars
+  newWorldState =
+    newWorldHistory
+      `par`  newWorldNHistory
+      `par`  newWorldDict
+      `par`  newWorldNDict
+      `par`  newWorldVars
+      `par`  newWorldNVars
+      `pseq` updateWorldState aWorldState
+                              newWorldHistory
+                              newWorldNHistory
+                              newWorldDict
+                              newWorldNDict
+                              newWorldVars
+                              newWorldNVars
   newWorldHistory = updateWorldHistoryFromCache worldHistory hCache
   newWorldNHistory = updateWorldNHistoryFromCache worldNHistory nHCache
   newWorldDict = updateValuesToValueMap worldDict (unwrapFromRWMV dCache)
