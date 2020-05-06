@@ -37,44 +37,44 @@ cacheMaker SpoolTree {..} World {..} = S.foldr cacheMakerSub blankCache vpSet
   cacheMakerSub vp aCache = case vp of
     (VP AtWorld (VII idx)) ->
       let mValue    = getHValueFromWS worldState 0 idx
-          (hCache, nHCache, dCache, nDCache, vCache, nVCache) = aCache
+          (hCache, nHCache, vCache, nVCache, dCache, nDCache) = aCache
           newHCache = setHCache 0 idx R mValue hCache
-      in  (newHCache, nHCache, dCache, nDCache, vCache, nVCache)
+      in  (newHCache, nHCache, vCache, nVCache, dCache, nDCache)
     (VP AtWorld ~(VIIT idx time)) ->
       let mValue    = getHValueFromWS worldState time idx
-          (hCache, nHCache, dCache, nDCache, vCache, nVCache) = aCache
+          (hCache, nHCache, vCache, nVCache, dCache, nDCache) = aCache
           newHCache = setHCache time idx R mValue hCache
-      in  (newHCache, nHCache, dCache, nDCache, vCache, nVCache)
+      in  (newHCache, nHCache, vCache, nVCache, dCache, nDCache)
     (VP AtTime (VII idx)) ->
       let mValue    = getHValueFromWS worldState worldTime idx
-          (hCache, nHCache, dCache, nDCache, vCache, nVCache) = aCache
+          (hCache, nHCache, vCache, nVCache, dCache, nDCache) = aCache
           newHCache = setHCache worldTime idx R mValue hCache
-      in  (newHCache, nHCache, dCache, nDCache, vCache, nVCache)
+      in  (newHCache, nHCache, vCache, nVCache, dCache, nDCache)
     (VP AtTime ~(VIIT idx time)) ->
       let mValue    = getHValueFromWS worldState (worldTime + time) idx
-          (hCache, nHCache, dCache, nDCache, vCache, nVCache) = aCache
+          (hCache, nHCache, vCache, nVCache, dCache, nDCache) = aCache
           newHCache = setHCache worldTime idx R mValue hCache
-      in  (newHCache, nHCache, dCache, nDCache, vCache, nVCache)
-    (VP AtDict ~(VII idx)) ->
-      let mValue    = getDValueFromWS worldState idx
-          (hCache, nHCache, dCache, nDCache, vCache, nVCache) = aCache
-          newDCache = setRWMVMap idx R mValue dCache
-      in  (hCache, nHCache, newDCache, nDCache, vCache, nVCache)
-    (VP AtNDict ~(VIN nKey)) ->
-      let mValue     = getNDValueFromWS worldState nKey
-          (hCache, nHCache, dCache, nDCache, vCache, nVCache) = aCache
-          newNDCache = setRWMVNMap nKey R mValue nDCache
-      in  (hCache, nHCache, dCache, newNDCache, vCache, nVCache)
+      in  (newHCache, nHCache, vCache, nVCache, dCache, nDCache)
     (VP AtVars ~(VII idx)) ->
       let mValue    = getVValueFromWS worldState idx
-          (hCache, nHCache, dCache, nDCache, vCache, nVCache) = aCache
+          (hCache, nHCache, vCache, nVCache, dCache, nDCache) = aCache
           newVCache = setRWMVMap idx R mValue vCache
-      in  (hCache, nHCache, dCache, nDCache, newVCache, nVCache)
+      in  (hCache, nHCache, newVCache, nVCache, dCache, nDCache)
     (VP AtNVars ~(VIN nKey)) ->
       let mValue     = getNVValueFromWS worldState nKey
-          (hCache, nHCache, dCache, nDCache, vCache, nVCache) = aCache
+          (hCache, nHCache, vCache, nVCache, dCache, nDCache) = aCache
           newNVCache = setRWMVNMap nKey R mValue nVCache
-      in  (hCache, nHCache, dCache, nDCache, vCache, newNVCache)
+      in  (hCache, nHCache, vCache, newNVCache, dCache, nDCache)
+    (VP AtDict ~(VII idx)) ->
+      let mValue    = getDValueFromWS worldState idx
+          (hCache, nHCache, vCache, nVCache, dCache, nDCache) = aCache
+          newDCache = setRWMVMap idx R mValue dCache
+      in  (hCache, nHCache, vCache, nVCache, newDCache, nDCache)
+    (VP AtNDict ~(VIN nKey)) ->
+      let mValue     = getNDValueFromWS worldState nKey
+          (hCache, nHCache, vCache, nVCache, dCache, nDCache) = aCache
+          newNDCache = setRWMVNMap nKey R mValue nDCache
+      in  (hCache, nHCache, vCache, nVCache, dCache, newNDCache)
     (VP AtPtr _) -> error $ "[ERROR]<cacheMaker :=: AtPtr> Not yet implemented"
     (VP AtTricky _) ->
       error $ "[ERROR]<cacheMaker :=: AtTricky> Not yet implemented"
@@ -95,29 +95,29 @@ cacheMaker SpoolTree {..} World {..} = S.foldr cacheMakerSub blankCache vpSet
 -- TODO: This style is for foldr, we may change this better
 -- TODO: Change this for when many WorldCache is given as List or etc.
 cacheCommitter :: WorldCache -> WorldState -> WorldState
-cacheCommitter (hCache, nHCache, dCache, nDCache, vCache, nVCache) aWorldState@WorldState {..}
+cacheCommitter (hCache, nHCache, vCache, nVCache, dCache, nDCache) aWorldState@WorldState {..}
   = newWorldState
  where
   newWorldState =
     newWorldHistory
       `par`  newWorldNHistory
-      `par`  newWorldDict
-      `par`  newWorldNDict
       `par`  newWorldVars
       `par`  newWorldNVars
+      `par`  newWorldDict
+      `par`  newWorldNDict
       `pseq` updateWorldState aWorldState
                               newWorldHistory
                               newWorldNHistory
-                              newWorldDict
-                              newWorldNDict
                               newWorldVars
                               newWorldNVars
+                              newWorldDict
+                              newWorldNDict
   newWorldHistory = updateWorldHistoryFromCache worldHistory hCache
   newWorldNHistory = updateWorldNHistoryFromCache worldNHistory nHCache
-  newWorldDict = updateValuesToValueMap worldDict (unwrapFromRWMV dCache)
-  newWorldNDict = updateValuesToValueNMap worldNDict (unwrapFromRWMVN nDCache)
   newWorldVars = updateValuesToValueMap worldVars (unwrapFromRWMV vCache)
   newWorldNVars = updateValuesToValueNMap worldNVars (unwrapFromRWMVN nVCache)
+  newWorldDict = updateValuesToValueMap worldDict (unwrapFromRWMV dCache)
+  newWorldNDict = updateValuesToValueNMap worldNDict (unwrapFromRWMVN nDCache)
 
 -- NOTE: HistoricalCache could have values in a time-slot which HistoricalTable may not have
 -- NOTE: Anyway, every values should alive

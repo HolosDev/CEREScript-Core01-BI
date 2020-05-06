@@ -134,7 +134,7 @@ runCEREScript
 runCEREScript aWorld@World {..} aSI@SI {..} = runCEREScriptSub
  where
   runCEREScriptSub cState [] = (cState, [])
-  runCEREScriptSub cState@(wc@(hCache, nHCache, dCache, nDCache, vCache, nVCache), lc@(lVCache, lNVCache, lTCache, lNTCache), tCache, rg) (ceres : cScript)
+  runCEREScriptSub cState@(wc@(hCache, nHCache, vCache, nVCache, dCache, nDCache), lc@(lVCache, lNVCache, lTCache, lNTCache), tCache, rg) (ceres : cScript)
     = if sp
       then ((nextWC, nextLC, nextTCache, nextRG), nextCEREScript)
       else runCEREScriptSub (nextWC, nextLC, nextTCache, nextRG) nextCEREScript
