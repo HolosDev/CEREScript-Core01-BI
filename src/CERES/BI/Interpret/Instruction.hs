@@ -67,7 +67,7 @@ crsSetValue anInput@(aWorld, _, cState) vpA vpB = newCState
   theValue     = getValue anInput vpB
   theExistence = getMValue anInput vpA
   theDLogMsg =
-    T.append "[Fail]<crsSetVariable> VP does not exists at" (showt vpA)
+    T.append "[Fail]<crsSetVariable> A variable does not exists at" (showt vpA)
   newCState = maybe (dLogAndErr anInput theDLogMsg vpA "[Fail]<SetVariable>")
                     (\_ -> setEnv aWorld vpA W (Just theValue) cState)
                     theExistence
@@ -77,7 +77,7 @@ crsDeleteVariable anInput@(aWorld, _, cState) vp = newCState
  where
   theExistence = getMValue anInput vp
   theDLogMsg =
-    T.append "[Fail]<crsSetVariable> VP does not exists at" (showt vp)
+    T.append "[Fail]<crsSetVariable> A variable does not exists at" (showt vp)
   newCState = maybe (dLogAndErr anInput theDLogMsg (VP AtNull VINull) "")
                     (\_ -> setEnv aWorld vp W Nothing cState)
                     theExistence
