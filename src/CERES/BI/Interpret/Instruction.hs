@@ -257,8 +257,7 @@ crsSIEnd anInput@(aWorld@World {..}, aSI@SI {..}, cState@(wc@(hCache, nHCache, v
   = undefined
 
 crsNoop :: Input -> Env
-crsNoop anInput@(aWorld@World {..}, aSI@SI {..}, cState@(wc@(hCache, nHCache, vCache, nVCache, dCache, nDCache), lc@(lVCache, lNVCache, lTCache, lNTCache), tCache, rg))
-  = undefined
+crsNoop (_, _, cState) = cState
 
 crsLog :: Input -> VPosition -> VPosition -> Env
 crsLog anInput@(aWorld@World {..}, aSI@SI {..}, cState@(wc@(hCache, nHCache, vCache, nVCache, dCache, nDCache), lc@(lVCache, lNVCache, lTCache, lNTCache), tCache, rg)) vpA vpB
