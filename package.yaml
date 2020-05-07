@@ -22,6 +22,7 @@ dependencies:
 - text
 - text-show
 - text-trie
+- unordered-containers
 - CEREScript-SS
 - CEREScript-SS-Parser
 

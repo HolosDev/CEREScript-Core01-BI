@@ -97,7 +97,7 @@ runSpoolInstance world@World {..} si@SI {..} wCache =
   iLNTCache   = undefined
   iLocalCache = (iLVCache, iLNVCache, iLTCache, iLNTCache)
   (newCache@(newWorldCache, (newLVCache, newLNVCache, newLTCache, newLNTCache), newTrickCache, newRG), restCEREScript)
-    = runCEREScript world si (wCache, iLocalCache, blankVNM, siRG) siRestScript
+    = runCEREScript world si (wCache, iLocalCache, blankVNHM, siRG) siRestScript
   siisCode = maybe "Retain" getStr $ IM.lookup retainCodeIdx newLTCache
   (doAbolish, doInit, nextLocalVars, nextLocalNVars) = case siisCode of
     "Retain"  -> (False, False, newLVCache, newLNVCache)

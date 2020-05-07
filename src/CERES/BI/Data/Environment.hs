@@ -4,12 +4,14 @@ module CERES.BI.Data.Environment where
 import           Data.IntMap                    ( IntMap )
 import qualified Data.IntMap                   as IM
 import           Data.Trie.Text                 ( Trie )
+import           Data.HashMap.Strict            ( HashMap )
 
 import           TextShow
 
 
 import           Data.CERES.Data
 import           Data.CERES.Data.Error
+import           Data.CERES.Type
 
 import           CERES.BI.Type
 
@@ -24,6 +26,7 @@ import           CERES.BI.Util.Random
 type RWMV = RW (Maybe Value)
 type RWMVMap = IntMap RWMV
 type RWMVNMap = Trie RWMV
+type RWMVNHMap = HashMap NKey RWMV
 
 type WorldCache
   = ( HistoricalCache
@@ -47,13 +50,13 @@ type LocalNVariables = ValueNMap
 type LocalTemp = ValueMap
 type LocalNTemp = ValueNMap
 
-type TrickCache = ValueNMap
+type TrickCache = ValueNHMap
 
 type Env = (WorldCache, LocalCache, TrickCache, RG)
 blankEnv = (blankWorldCache, blankLocalCache, blankTrickCache, blankRG)
 blankWorldCache = (IM.empty, IM.empty, blankVM, blankVNM, blankVM, blankVNM)
 blankLocalCache = (blankVM, blankVNM, blankVM, blankVNM)
-blankTrickCache = blankVNM
+blankTrickCache = blankVNHM
 blankRG = mkGenFromInt 0
 
 data RW a = R a | W a | RW a deriving (Eq, Ord)

@@ -3,6 +3,7 @@ module CERES.BI.Data.Cache.Function where
 
 import           Data.Bifunctor
 import qualified Data.IntMap                   as IM
+import qualified Data.HashMap.Strict           as HM
 import           Data.Maybe
 import qualified Data.Text.Lazy                as TL
 import qualified Data.Trie.Text                as Trie
@@ -126,7 +127,7 @@ setEnvBy _ (VP AtLNTemp ~(VIN nKey)) mode mValue (wCache, (lVCache, lNVCache, lT
   where newLNTCache = setVNMap nKey mValue lNTCache
 setEnvBy _ (VP AtTricky ~(VIN nKey)) mode mValue (wCache, lCache, trickCache, rg)
   = (wCache, lCache, newTrickCache, rg)
-  where newTrickCache = setVNMap nKey mValue trickCache
+  where newTrickCache = setVNHMap nKey mValue trickCache
 setEnvBy _ _ _ _ cState = cState
 
 
@@ -169,6 +170,10 @@ setVMap idx mValue = IM.update (const mValue) idx
 setVNMap :: NKey -> Maybe Value -> ValueNMap -> ValueNMap
 setVNMap nKey mValue vnMap =
   maybe (Trie.delete nKey vnMap) (\v -> Trie.insert nKey v vnMap) mValue
+
+setVNHMap :: NKey -> Maybe Value -> ValueNHMap -> ValueNHMap
+setVNHMap nKey mValue vnhMap =
+  maybe (HM.delete nKey vnhMap) (\v -> HM.insert nKey v vnhMap) mValue
 
 
 -- FIXME: Fix when refers non-cached value
@@ -277,9 +282,15 @@ getVMap = IM.lookup
 getVNMap :: NKey -> ValueNMap -> Maybe Value
 getVNMap = Trie.lookup
 
+getVNHMap :: NKey -> ValueNHMap -> Maybe Value
+getVNHMap = HM.lookup
+
 unwrapFromRWMV :: RWMVMap -> [(Idx, Maybe Value)]
 unwrapFromRWMV = map (second runRW) . filter (notR . snd) . IM.toList
 
 unwrapFromRWMVN :: RWMVNMap -> [(NKey, Maybe Value)]
 unwrapFromRWMVN =
   map (bimap TL.toStrict runRW) . filter (notR . snd) . Trie.toList
+
+unwrapFromRWMVNH :: RWMVNHMap -> [(NKey, Maybe Value)]
+unwrapFromRWMVNH = map (second runRW) . filter (notR . snd) . HM.toList
