@@ -45,9 +45,14 @@ tests = $(testGroupGenerator)
 
 case_nothing = assertBool "Nothing" True
 
-case_err01 = assertEqual "crsGetVPosition blankWorld undefined blankEnv (VP AtHere (VIV (StrValue \"AtDict[VII=1]\"))) (VP AtDict (VII 1))" question answer
+case_err01 = assertEqual
+  "crsGetVPosition blankWorld undefined blankEnv (VP AtHere (VIV (StrValue \"AtDict[VII=1]\"))) (VP AtDict (VII 1))"
+  question
+  answer
  where
-  question = crsGetVPosition blankWorld undefined blankEnv (VP AtHere (VIV (StrValue "AtDict[VII=1]"))) (VP AtDict (VII 1))
+  question = crsGetVPosition (blankWorld, undefined, blankEnv)
+                             (VP AtHere (VIV (StrValue "AtDict[VII=1]")))
+                             (VP AtDict (VII 1))
   answer =
     ( ( IM.empty
       , IM.empty

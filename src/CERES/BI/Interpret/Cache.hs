@@ -33,7 +33,9 @@ import           Debug
 -- TODO: Not using foldr, but Refactoring to use getValues* instead of getValue
 -- TODO: But using getValues* is hard to use
 worldCacheMaker :: SpoolTree -> World -> WorldCache
-worldCacheMaker SpoolTree {..} World {..} = S.foldr cacheMakerSub blankCache vpSet
+worldCacheMaker SpoolTree {..} World {..} = S.foldr cacheMakerSub
+                                                    blankCache
+                                                    vpSet
  where
   blankCache = (IM.empty, IM.empty, blankVM, blankVNM, blankVM, blankVNM)
   cacheMakerSub vp aCache = case vp of
