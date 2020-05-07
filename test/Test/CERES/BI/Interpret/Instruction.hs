@@ -106,6 +106,57 @@ case_DeleteVariable = assertEqual
   question = worldCacheCommitter nWC theWorld
   answer   = worldState blankWorld
 
+case_Modify1 = assertEqual
+  "crsModifyValue1 (blankWorld, undefined, theEnv) (VP AtDict (VII 1)) COANeg"
+  answer
+  question
+ where
+  iInput = (blankWorld, undefined, blankEnv)
+  theEnv =
+    crsInitVariable iInput (VP AtDict (VII 1)) (VP AtHere (VIV (IntValue 1)))
+  question =
+    crsModifyValue1 (blankWorld, undefined, theEnv) (VP AtDict (VII 1)) COANeg
+  answer =
+    ( ( IM.empty
+      , IM.empty
+      , blankVM
+      , blankVNM
+      , IM.singleton 1 (W (Just (IntValue (-1))))
+      , blankVNM
+      )
+    , blankLocalCache
+    , blankTrickCache
+    , blankRG
+    )
+
+case_Modify2 = assertEqual
+  "crsModifyValue2 (blankWorld, undefined, theEnv) (VP AtDict (VII 1)) (VP AtDict (VII 2)) COASub"
+  answer
+  question
+ where
+  iInput = (blankWorld, undefined, blankEnv)
+  theEnv1 =
+    crsInitVariable iInput (VP AtDict (VII 1)) (VP AtHere (VIV (IntValue 1)))
+  theInput1 = (blankWorld, undefined, theEnv1)
+  theEnv2 =
+    crsInitVariable theInput1 (VP AtDict (VII 2)) (VP AtHere (VIV (IntValue 3)))
+  question = crsModifyValue2 (blankWorld, undefined, theEnv2)
+                             (VP AtDict (VII 1))
+                             (VP AtDict (VII 2))
+                             COASub
+  answer =
+    ( ( IM.empty
+      , IM.empty
+      , blankVM
+      , blankVNM
+      , IM.fromList [(1, W (Just (IntValue (-2)))), (2, W (Just (IntValue 3)))]
+      , blankVNM
+      )
+    , blankLocalCache
+    , blankTrickCache
+    , blankRG
+    )
+
 case_SetVPosition = assertEqual
   "crsSetVPosition (blankWorld, undefined, blankEnv) (VP AtHere (VIV (StrValue \"AtDict[VII=1]\"))) (VP AtDict (VII 1))"
   answer

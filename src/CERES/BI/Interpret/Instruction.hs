@@ -27,6 +27,7 @@ import           CERES.BI.Data.Environment
 import           CERES.BI.Data.Function
 
 import           CERES.BI.Interpret.Cache
+import           CERES.BI.Interpret.Modify
 import           CERES.BI.Interpret.Spool
 
 import           CERES.BI.Type
@@ -82,17 +83,38 @@ crsDeleteVariable anInput@(aWorld, _, cState) vp = newCState
                     theExistence
 
 crsModifyValue1 :: Input -> VPosition -> CERESOperator -> Env
-crsModifyValue1 anInput@(aWorld@World {..}, aSI@SI {..}, cState@(wc@(hCache, nHCache, vCache, nVCache, dCache, nDCache), lc@(lVCache, lNVCache, lTCache, lNTCache), tCache, rg)) vp cOp
-  = undefined
+crsModifyValue1 anInput@(aWorld, _, cState) vp cOp = newCState
+ where
+  theValue              = getValue anInput vp
+  newValue              = modify1 cOp theValue
+  (ErrValue theDLogMsg) = newValue
+  newCState             = if getValueType newValue == VTErr
+    then dLogAndErr anInput theDLogMsg vp theDLogMsg
+    else setEnv aWorld vp W (Just newValue) cState
 
 crsModifyValue2 :: Input -> VPosition -> VPosition -> CERESOperator -> Env
-crsModifyValue2 anInput@(aWorld@World {..}, aSI@SI {..}, cState@(wc@(hCache, nHCache, vCache, nVCache, dCache, nDCache), lc@(lVCache, lNVCache, lTCache, lNTCache), tCache, rg)) vpA vpB cOp
-  = undefined
+crsModifyValue2 anInput@(aWorld, _, cState) vpA vpB cOp = newCState
+ where
+  theVA                 = getValue anInput vpA
+  theVB                 = getValue anInput vpB
+  newValue              = modify2 cOp theVA theVB
+  (ErrValue theDLogMsg) = newValue
+  newCState             = if getValueType newValue == VTErr
+    then dLogAndErr anInput theDLogMsg vpA theDLogMsg
+    else setEnv aWorld vpA W (Just newValue) cState
 
 crsModifyValue3
   :: Input -> VPosition -> VPosition -> CERESOperator -> VPosition -> Env
-crsModifyValue3 anInput@(aWorld@World {..}, aSI@SI {..}, cState@(wc@(hCache, nHCache, vCache, nVCache, dCache, nDCache), lc@(lVCache, lNVCache, lTCache, lNTCache), tCache, rg)) vpA vpB cOp vpC
-  = undefined
+crsModifyValue3 anInput@(aWorld, _, cState) vpA vpB cOp vpC = newCState
+ where
+  theVA                 = getValue anInput vpA
+  theVB                 = getValue anInput vpB
+  theVC                 = getValue anInput vpC
+  newValue              = modify3 cOp theVA theVB theVC
+  (ErrValue theDLogMsg) = newValue
+  newCState             = if getValueType newValue == VTErr
+    then dLogAndErr anInput theDLogMsg vpA theDLogMsg
+    else setEnv aWorld vpA W (Just newValue) cState
 
 crsCopyValue :: Input -> VPosition -> VPosition -> Env
 crsCopyValue anInput@(aWorld@World {..}, aSI@SI {..}, cState@(wc@(hCache, nHCache, vCache, nVCache, dCache, nDCache), lc@(lVCache, lNVCache, lTCache, lNTCache), tCache, rg)) vpA vpB
