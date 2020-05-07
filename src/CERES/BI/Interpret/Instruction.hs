@@ -36,6 +36,12 @@ import           CERES.BI.Util.Random
 import           Debug
 
 
+dLogAndErr :: Input -> Message -> VPosition -> Message -> Env
+dLogAndErr anInput@(aWorld, _, cState) logMsg vpT errMsg =
+  setEnv aWorld (VP AtTricky (VIN "DebugLog")) W (Just . StrValue $ logMsg)
+    . setEnv aWorld vpT W (Just . ErrValue $ errMsg)
+    $ cState
+
 crsInitVariable :: Input -> VPosition -> VPosition -> Env
 crsInitVariable anInput@(_, _, cState@(wc@(hCache, nHCache, vCache, nVCache, dCache, nDCache), lc@(lVCache, lNVCache, lTCache, lNTCache), tCache, rg)) vpA vpB
   = undefined
@@ -97,19 +103,10 @@ crsGetVPosition anInput@(aWorld, _, cState) vpA vpB = newCState
   rTargetPtr    = parseVariablePosition lazyTargetStr
   mTargetPtr    = getResult rTargetPtr
   aMsg          = fromJust . getMessage $ rTargetPtr
-  newCState     = maybe
-    ( setEnv
-        aWorld
-        (VP AtTricky (VIN "DebugLog"))
-        W
-        (Just . StrValue $ T.append "Fail to read VariablePosition: "
-                                    (showt targetStr)
-        )
-    . setEnv aWorld vpB W (Just . ErrValue $ aMsg)
-    $ cState
-    )
-    (\p -> setEnv aWorld vpB W (Just . PtrValue $ p) cState)
-    mTargetPtr
+  theDLogMsg    = T.append "Fail to read VariablePosition: " (showt targetStr)
+  newCState     = maybe (dLogAndErr anInput theDLogMsg vpB aMsg)
+                        (\p -> setEnv aWorld vpB W (Just . PtrValue $ p) cState)
+                        mTargetPtr
 
 crsSetVPosition :: Input -> VPosition -> VPosition -> Env
 crsSetVPosition anInput@(aWorld@World {..}, _, cState@(wc@(hCache, nHCache, vCache, nVCache, dCache, nDCache), lc@(lVCache, lNVCache, lTCache, lNTCache), tCache, rg)) vpA vpB
