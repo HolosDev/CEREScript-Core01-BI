@@ -166,87 +166,58 @@ setRWMVNMap
 setRWMVNMap nKey mode mValue = Trie.insert nKey (mode mValue)
 
 
--- FIXME: Fix when refers non-cached value
 getValue :: Input -> VPosition -> Value
-getValue (World {..}, _, ((hCache, _, _, _, _, _), _, _, _)) vp@(VP AtWorld (VII idx))
-  = fromMaybe
-    (error $ "[ERROR]<getValue :=: AtWorld[VII]> No such value at " ++ show vp)
-    (recover (getHCache 0 idx hCache) (getHValueFromWS worldState 0 idx))
-getValue (World {..}, _, ((hCache, _, _, _, _, _), _, _, _)) vp@(VP AtWorld ~(VIIT idx time))
-  = fromMaybe
-    (error $ "[ERROR]<getValue :=: AtWorld[VIIT]> No such value at " ++ show vp)
-    (recover (getHCache time idx hCache) (getHValueFromWS worldState time idx))
-getValue (World {..}, _, ((_, nHCache, _, _, _, _), _, _, _)) vp@(VP AtNWorld (VIN nKey))
-  = fromMaybe
-    (error $ "[ERROR]<getValue :=: AtNWorld[VIN]> No such value at " ++ show vp)
-    (recover (getNHCache 0 nKey nHCache) (getNHValueFromWS worldState 0 nKey))
-getValue (World {..}, _, ((_, nHCache, _, _, _, _), _, _, _)) vp@(VP AtNWorld ~(VINT nKey time))
-  = fromMaybe
-    (error $ "[ERROR]<getValue :=: AtNWorld[VINT]> No such value at " ++ show vp
-    )
-    (recover (getNHCache time nKey nHCache)
-             (getNHValueFromWS worldState time nKey)
-    )
-getValue (World {..}, _, ((hCache, _, _, _, _, _), _, _, _)) vp@(VP AtTime (VII idx))
-  = fromMaybe
-    (error $ "[ERROR]<getValue :=: AtTime[VII]> No such value at " ++ show vp)
-    (recover (getHCache worldTime idx hCache)
-             (getHValueFromWS worldState worldTime idx)
-    )
-getValue (World {..}, _, ((hCache, _, _, _, _, _), _, _, _)) vp@(VP AtTime ~(VIIT idx time))
-  = fromMaybe
-    (error $ "[ERROR]<getValue :=: AtTime[VIIT] > No such value at " ++ show vp)
-    (recover (getHCache (worldTime + time) idx hCache)
-             (getHValueFromWS worldState (worldTime + time) idx)
-    )
-getValue (World {..}, _, ((_, nHCache, _, _, _, _), _, _, _)) vp@(VP AtNTime (VIN nKey))
-  = fromMaybe
-    (error $ "[ERROR]<getValue :=: AtNTime[VIN]> No such value at " ++ show vp)
-    (recover (getNHCache worldTime nKey nHCache)
-             (getNHValueFromWS worldState worldTime nKey)
-    )
-getValue (World {..}, _, ((_, nHCache, _, _, _, _), _, _, _)) vp@(VP AtNTime ~(VINT nKey time))
-  = fromMaybe
-    (error $ "[ERROR]<getValue :=: AtNTime[VINT]> No such value at " ++ show vp)
-    (recover (getNHCache (worldTime + time) nKey nHCache)
-             (getNHValueFromWS worldState (worldTime + time) nKey)
-    )
-getValue (World {..}, _, ((_, _, vCache, _, _, _), _, _, _)) vp@(VP AtVars ~(VII idx))
-  = fromMaybe
-    (error $ "[ERROR]<getValue :=: AtVars[VII]> No such value at " ++ show vp)
-    (recover (getRWMVMap idx vCache) (getVValueFromWS worldState idx))
-getValue (World {..}, _, ((_, _, _, nVCache, _, _), _, _, _)) vp@(VP AtNVars ~(VIN nKey))
-  = fromMaybe
-    (error $ "[ERROR]<getValue :=: AtNVars[VIN]> No such value at " ++ show vp)
-    (recover (getRWMVNMap nKey nVCache) (getNVValueFromWS worldState nKey))
-getValue (World {..}, _, ((_, _, _, _, dCache, _), _, _, _)) vp@(VP AtDict ~(VII idx))
-  = fromMaybe
-    (error $ "[ERROR]<getValue :=: AtDict[VII]> No such value at " ++ show vp)
-    (recover (getRWMVMap idx dCache) (getDValueFromWS worldState idx))
-getValue (World {..}, _, ((_, _, _, _, _, nDCache), _, _, _)) vp@(VP AtNDict ~(VIN nKey))
-  = fromMaybe
-    (error $ "[ERROR]<getValue :=: AtNDict[VIN]> No such value at " ++ show vp)
-    (recover (getRWMVNMap nKey nDCache) (getNDValueFromWS worldState nKey))
-getValue (_, _, (_, (localVars, _, _, _), _, _)) vp@(VP AtLVars ~(VII idx)) =
-  fromMaybe
-    (error $ "[ERROR]<getValue :=: AtLVars[VII]> No such value at " ++ show vp)
-    (vMapLookup idx localVars)
-getValue (_, _, (_, (_, localNVars, _, _), _, _)) vp@(VP AtLNVars ~(VIN nKey))
-  = fromMaybe
-    (error $ "[ERROR]<getValue :=: AtLNVars[VIN]> No such value at " ++ show vp)
-    (vNMapLookup nKey localNVars)
-getValue (_, _, (_, (_, _, localCache, _), _, _)) vp@(VP AtLTemp ~(VII idx)) =
-  fromMaybe
-    (error $ "[ERROR]<getValue :=: AtLTemp[VII] > No such value at " ++ show vp)
-    (vMapLookup idx localCache)
-getValue (_, _, (_, (_, _, _, localNCache), _, _)) vp@(VP AtLNTemp ~(VIN nKey))
-  = fromMaybe
-    (error $ "[ERROR]<getValue :=: AtLNTemp[VIN] > No such value at " ++ show vp
-    )
-    (vNMapLookup nKey localNCache)
-getValue (_     , _  , (_, _, _, _)) vp@(VP AtHere   ~(VIV v)) = v
+getValue anInput vp@(VP AtWorld (VII idx)) = fromMaybe
+  (error $ "[ERROR]<getValue :=: AtWorld[VII]> No such value at " ++ show vp)
+  (getMValue anInput vp)
+getValue anInput vp@(VP AtWorld ~(VIIT idx time)) = fromMaybe
+  (error $ "[ERROR]<getValue :=: AtWorld[VIIT]> No such value at " ++ show vp)
+  (getMValue anInput vp)
+getValue anInput vp@(VP AtNWorld (VIN nKey)) = fromMaybe
+  (error $ "[ERROR]<getValue :=: AtNWorld[VIN]> No such value at " ++ show vp)
+  (getMValue anInput vp)
+getValue anInput vp@(VP AtNWorld ~(VINT nKey time)) = fromMaybe
+  (error $ "[ERROR]<getValue :=: AtNWorld[VINT]> No such value at " ++ show vp)
+  (getMValue anInput vp)
+getValue anInput vp@(VP AtTime (VII idx)) = fromMaybe
+  (error $ "[ERROR]<getValue :=: AtTime[VII]> No such value at " ++ show vp)
+  (getMValue anInput vp)
+getValue anInput vp@(VP AtTime ~(VIIT idx time)) = fromMaybe
+  (error $ "[ERROR]<getValue :=: AtTime[VIIT] > No such value at " ++ show vp)
+  (getMValue anInput vp)
+getValue anInput vp@(VP AtNTime (VIN nKey)) = fromMaybe
+  (error $ "[ERROR]<getValue :=: AtNTime[VIN]> No such value at " ++ show vp)
+  (getMValue anInput vp)
+getValue anInput vp@(VP AtNTime ~(VINT nKey time)) = fromMaybe
+  (error $ "[ERROR]<getValue :=: AtNTime[VINT]> No such value at " ++ show vp)
+  (getMValue anInput vp)
+getValue anInput vp@(VP AtVars ~(VII idx)) = fromMaybe
+  (error $ "[ERROR]<getValue :=: AtVars[VII]> No such value at " ++ show vp)
+  (getMValue anInput vp)
+getValue anInput vp@(VP AtNVars ~(VIN nKey)) = fromMaybe
+  (error $ "[ERROR]<getValue :=: AtNVars[VIN]> No such value at " ++ show vp)
+  (getMValue anInput vp)
+getValue anInput vp@(VP AtDict ~(VII idx)) = fromMaybe
+  (error $ "[ERROR]<getValue :=: AtDict[VII]> No such value at " ++ show vp)
+  (getMValue anInput vp)
+getValue anInput vp@(VP AtNDict ~(VIN nKey)) = fromMaybe
+  (error $ "[ERROR]<getValue :=: AtNDict[VIN]> No such value at " ++ show vp)
+  (getMValue anInput vp)
+getValue anInput vp@(VP AtLVars ~(VII idx)) = fromMaybe
+  (error $ "[ERROR]<getValue :=: AtLVars[VII]> No such value at " ++ show vp)
+  (getMValue anInput vp)
+getValue anInput vp@(VP AtLNVars ~(VIN nKey)) = fromMaybe
+  (error $ "[ERROR]<getValue :=: AtLNVars[VIN]> No such value at " ++ show vp)
+  (getMValue anInput vp)
+getValue anInput vp@(VP AtLTemp ~(VII idx)) = fromMaybe
+  (error $ "[ERROR]<getValue :=: AtLTemp[VII] > No such value at " ++ show vp)
+  (getMValue anInput vp)
+getValue anInput vp@(VP AtLNTemp ~(VIN nKey)) = fromMaybe
+  (error $ "[ERROR]<getValue :=: AtLNTemp[VIN] > No such value at " ++ show vp)
+  (getMValue anInput vp)
+getValue anInput vp@(VP AtHere   ~(VIV v)) = v
 -- TODO: Need to implement
-getValue (aWorld, aSI, (_, _, _, _)) vp@(VP AtTricky _       ) = fromMaybe
+getValue anInput vp@(VP AtTricky _       ) = fromMaybe
   (error $ "[ERROR]<getValue :=: > No such value at " ++ show vp)
   (Just $ error "[ERROR]<getValue :=: AtTricky> Not yet implemented")
 getValue anInput (VP AtPtr ~(VIV ~(PtrValue pVP))) = getValue anInput pVP
@@ -255,6 +226,57 @@ getValue _ (VP AtReg _) =
 getValue _ (VP AtNull _) =
   error "[ERROR]<getValue :=: AtNull> Can't access AtNull"
 getValue _ vp = error $ "[ERROR]<getValue> Can't be reached with " ++ show vp
+
+
+-- FIXME: Fix when refers non-cached value
+getMValue :: Input -> VPosition -> Maybe Value
+getMValue (World {..}, _, ((hCache, _, _, _, _, _), _, _, _)) vp@(VP AtWorld (VII idx))
+  = recover (getHCache 0 idx hCache) (getHValueFromWS worldState 0 idx)
+getMValue (World {..}, _, ((hCache, _, _, _, _, _), _, _, _)) vp@(VP AtWorld ~(VIIT idx time))
+  = recover (getHCache time idx hCache) (getHValueFromWS worldState time idx)
+getMValue (World {..}, _, ((_, nHCache, _, _, _, _), _, _, _)) vp@(VP AtNWorld (VIN nKey))
+  = recover (getNHCache 0 nKey nHCache) (getNHValueFromWS worldState 0 nKey)
+getMValue (World {..}, _, ((_, nHCache, _, _, _, _), _, _, _)) vp@(VP AtNWorld ~(VINT nKey time))
+  = recover (getNHCache time nKey nHCache)
+            (getNHValueFromWS worldState time nKey)
+getMValue (World {..}, _, ((hCache, _, _, _, _, _), _, _, _)) vp@(VP AtTime (VII idx))
+  = recover (getHCache worldTime idx hCache)
+            (getHValueFromWS worldState worldTime idx)
+getMValue (World {..}, _, ((hCache, _, _, _, _, _), _, _, _)) vp@(VP AtTime ~(VIIT idx time))
+  = recover (getHCache (worldTime + time) idx hCache)
+            (getHValueFromWS worldState (worldTime + time) idx)
+getMValue (World {..}, _, ((_, nHCache, _, _, _, _), _, _, _)) vp@(VP AtNTime (VIN nKey))
+  = recover (getNHCache worldTime nKey nHCache)
+            (getNHValueFromWS worldState worldTime nKey)
+getMValue (World {..}, _, ((_, nHCache, _, _, _, _), _, _, _)) vp@(VP AtNTime ~(VINT nKey time))
+  = recover (getNHCache (worldTime + time) nKey nHCache)
+            (getNHValueFromWS worldState (worldTime + time) nKey)
+getMValue (World {..}, _, ((_, _, vCache, _, _, _), _, _, _)) vp@(VP AtVars ~(VII idx))
+  = recover (getRWMVMap idx vCache) (getVValueFromWS worldState idx)
+getMValue (World {..}, _, ((_, _, _, nVCache, _, _), _, _, _)) vp@(VP AtNVars ~(VIN nKey))
+  = recover (getRWMVNMap nKey nVCache) (getNVValueFromWS worldState nKey)
+getMValue (World {..}, _, ((_, _, _, _, dCache, _), _, _, _)) vp@(VP AtDict ~(VII idx))
+  = recover (getRWMVMap idx dCache) (getDValueFromWS worldState idx)
+getMValue (World {..}, _, ((_, _, _, _, _, nDCache), _, _, _)) vp@(VP AtNDict ~(VIN nKey))
+  = recover (getRWMVNMap nKey nDCache) (getNDValueFromWS worldState nKey)
+getMValue (_, _, (_, (localVars, _, _, _), _, _)) vp@(VP AtLVars ~(VII idx)) =
+  vMapLookup idx localVars
+getMValue (_, _, (_, (_, localNVars, _, _), _, _)) vp@(VP AtLNVars ~(VIN nKey))
+  = vNMapLookup nKey localNVars
+getMValue (_, _, (_, (_, _, localCache, _), _, _)) vp@(VP AtLTemp ~(VII idx)) =
+  vMapLookup idx localCache
+getMValue (_, _, (_, (_, _, _, localNCache), _, _)) vp@(VP AtLNTemp ~(VIN nKey))
+  = vNMapLookup nKey localNCache
+getMValue (_, _, (_, _, _, _)) vp@(VP AtHere ~(VIV v)) = Just v
+-- TODO: Need to implement
+getMValue (aWorld, aSI, (_, _, _, _)) vp@(VP AtTricky _) =
+  Just $ error "[ERROR]<getMValue :=: AtTricky> Not yet implemented"
+getMValue anInput (VP AtPtr ~(VIV ~(PtrValue pVP))) = getMValue anInput pVP
+getMValue _ (VP AtReg _) =
+  error "[ERROR]<getMValue :=: AtReg> Not yet implemented"
+getMValue _ (VP AtNull _) =
+  error "[ERROR]<getMValue :=: AtNull> Can't access AtNull"
+getMValue _ vp = error $ "[ERROR]<getMValue> Can't be reached with " ++ show vp
 
 getHCache :: Time -> Idx -> HistoricalCache -> Maybe Value
 getHCache time idx hCache = IM.lookup time hCache >>= IM.lookup idx >>= runRW
