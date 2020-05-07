@@ -16,6 +16,7 @@ import           CERES.BI.Data
 import           CERES.BI.Data.Environment
 import           CERES.BI.Interpret
 import           CERES.BI.Util.Random
+import           CERES.BI.Type
 
 
 main :: IO ()

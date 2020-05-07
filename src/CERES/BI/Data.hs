@@ -43,8 +43,7 @@ blankWorld = World
   , worldTSSize    = 0
   }
 
--- | ValueList remembers type of each Variable
-type ValueList = IntMap ValueTyper
+
 type SpoolInstanceTable = IntMap SpoolInstanceRow
 
 -- No Branch World yet

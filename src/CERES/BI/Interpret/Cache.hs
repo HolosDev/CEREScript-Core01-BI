@@ -25,6 +25,8 @@ import           CERES.BI.Data.Function
 
 import           CERES.BI.Interpret.Spool
 
+import           CERES.BI.Type
+
 import           Debug
 
 

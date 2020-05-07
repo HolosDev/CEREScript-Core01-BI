@@ -17,7 +17,8 @@ import           Data.CERES.Type
 import           CERES.BI.Data
 import           CERES.BI.Data.Constants
 
-import           CERES.Util
+import           CERES.BI.Type
+import           CERES.BI.Util
 
 
 updateWorldState

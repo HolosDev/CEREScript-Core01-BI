@@ -2,7 +2,6 @@ module CERES.BI.Data.Cache.Function where
 
 
 import           Data.Bifunctor
-import           Data.IntMap                    ( IntMap )
 import qualified Data.IntMap                   as IM
 import           Data.Maybe
 import qualified Data.Text.Lazy                as TL
@@ -15,6 +14,7 @@ import           Data.CERES.Type
 import           CERES.BI.Data
 import           CERES.BI.Data.Function
 import           CERES.BI.Data.Environment
+import           CERES.BI.Type
 
 import           Debug
 import           Util

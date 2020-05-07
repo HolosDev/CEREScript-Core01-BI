@@ -1,4 +1,4 @@
-module CERES.Util where
+module CERES.BI.Util where
 
 
 import           Data.IntMap                   as IM
@@ -6,6 +6,8 @@ import           Data.Trie.Text                as Trie
 
 import           Data.CERES.Data
 import           Data.CERES.Type
+
+import           CERES.BI.Type
 
 
 vMapInsert :: Idx -> Value -> ValueMap -> ValueMap
