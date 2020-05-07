@@ -45,7 +45,7 @@ runTimeSlot aWorld@World {..} = newWorld
   siisList         = concatMap fst resultList
   wcList           = map snd resultList
   -- TODO: Change cacheCommitter style or union WorldCache in wcList
-  committed        = foldr cacheCommitter worldState wcList
+  committed        = foldr worldCacheCommitter worldState wcList
   nextWorldTime    = worldTime + 1
   nextWorldHistory = IM.insert nextWorldTime newNextEpochRow targetWorldHistory
    where
@@ -69,7 +69,7 @@ runSpoolTree :: World -> SpoolTree -> ([(SIIS, SpoolInstance)], WorldCache)
 runSpoolTree aWorld@World {..} aSpoolTree@SpoolTree {..} =
   (siisList, newWorldCache)
  where
-  worldCache                = cacheMaker aSpoolTree aWorld
+  worldCache                = worldCacheMaker aSpoolTree aWorld
   (siisList, newWorldCache) = foldr
     (\s (l, c) -> joint l (runSpoolInstance aWorld s c))
     ([], worldCache)

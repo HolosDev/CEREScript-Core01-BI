@@ -30,8 +30,8 @@ import           Debug
 
 -- TODO: Not using foldr, but Refactoring to use getValues* instead of getValue
 -- TODO: But using getValues* is hard to use
-cacheMaker :: SpoolTree -> World -> WorldCache
-cacheMaker SpoolTree {..} World {..} = S.foldr cacheMakerSub blankCache vpSet
+worldCacheMaker :: SpoolTree -> World -> WorldCache
+worldCacheMaker SpoolTree {..} World {..} = S.foldr cacheMakerSub blankCache vpSet
  where
   blankCache = (IM.empty, IM.empty, blankVM, blankVNM, blankVM, blankVNM)
   cacheMakerSub vp aCache = case vp of
@@ -94,8 +94,8 @@ cacheMaker SpoolTree {..} World {..} = S.foldr cacheMakerSub blankCache vpSet
 
 -- TODO: This style is for foldr, we may change this better
 -- TODO: Change this for when many WorldCache is given as List or etc.
-cacheCommitter :: WorldCache -> WorldState -> WorldState
-cacheCommitter (hCache, nHCache, vCache, nVCache, dCache, nDCache) aWorldState@WorldState {..}
+worldCacheCommitter :: WorldCache -> WorldState -> WorldState
+worldCacheCommitter (hCache, nHCache, vCache, nVCache, dCache, nDCache) aWorldState@WorldState {..}
   = newWorldState
  where
   newWorldState =
