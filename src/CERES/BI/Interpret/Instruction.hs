@@ -112,8 +112,8 @@ crsGetVPosition anInput@(aWorld, _, cState) vpA vpB = newCState
     mTargetPtr
 
 crsSetVPosition :: Input -> VPosition -> VPosition -> Env
-crsSetVPosition anInput@(aWorld@World {..}, aSI@SI {..}, cState@(wc@(hCache, nHCache, vCache, nVCache, dCache, nDCache), lc@(lVCache, lNVCache, lTCache, lNTCache), tCache, rg)) vpA vpB
-  = undefined
+crsSetVPosition anInput@(aWorld@World {..}, _, cState@(wc@(hCache, nHCache, vCache, nVCache, dCache, nDCache), lc@(lVCache, lNVCache, lTCache, lNTCache), tCache, rg)) vpA vpB
+  = setEnv aWorld vpB W (Just . PtrValue $ vpA) cState
 
 crsRandom :: Input -> VPosition -> ValueType -> Env
 crsRandom (aWorld, _, cState@(wc@(hCache, nHCache, vCache, nVCache, dCache, nDCache), lc@(lVCache, lNVCache, lTCache, lNTCache), tCache, rg)) vp vType
