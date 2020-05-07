@@ -16,6 +16,7 @@ import           CERES.BI.Data
 import           CERES.BI.Data.Function
 import           CERES.BI.Data.Environment
 import           CERES.BI.Type
+import           CERES.BI.Util
 
 import           Debug
 import           Util
@@ -115,19 +116,19 @@ setEnvBy _ (VP AtNDict ~(VIN nKey)) mode mValue ((hCache, nHCache, vCache, nVCac
   where newNDCache = setRWMVNMap nKey mode mValue nDCache
 setEnvBy _ (VP AtLVars ~(VII idx)) mode mValue (wCache, (lVCache, lNVCache, lTCache, lNTCache), trickCache, rg)
   = (wCache, (newLVCache, lNVCache, lTCache, lNTCache), trickCache, rg)
-  where newLVCache = setVMap idx mValue lVCache
+  where newLVCache = vMapUpdate idx mValue lVCache
 setEnvBy _ (VP AtLNVars ~(VIN nKey)) mode mValue (wCache, (lVCache, lNVCache, lTCache, lNTCache), trickCache, rg)
   = (wCache, (lVCache, newLNVCache, lTCache, lNTCache), trickCache, rg)
-  where newLNVCache = setVNMap nKey mValue lNVCache
+  where newLNVCache = vNMapUpdate nKey mValue lNVCache
 setEnvBy _ (VP AtLTemp ~(VII idx)) mode mValue (wCache, (lVCache, lNVCache, lTCache, lNTCache), trickCache, rg)
   = (wCache, (lVCache, lNVCache, newLTCache, lNTCache), trickCache, rg)
-  where newLTCache = setVMap idx mValue lTCache
+  where newLTCache = vMapUpdate idx mValue lTCache
 setEnvBy _ (VP AtLNTemp ~(VIN nKey)) mode mValue (wCache, (lVCache, lNVCache, lTCache, lNTCache), trickCache, rg)
   = (wCache, (lVCache, lNVCache, lTCache, newLNTCache), trickCache, rg)
-  where newLNTCache = setVNMap nKey mValue lNTCache
+  where newLNTCache = vNMapUpdate nKey mValue lNTCache
 setEnvBy _ (VP AtTricky ~(VIN nKey)) mode mValue (wCache, lCache, trickCache, rg)
   = (wCache, lCache, newTrickCache, rg)
-  where newTrickCache = setVNHMap nKey mValue trickCache
+  where newTrickCache = vNHMapUpdate nKey mValue trickCache
 setEnvBy _ _ _ _ cState = cState
 
 
@@ -163,17 +164,6 @@ setRWMVMap idx mode mValue = IM.insert idx (mode mValue)
 setRWMVNMap
   :: NKey -> (Maybe Value -> RWMV) -> Maybe Value -> RWMVNMap -> RWMVNMap
 setRWMVNMap nKey mode mValue = Trie.insert nKey (mode mValue)
-
-setVMap :: Idx -> Maybe Value -> ValueMap -> ValueMap
-setVMap idx mValue = IM.update (const mValue) idx
-
-setVNMap :: NKey -> Maybe Value -> ValueNMap -> ValueNMap
-setVNMap nKey mValue vnMap =
-  maybe (Trie.delete nKey vnMap) (\v -> Trie.insert nKey v vnMap) mValue
-
-setVNHMap :: NKey -> Maybe Value -> ValueNHMap -> ValueNHMap
-setVNHMap nKey mValue vnhMap =
-  maybe (HM.delete nKey vnhMap) (\v -> HM.insert nKey v vnhMap) mValue
 
 
 -- FIXME: Fix when refers non-cached value
@@ -240,20 +230,20 @@ getValue (World {..}, _, ((_, _, _, _, _, nDCache), _, _, _)) vp@(VP AtNDict ~(V
 getValue (_, _, (_, (localVars, _, _, _), _, _)) vp@(VP AtLVars ~(VII idx)) =
   fromMaybe
     (error $ "[ERROR]<getValue :=: AtLVars[VII]> No such value at " ++ show vp)
-    (getVMap idx localVars)
+    (vMapLookup idx localVars)
 getValue (_, _, (_, (_, localNVars, _, _), _, _)) vp@(VP AtLNVars ~(VIN nKey))
   = fromMaybe
     (error $ "[ERROR]<getValue :=: AtLNVars[VIN]> No such value at " ++ show vp)
-    (getVNMap nKey localNVars)
+    (vNMapLookup nKey localNVars)
 getValue (_, _, (_, (_, _, localCache, _), _, _)) vp@(VP AtLTemp ~(VII idx)) =
   fromMaybe
     (error $ "[ERROR]<getValue :=: AtLTemp[VII] > No such value at " ++ show vp)
-    (getVMap idx localCache)
+    (vMapLookup idx localCache)
 getValue (_, _, (_, (_, _, _, localNCache), _, _)) vp@(VP AtLNTemp ~(VIN nKey))
   = fromMaybe
     (error $ "[ERROR]<getValue :=: AtLNTemp[VIN] > No such value at " ++ show vp
     )
-    (getVNMap nKey localNCache)
+    (vNMapLookup nKey localNCache)
 getValue (_     , _  , (_, _, _, _)) vp@(VP AtHere   ~(VIV v)) = v
 -- TODO: Need to implement
 getValue (aWorld, aSI, (_, _, _, _)) vp@(VP AtTricky _       ) = fromMaybe
@@ -278,15 +268,6 @@ getRWMVMap idx rwmvMap = IM.lookup idx rwmvMap >>= runRW
 
 getRWMVNMap :: NKey -> RWMVNMap -> Maybe Value
 getRWMVNMap nKey rwmvnMap = Trie.lookup nKey rwmvnMap >>= runRW
-
-getVMap :: Idx -> ValueMap -> Maybe Value
-getVMap = IM.lookup
-
-getVNMap :: NKey -> ValueNMap -> Maybe Value
-getVNMap = Trie.lookup
-
-getVNHMap :: NKey -> ValueNHMap -> Maybe Value
-getVNHMap = HM.lookup
 
 unwrapFromRWMV :: RWMVMap -> [(Idx, Maybe Value)]
 unwrapFromRWMV = map (second runRW) . filter (notR . snd) . IM.toList
