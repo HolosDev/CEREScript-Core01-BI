@@ -117,8 +117,15 @@ crsModifyValue3 anInput@(aWorld, _, cState) vpA vpB cOp vpC = newCState
     else setEnv aWorld vpA W (Just newValue) cState
 
 crsCopyValue :: Input -> VPosition -> VPosition -> Env
-crsCopyValue anInput@(aWorld@World {..}, aSI@SI {..}, cState@(wc@(hCache, nHCache, vCache, nVCache, dCache, nDCache), lc@(lVCache, lNVCache, lTCache, lNTCache), tCache, rg)) vpA vpB
-  = undefined
+crsCopyValue anInput@(aWorld, _, cState) vpA vpB = newCState
+ where
+  theValue     = getValue anInput vpB
+  theExistence = getMValue anInput vpA
+  theDLogMsg =
+    T.append "[Fail]<crsCopyValue> A variable does not exists at" (showt vpA)
+  newCState = maybe (dLogAndErr anInput theDLogMsg vpA "[Fail]<CopyValue>")
+                    (\_ -> setEnv aWorld vpA W (Just theValue) cState)
+                    theExistence
 
 crsConvertValue :: Input -> VPosition -> ValueType -> Env
 crsConvertValue anInput@(aWorld@World {..}, aSI@SI {..}, cState@(wc@(hCache, nHCache, vCache, nVCache, dCache, nDCache), lc@(lVCache, lNVCache, lTCache, lNTCache), tCache, rg)) vp vt
