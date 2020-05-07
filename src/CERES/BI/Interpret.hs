@@ -97,8 +97,8 @@ runSpoolInstance world@World {..} si@SI {..} wCache =
   iLNTCache   = undefined
   iLocalCache = (iLVCache, iLNVCache, iLTCache, iLNTCache)
   (newCache@(newWorldCache, (newLVCache, newLNVCache, newLTCache, newLNTCache), newTrickCache, newRG), restCEREScript)
-    = runCEREScript world si (wCache, iLocalCache, blankVNHM, siRG) siRestScript
-  siisCode = maybe "Retain" getStr $ IM.lookup retainCodeIdx newLTCache
+    = runCEREScript (world, si, (wCache, iLocalCache, blankVNHM, siRG))
+                    siRestScript
   (doAbolish, doInit, nextLocalVars, nextLocalNVars) = case siisCode of
     "Retain"  -> (False, False, newLVCache, newLNVCache)
     "Forget"  -> (False, False, blankVM, blankVNM)
@@ -129,18 +129,19 @@ runSpoolInstance world@World {..} si@SI {..} wCache =
              }
 
 
-runCEREScript
-  :: World -> SpoolInstance -> Env -> CEREScript -> (Env, CEREScript)
-runCEREScript aWorld@World {..} aSI@SI {..} = runCEREScriptSub
+runCEREScript :: Input -> CEREScript -> (Env, CEREScript)
+runCEREScript (aWorld@World {..}, aSI@SI {..}, cState) = runCEREScriptSub
+  cState
  where
   runCEREScriptSub cState [] = (cState, [])
   runCEREScriptSub cState@(wc@(hCache, nHCache, vCache, nVCache, dCache, nDCache), lc@(lVCache, lNVCache, lTCache, lNTCache), tCache, rg) (ceres : cScript)
     = if sp
+    -- NOTE: si == True, then end runCEREScript
       then ((nextWC, nextLC, nextTCache, nextRG), nextCEREScript)
       else runCEREScriptSub (nextWC, nextLC, nextTCache, nextRG) nextCEREScript
-    -- NOTE: si == True, then end runCEREScript
    where
-    (newWC, newLC, newTCache, newRG) = runInstruction aWorld aSI cState ceres
+    (newWC, newLC, newTCache, newRG) =
+      runInstruction (aWorld, aSI, cState) ceres
     -- TODO: Check Stop or Pause
     spCode = maybe "" getStr $ IM.lookup spCodeIdx newLTCache
     sp                               = spCode == "Stop" || spCode == "Pause"
@@ -163,70 +164,65 @@ runCEREScript aWorld@World {..} aSI@SI {..} = runCEREScriptSub
     nextRG         = newRG
 
 
-runInstruction :: World -> SpoolInstance -> Env -> CERES -> Env
-runInstruction aWorld aSI cState aCERES = case aCERES of
-  (CRSInitVariable   vpA vpB) -> crsInitVariable aWorld aSI cState vpA vpB
-  (CRSInitVariableAt vpA vpB) -> crsInitVariableAt aWorld aSI cState vpA vpB
-  (CRSSetValue       vpA vpB) -> crsSetValue aWorld aSI cState vpA vpB
-  (CRSDeleteVariable vp     ) -> crsDeleteVariable aWorld aSI cState vp
-  (CRSModifyValue1 vpA cOp  ) -> crsModifyValue1 aWorld aSI cState vpA cOp
-  (CRSModifyValue2 vpA vpB cOp) ->
-    crsModifyValue2 aWorld aSI cState vpA vpB cOp
-  (CRSModifyValue3 vpA vpB cOp vpC) ->
-    crsModifyValue3 aWorld aSI cState vpA vpB cOp vpC
-  (CRSCopyValue      vpA vpB) -> crsCopyValue aWorld aSI cState vpA vpB
-  (CRSConvertValue   vp  vt ) -> crsConvertValue aWorld aSI cState vp vt
-  (CRSConvertValueBy vpA vpB) -> crsConvertValueBy aWorld aSI cState vpA vpB
-  (CRSConvertValueWith vpA vpB) ->
-    crsConvertValueWith aWorld aSI cState vpA vpB
-  (CRSReplaceText vp       ) -> crsReplaceText aWorld aSI cState vp
-  (CRSReplaceTextTo vpA vpB) -> crsReplaceTextTo aWorld aSI cState vpA vpB
-  (CRSGetVPosition  vpA vpB) -> crsGetVPosition aWorld aSI cState vpA vpB
-  (CRSSetVPosition  vpA vpB) -> crsSetVPosition aWorld aSI cState vpA vpB
-  (CRSRandom        vp  vt ) -> crsRandom aWorld aSI cState vp vt
-  (CRSRandomBy      vpA vpB) -> crsRandomBy aWorld aSI cState vpA vpB
+runInstruction :: Input -> CERES -> Env
+runInstruction anInput aCERES = case aCERES of
+  (CRSInitVariable   vpA vpB      ) -> crsInitVariable anInput vpA vpB
+  (CRSInitVariableAt vpA vpB      ) -> crsInitVariableAt anInput vpA vpB
+  (CRSSetValue       vpA vpB      ) -> crsSetValue anInput vpA vpB
+  (CRSDeleteVariable vp           ) -> crsDeleteVariable anInput vp
+  (CRSModifyValue1 vpA cOp        ) -> crsModifyValue1 anInput vpA cOp
+  (CRSModifyValue2 vpA vpB cOp    ) -> crsModifyValue2 anInput vpA vpB cOp
+  (CRSModifyValue3 vpA vpB cOp vpC) -> crsModifyValue3 anInput vpA vpB cOp vpC
+  (CRSCopyValue        vpA vpB    ) -> crsCopyValue anInput vpA vpB
+  (CRSConvertValue     vp  vt     ) -> crsConvertValue anInput vp vt
+  (CRSConvertValueBy   vpA vpB    ) -> crsConvertValueBy anInput vpA vpB
+  (CRSConvertValueWith vpA vpB    ) -> crsConvertValueWith anInput vpA vpB
+  (CRSReplaceText vp              ) -> crsReplaceText anInput vp
+  (CRSReplaceTextTo vpA vpB       ) -> crsReplaceTextTo anInput vpA vpB
+  (CRSGetVPosition  vpA vpB       ) -> crsGetVPosition anInput vpA vpB
+  (CRSSetVPosition  vpA vpB       ) -> crsSetVPosition anInput vpA vpB
+  (CRSRandom        vp  vt        ) -> crsRandom anInput vp vt
+  (CRSRandomBy      vpA vpB       ) -> crsRandomBy anInput vpA vpB
   (CRSRandomWith vpA vt vpC vpD vpE) ->
-    crsRandomWith aWorld aSI cState vpA vt vpC vpD vpE
+    crsRandomWith anInput vpA vt vpC vpD vpE
   (CRSRandomWithBy vpA vpB vpC vpD vpE) ->
-    crsRandomWithBy aWorld aSI cState vpA vpB vpC vpD vpE
-  (CRSElapseTime vpA vpB    ) -> crsElapsedTime aWorld aSI cState vpA vpB
-  (CRSSPControl vp          ) -> crsSPControl aWorld aSI cState vp
-  (CRSSIControl vpA vpB     ) -> crsSIControl aWorld aSI cState vpA vpB
-  (CRSSIInit vpA vpB vpC vpD) -> crsSIInit aWorld aSI cState vpA vpB vpC vpD
-  (CRSSIEnd vp              ) -> crsSIEnd aWorld aSI cState vp
-  CRSNoop                     -> crsNoop aWorld aSI cState
-  (CRSLog         vpA vpB   ) -> crsLog aWorld aSI cState vpA vpB
-  (CRSParseScript vpA vpB   ) -> crsParseScript aWorld aSI cState vpA vpB
-  (CRSToInterpreter0 iHeader) -> crsToInterpreter0 aWorld aSI cState iHeader
-  (CRSToInterpreter1 iHeader vpA) ->
-    crsToInterpreter1 aWorld aSI cState iHeader vpA
+    crsRandomWithBy anInput vpA vpB vpC vpD vpE
+  (CRSElapseTime vpA vpB    )     -> crsElapsedTime anInput vpA vpB
+  (CRSSPControl vp          )     -> crsSPControl anInput vp
+  (CRSSIControl vpA vpB     )     -> crsSIControl anInput vpA vpB
+  (CRSSIInit vpA vpB vpC vpD)     -> crsSIInit anInput vpA vpB vpC vpD
+  (CRSSIEnd vp              )     -> crsSIEnd anInput vp
+  CRSNoop                         -> crsNoop anInput
+  (CRSLog         vpA vpB       ) -> crsLog anInput vpA vpB
+  (CRSParseScript vpA vpB       ) -> crsParseScript anInput vpA vpB
+  (CRSToInterpreter0 iHeader    ) -> crsToInterpreter0 anInput iHeader
+  (CRSToInterpreter1 iHeader vpA) -> crsToInterpreter1 anInput iHeader vpA
   (CRSToInterpreter2 iHeader vpA vpB) ->
-    crsToInterpreter2 aWorld aSI cState iHeader vpA vpB
+    crsToInterpreter2 anInput iHeader vpA vpB
   (CRSToInterpreter3 iHeader vpA vpB vpC) ->
-    crsToInterpreter3 aWorld aSI cState iHeader vpA vpB vpC
+    crsToInterpreter3 anInput iHeader vpA vpB vpC
   (CRSToInterpreter4 iHeader vpA vpB vpC vpD) ->
-    crsToInterpreter4 aWorld aSI cState iHeader vpA vpB vpC vpD
+    crsToInterpreter4 anInput iHeader vpA vpB vpC vpD
   (CRSToInterpreter5 iHeader vpA vpB vpC vpD vpE) ->
-    crsToInterpreter5 aWorld aSI cState iHeader vpA vpB vpC vpD vpE
+    crsToInterpreter5 anInput iHeader vpA vpB vpC vpD vpE
   (CRSToInterpreter6 iHeader vpA vpB vpC vpD vpE vpF) ->
-    crsToInterpreter6 aWorld aSI cState iHeader vpA vpB vpC vpD vpE vpF
+    crsToInterpreter6 anInput iHeader vpA vpB vpC vpD vpE vpF
   (CRSToInterpreter7 iHeader vpA vpB vpC vpD vpE vpF vpG) ->
-    crsToInterpreter7 aWorld aSI cState iHeader vpA vpB vpC vpD vpE vpF vpG
+    crsToInterpreter7 anInput iHeader vpA vpB vpC vpD vpE vpF vpG
   (CRSToInterpreter8 iHeader vpA vpB vpC vpD vpE vpF vpG vpH) ->
-    crsToInterpreter8 aWorld aSI cState iHeader vpA vpB vpC vpD vpE vpF vpG vpH
-  (CRSExtend0 iHeader        ) -> crsExtend0 aWorld aSI cState iHeader
-  (CRSExtend1 iHeader vpA    ) -> crsExtend1 aWorld aSI cState iHeader vpA
-  (CRSExtend2 iHeader vpA vpB) -> crsExtend2 aWorld aSI cState iHeader vpA vpB
-  (CRSExtend3 iHeader vpA vpB vpC) ->
-    crsExtend3 aWorld aSI cState iHeader vpA vpB vpC
+    crsToInterpreter8 anInput iHeader vpA vpB vpC vpD vpE vpF vpG vpH
+  (CRSExtend0 iHeader            ) -> crsExtend0 anInput iHeader
+  (CRSExtend1 iHeader vpA        ) -> crsExtend1 anInput iHeader vpA
+  (CRSExtend2 iHeader vpA vpB    ) -> crsExtend2 anInput iHeader vpA vpB
+  (CRSExtend3 iHeader vpA vpB vpC) -> crsExtend3 anInput iHeader vpA vpB vpC
   (CRSExtend4 iHeader vpA vpB vpC vpD) ->
-    crsExtend4 aWorld aSI cState iHeader vpA vpB vpC vpD
+    crsExtend4 anInput iHeader vpA vpB vpC vpD
   (CRSExtend5 iHeader vpA vpB vpC vpD vpE) ->
-    crsExtend5 aWorld aSI cState iHeader vpA vpB vpC vpD vpE
+    crsExtend5 anInput iHeader vpA vpB vpC vpD vpE
   (CRSExtend6 iHeader vpA vpB vpC vpD vpE vpF) ->
-    crsExtend6 aWorld aSI cState iHeader vpA vpB vpC vpD vpE vpF
+    crsExtend6 anInput iHeader vpA vpB vpC vpD vpE vpF
   (CRSExtend7 iHeader vpA vpB vpC vpD vpE vpF vpG) ->
-    crsExtend7 aWorld aSI cState iHeader vpA vpB vpC vpD vpE vpF vpG
+    crsExtend7 anInput iHeader vpA vpB vpC vpD vpE vpF vpG
   (CRSExtend8 iHeader vpA vpB vpC vpD vpE vpF vpG vpH) ->
-    crsExtend8 aWorld aSI cState iHeader vpA vpB vpC vpD vpE vpF vpG vpH
+    crsExtend8 anInput iHeader vpA vpB vpC vpD vpE vpF vpG vpH
   _ -> error "[ERROR]<runInstruction :=: otherwise> Can't be reached"

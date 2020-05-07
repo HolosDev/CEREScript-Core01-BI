@@ -157,3 +157,6 @@ instance TextShow SpoolInstance where
 type SIIS = SpoolInstanceInheritStatus
 -- NOTE: SIJump takes relative time-slot
 data SpoolInstanceInheritStatus = SIJump Int | SIEnd
+
+
+type Input = (World, SpoolInstance, Env)
