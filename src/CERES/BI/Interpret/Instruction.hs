@@ -34,6 +34,7 @@ import           CERES.BI.Type
 import           CERES.BI.Util.Random
 
 import           Debug
+import           Debug.Trace
 
 
 dLogAndErr :: Input -> Message -> VPosition -> Message -> Env
@@ -58,9 +59,17 @@ crsInitVariableAt :: Input -> VPosition -> VPosition -> Env
 crsInitVariableAt _ _ _ =
   error "[ERROR]<crsInitVariableAt> Would be deprecated"
 
+-- TODO: Do I need to check existence?
 crsSetValue :: Input -> VPosition -> VPosition -> Env
-crsSetValue anInput@(aWorld@World {..}, aSI@SI {..}, cState@(wc@(hCache, nHCache, vCache, nVCache, dCache, nDCache), lc@(lVCache, lNVCache, lTCache, lNTCache), tCache, rg)) vpA vpB
-  = undefined
+crsSetValue anInput@(aWorld, _, cState) vpA vpB = newCState
+ where
+  theValue     = getValue anInput vpB
+  theExistence = getMValue anInput vpA
+  theDLogMsg =
+    T.append "[Fail]<crsSetVariable> VP does not exists at" (showt vpA)
+  newCState = maybe (dLogAndErr anInput theDLogMsg vpA "[Fail]<SetVariable>")
+                    (\_ -> setEnv aWorld vpA W (Just theValue) cState)
+                    theExistence
 
 crsDeleteVariable :: Input -> VPosition -> Env
 crsDeleteVariable anInput@(aWorld@World {..}, aSI@SI {..}, cState@(wc@(hCache, nHCache, vCache, nVCache, dCache, nDCache), lc@(lVCache, lNVCache, lTCache, lNTCache), tCache, rg)) vp

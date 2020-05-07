@@ -64,6 +64,31 @@ case_InitVariable = assertEqual
     , blankRG
     )
 
+case_SetValue = assertEqual
+  "crsSetValue (blankWorld, undefined, theEnv) (VP AtDict (VII 1)) (VP AtHere (VIV (StrValue \"AtDict[VII=1]\")))"
+  answer
+  question
+ where
+  iInput = (blankWorld, undefined, blankEnv)
+  theEnv = crsInitVariable iInput
+                           (VP AtDict (VII 1))
+                           (VP AtHere (VIV (StrValue "AtDict[VII=1]")))
+  question = crsSetValue (blankWorld, undefined, theEnv)
+                         (VP AtDict (VII 1))
+                         (VP AtHere (VIV (IntValue 1)))
+  answer =
+    ( ( IM.empty
+      , IM.empty
+      , blankVM
+      , blankVNM
+      , IM.singleton 1 (W (Just (IntValue 1)))
+      , blankVNM
+      )
+    , blankLocalCache
+    , blankTrickCache
+    , blankRG
+    )
+
 case_SetVPosition = assertEqual
   "crsSetVPosition (blankWorld, undefined, blankEnv) (VP AtHere (VIV (StrValue \"AtDict[VII=1]\"))) (VP AtDict (VII 1))"
   answer
