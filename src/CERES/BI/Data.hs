@@ -56,7 +56,7 @@ data WorldState = WorldState
   , worldDict     :: Dictionary
   , worldNDict    :: NDictionary
   , worldRG       :: RG
-  } deriving Show
+  } deriving (Show, Eq)
 
 type TimeSpan = Maybe (Time, Time)
 type HistoricalTable = IntMap EpochRow
@@ -64,11 +64,11 @@ type NHistoricalTable = IntMap NEpochRow
 data EpochRow = EpochRow
   { eRowTime :: {-# UNPACK #-} !Time
   , values   :: Values
-  } deriving Show
+  } deriving (Show, Eq)
 data NEpochRow = NEpochRow
   { nERowTime :: {-# UNPACK #-} !Time
   , nValues   :: NValues
-  } deriving Show
+  } deriving (Show, Eq)
 
 type Values = ValueMap
 type NValues = ValueNMap
