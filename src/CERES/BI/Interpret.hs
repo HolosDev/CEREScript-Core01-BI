@@ -22,6 +22,8 @@ import           CERES.BI.Interpret.Spool
 
 import           CERES.BI.Type
 
+import           CERES.BI.Util
+
 import           Debug
 
 
@@ -85,7 +87,7 @@ runSpoolInstance world@World {..} si@SI {..} wCache =
  where
   -- TODO: Change `StrValue "Retain"` as a named constant
   iLTCache = csInitLocalTemp $ worldSpools IM.! siSpoolID
-  isResume = maybe False getBool $ IM.lookup resumeCodeIdx siLocalVars
+  isResume = maybe False getBool $ vMapLookup resumeCodeIdx siLocalVars
   iLVCache =
     -- TODO: Not sure to initialize ExecutingTime variable
     (if isResume then id else IM.insert executingTimeIdx (IntValue 0))
@@ -99,6 +101,7 @@ runSpoolInstance world@World {..} si@SI {..} wCache =
   (newCache@(newWorldCache, (newLVCache, newLNVCache, newLTCache, newLNTCache), newTrickCache, newRG), restCEREScript)
     = runCEREScript (world, si, (wCache, iLocalCache, blankVNHM, siRG))
                     siRestScript
+  siisCode = maybe "Retain" getStr $ vMapLookup retainCodeIdx newLTCache
   (doAbolish, doInit, nextLocalVars, nextLocalNVars) = case siisCode of
     "Retain"  -> (False, False, newLVCache, newLNVCache)
     "Forget"  -> (False, False, blankVM, blankVNM)
@@ -107,7 +110,7 @@ runSpoolInstance world@World {..} si@SI {..} wCache =
     "Abolish" -> (True, False, blankVM, blankVNM)
     _ -> error "[ERROR]<runSpoolInstance :=: _> Undefined Retention Code"
   -- NOTE: SIJump takes relative time-slot
-  jumpTarget = maybe 1 getInt $ IM.lookup jumpOffsetIdx newLTCache
+  jumpTarget = maybe 1 getInt $ vMapLookup jumpOffsetIdx newLTCache
   siis       = if doAbolish || null (restCEREScript :: CEREScript)
     then SIEnd
     else SIJump jumpTarget
@@ -143,15 +146,15 @@ runCEREScript (aWorld@World {..}, aSI@SI {..}, cState) = runCEREScriptSub
     (newWC, newLC, newTCache, newRG) =
       runInstruction (aWorld, aSI, cState) ceres
     -- TODO: Check Stop or Pause
-    spCode = maybe "" getStr $ IM.lookup spCodeIdx newLTCache
-    sp                               = spCode == "Stop" || spCode == "Pause"
-    retentionCode                    = case spCode of
+    spCode        = maybe "" getStr $ vMapLookup spCodeIdx newLTCache
+    sp            = spCode == "Stop" || spCode == "Pause"
+    retentionCode = case spCode of
       "Stop"  -> "Abolish"
       -- TODO: Not sure do I need to identify whether this is "Pause"
       "Pause" -> "Retain"
-      _       -> maybe "Retain" getStr $ IM.lookup retainCodeIdx newLTCache
+      _       -> maybe "Retain" getStr $ vMapLookup retainCodeIdx newLTCache
     -- TODO: Check the instruction is executed or not
-    resumeFlag     = maybe False getBool $ IM.lookup resumeCodeIdx newLVCache
+    resumeFlag     = maybe False getBool $ vMapLookup resumeCodeIdx newLVCache
     nextCEREScript = if resumeFlag then (ceres : cScript) else cScript
     (newLVCache, newLNVCache, newLTCache, newLNTCache) = newLC
     nextWC         = newWC
