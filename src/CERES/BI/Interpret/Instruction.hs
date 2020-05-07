@@ -128,12 +128,20 @@ crsCopyValue anInput@(aWorld, _, cState) vpA vpB = newCState
                     theExistence
 
 crsConvertValue :: Input -> VPosition -> ValueType -> Env
-crsConvertValue anInput@(aWorld@World {..}, aSI@SI {..}, cState@(wc@(hCache, nHCache, vCache, nVCache, dCache, nDCache), lc@(lVCache, lNVCache, lTCache, lNTCache), tCache, rg)) vp vt
-  = undefined
+crsConvertValue anInput@(aWorld, _, cState) vp vt = newCState
+ where
+  theValue     = getValue anInput vp
+  theExistence = getMValue anInput vp
+  theDLogMsg =
+    T.append "[Fail]<crsConvertValue> A variable does not exists at" (showt vp)
+  newValue  = convertValue theValue vt
+  newCState = maybe (dLogAndErr anInput theDLogMsg vp "[Fail]<ConvertValue>")
+                    (\_ -> setEnv aWorld vp W (Just newValue) cState)
+                    theExistence
 
 crsConvertValueBy :: Input -> VPosition -> VPosition -> Env
-crsConvertValueBy anInput@(aWorld@World {..}, aSI@SI {..}, cState@(wc@(hCache, nHCache, vCache, nVCache, dCache, nDCache), lc@(lVCache, lNVCache, lTCache, lNTCache), tCache, rg)) vpA vpB
-  = undefined
+crsConvertValueBy anInput vpA vpB = crsConvertValue anInput vpA vt
+  where vt = getValueType $ getValue anInput vpB
 
 crsConvertValueWith :: Input -> VPosition -> VPosition -> Env
 crsConvertValueWith anInput@(aWorld@World {..}, aSI@SI {..}, cState@(wc@(hCache, nHCache, vCache, nVCache, dCache, nDCache), lc@(lVCache, lNVCache, lTCache, lNTCache), tCache, rg)) vpA vpB

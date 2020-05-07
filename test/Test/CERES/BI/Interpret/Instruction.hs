@@ -182,6 +182,57 @@ case_CopyValue = assertEqual
     , blankRG
     )
 
+case_ConvertValue = assertEqual
+  "crsConvertValue (blankWorld, undefined, theEnv) (VP AtDict (VII 1)) VTDbl"
+  answer
+  question
+ where
+  iInput = (blankWorld, undefined, blankEnv)
+  theEnv =
+    crsInitVariable iInput (VP AtDict (VII 1)) (VP AtHere (VIV (IntValue 12)))
+  theInput = (blankWorld, undefined, theEnv)
+  question =
+    crsConvertValue (blankWorld, undefined, theEnv) (VP AtDict (VII 1)) VTDbl
+  answer =
+    ( ( IM.empty
+      , IM.empty
+      , blankVM
+      , blankVNM
+      , IM.singleton 1 (W (Just (DblValue 12)))
+      , blankVNM
+      )
+    , blankLocalCache
+    , blankTrickCache
+    , blankRG
+    )
+
+case_ConvertValueBy = assertEqual
+  "crsConvertValueBy (blankWorld, undefined, theEnv) (VP AtDict (VII 1)) (VP AtDict (VII 2))"
+  answer
+  question
+ where
+  iInput = (blankWorld, undefined, blankEnv)
+  theEnv1 =
+    crsInitVariable iInput (VP AtDict (VII 1)) (VP AtHere (VIV (IntValue 12)))
+  theInput1 = (blankWorld, undefined, theEnv1)
+  theEnv2 =
+    crsInitVariable theInput1 (VP AtDict (VII 2)) (VP AtHere (VIV (DblValue 3)))
+  question = crsConvertValueBy (blankWorld, undefined, theEnv2)
+                               (VP AtDict (VII 1))
+                               (VP AtDict (VII 2))
+  answer =
+    ( ( IM.empty
+      , IM.empty
+      , blankVM
+      , blankVNM
+      , IM.fromList [(1, W (Just (DblValue 12))), (2, W (Just (DblValue 3)))]
+      , blankVNM
+      )
+    , blankLocalCache
+    , blankTrickCache
+    , blankRG
+    )
+
 case_SetVPosition = assertEqual
   "crsSetVPosition (blankWorld, undefined, blankEnv) (VP AtHere (VIV (StrValue \"AtDict[VII=1]\"))) (VP AtDict (VII 1))"
   answer
