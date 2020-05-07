@@ -45,8 +45,8 @@ tests = $(testGroupGenerator)
 
 case_InitVariable = assertEqual
   "crsInitVariable (blankWorld, undefined, blankEnv) (VP AtDict (VII 1)) (VP AtHere (VIV (StrValue \"AtDict[VII=1]\")))"
-  question
   answer
+  question
  where
   question = crsInitVariable (blankWorld, undefined, blankEnv)
                              (VP AtDict (VII 1))
@@ -66,8 +66,8 @@ case_InitVariable = assertEqual
 
 case_SetVPosition = assertEqual
   "crsSetVPosition (blankWorld, undefined, blankEnv) (VP AtHere (VIV (StrValue \"AtDict[VII=1]\"))) (VP AtDict (VII 1))"
-  question
   answer
+  question
  where
   question = crsSetVPosition (blankWorld, undefined, blankEnv)
                              (VP AtHere (VIV (StrValue "AtDict[VII=1]")))
@@ -89,8 +89,8 @@ case_SetVPosition = assertEqual
 
 case_GetVPosition = assertEqual
   "crsGetVPosition (blankWorld, undefined, blankEnv) (VP AtHere (VIV (StrValue \"AtDict[VII=1]\"))) (VP AtDict (VII 1))"
-  question
   answer
+  question
  where
   question = crsGetVPosition (blankWorld, undefined, blankEnv)
                              (VP AtHere (VIV (StrValue "AtDict[VII=1]")))
