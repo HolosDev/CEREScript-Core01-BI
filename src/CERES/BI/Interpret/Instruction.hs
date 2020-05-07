@@ -72,8 +72,14 @@ crsSetValue anInput@(aWorld, _, cState) vpA vpB = newCState
                     theExistence
 
 crsDeleteVariable :: Input -> VPosition -> Env
-crsDeleteVariable anInput@(aWorld@World {..}, aSI@SI {..}, cState@(wc@(hCache, nHCache, vCache, nVCache, dCache, nDCache), lc@(lVCache, lNVCache, lTCache, lNTCache), tCache, rg)) vp
-  = undefined
+crsDeleteVariable anInput@(aWorld, _, cState) vp = newCState
+ where
+  theExistence = getMValue anInput vp
+  theDLogMsg =
+    T.append "[Fail]<crsSetVariable> VP does not exists at" (showt vp)
+  newCState = maybe (dLogAndErr anInput theDLogMsg (VP AtNull VINull) "")
+                    (\_ -> setEnv aWorld vp W Nothing cState)
+                    theExistence
 
 crsModifyValue1 :: Input -> VPosition -> CERESOperator -> Env
 crsModifyValue1 anInput@(aWorld@World {..}, aSI@SI {..}, cState@(wc@(hCache, nHCache, vCache, nVCache, dCache, nDCache), lc@(lVCache, lNVCache, lTCache, lNTCache), tCache, rg)) vp cOp

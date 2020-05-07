@@ -89,6 +89,23 @@ case_SetValue = assertEqual
     , blankRG
     )
 
+case_DeleteVariable = assertEqual
+  "crsDeleteVariable (blankWorld, undefined, theEnv) (VP AtDict (VII 1))"
+  answer
+  question
+ where
+  iInput                  = (blankWorld, undefined, blankEnv)
+  theEnv@(theWC, _, _, _) = crsInitVariable
+    iInput
+    (VP AtDict (VII 1))
+    (VP AtHere (VIV (StrValue "AtDict[VII=1]")))
+  theWorld       = worldCacheCommitter theWC (worldState blankWorld)
+  (nWC, _, _, _) = crsSetValue (blankWorld, undefined, theEnv)
+                               (VP AtDict (VII 1))
+                               (VP AtHere (VIV (IntValue 1)))
+  question = worldCacheCommitter nWC theWorld
+  answer   = worldState blankWorld
+
 case_SetVPosition = assertEqual
   "crsSetVPosition (blankWorld, undefined, blankEnv) (VP AtHere (VIV (StrValue \"AtDict[VII=1]\"))) (VP AtDict (VII 1))"
   answer
