@@ -43,12 +43,20 @@ dLogAndErr anInput@(aWorld, _, cState) logMsg vpT errMsg =
     $ cState
 
 crsInitVariable :: Input -> VPosition -> VPosition -> Env
-crsInitVariable anInput@(_, _, cState@(wc@(hCache, nHCache, vCache, nVCache, dCache, nDCache), lc@(lVCache, lNVCache, lTCache, lNTCache), tCache, rg)) vpA vpB
-  = undefined
+crsInitVariable anInput@(aWorld, _, cState) vpA vpB = newCState
+ where
+  theValue     = getValue anInput vpB
+  theExistence = getMValue anInput vpA
+  theDLogMsg =
+    T.append "[Fail]<crsInitVariable> VP exists already at" (showt vpA)
+  newCState = maybe
+    (setEnv aWorld vpA W (Just theValue) cState)
+    (\_ -> dLogAndErr anInput theDLogMsg vpA "[Fail]<InitVariable>")
+    theExistence
 
 crsInitVariableAt :: Input -> VPosition -> VPosition -> Env
-crsInitVariableAt anInput@(aWorld@World {..}, aSI@SI {..}, cState@(wc@(hCache, nHCache, vCache, nVCache, dCache, nDCache), lc@(lVCache, lNVCache, lTCache, lNTCache), tCache, rg)) vpA vpB
-  = undefined
+crsInitVariableAt _ _ _ =
+  error "[ERROR]<crsInitVariableAt> Would be deprecated"
 
 crsSetValue :: Input -> VPosition -> VPosition -> Env
 crsSetValue anInput@(aWorld@World {..}, aSI@SI {..}, cState@(wc@(hCache, nHCache, vCache, nVCache, dCache, nDCache), lc@(lVCache, lNVCache, lTCache, lNTCache), tCache, rg)) vpA vpB

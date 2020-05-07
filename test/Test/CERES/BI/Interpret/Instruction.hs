@@ -43,7 +43,26 @@ import           Debug
 
 tests = $(testGroupGenerator)
 
-case_nothing = assertBool "Nothing" True
+case_InitVariable = assertEqual
+  "crsInitVariable (blankWorld, undefined, blankEnv) (VP AtDict (VII 1)) (VP AtHere (VIV (StrValue \"AtDict[VII=1]\")))"
+  question
+  answer
+ where
+  question = crsInitVariable (blankWorld, undefined, blankEnv)
+                             (VP AtDict (VII 1))
+                             (VP AtHere (VIV (StrValue "AtDict[VII=1]")))
+  answer =
+    ( ( IM.empty
+      , IM.empty
+      , blankVM
+      , blankVNM
+      , IM.singleton 1 (W (Just (StrValue "AtDict[VII=1]")))
+      , blankVNM
+      )
+    , blankLocalCache
+    , blankTrickCache
+    , blankRG
+    )
 
 case_SetVPosition = assertEqual
   "crsSetVPosition (blankWorld, undefined, blankEnv) (VP AtHere (VIV (StrValue \"AtDict[VII=1]\"))) (VP AtDict (VII 1))"
@@ -58,7 +77,9 @@ case_SetVPosition = assertEqual
       , IM.empty
       , blankVM
       , blankVNM
-      , IM.singleton 1 (W (Just (PtrValue (VP AtHere (VIV (StrValue "AtDict[VII=1]"))))))
+      , IM.singleton
+        1
+        (W (Just (PtrValue (VP AtHere (VIV (StrValue "AtDict[VII=1]"))))))
       , blankVNM
       )
     , blankLocalCache
