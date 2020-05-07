@@ -30,22 +30,6 @@ main = do
   T.putStrLn "End"
 
 initializer = do
-  T.putStrLn " - = Set Spools"
-  let iSpools = IM.empty
-  T.putStrLn " - = Set ValueList"
-  let iValueList = IM.empty
-  T.putStrLn " - = Set WorldState"
-  T.putStrLn " - = + Set HistoricalTable"
-  let iHistoricalTable = IM.empty
-  T.putStrLn " - = + Set NHistoricalTable"
-  let iNHistoricalTable = IM.empty
-  let iValueMap      = blankVM
-  let iTrie          = blankVNM
-  let rGen           = mkGenFromInt 0
-  let iWorldState =
-        WorldState Nothing iHistoricalTable iNHistoricalTable iValueMap iTrie iValueMap iTrie rGen
-  T.putStrLn " - = Set SpoolInstances"
-  let iSITable = IM.empty
-  let iWorld = World iSpools iValueList iWorldState iSITable 0 256
-  return iWorld
-
+  let bWorld = blankWorld
+  let theWorld = bWorld
+  return theWorld
