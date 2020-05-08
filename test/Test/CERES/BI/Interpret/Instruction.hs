@@ -234,6 +234,62 @@ case_ConvertValueBy = assertEqual
     , blankRG
     )
 
+case_ReplaceText = assertEqual
+  "crsReplaceText (blankWorld, undefined, theEnv) (VP AtHere (VIV (StrValue \"ABC${D:1}BEC\"))) (VP AtDict (VII 1))"
+  answer
+  question
+ where
+  iInput = (blankWorld, undefined, blankEnv)
+  theEnv = crsInitVariable iInput
+                           (VP AtDict (VII 1))
+                           (VP AtHere (VIV (StrValue "ABC${D:1}BE${D:1}C")))
+  theInput = (blankWorld, undefined, theEnv)
+  question = crsReplaceText theInput (VP AtDict (VII 1))
+  answer =
+    ( ( IM.empty
+      , IM.empty
+      , blankVM
+      , blankVNM
+      , IM.singleton
+        1
+        (W (Just (StrValue "ABCABC${D:1}BE${D:1}CBEABC${D:1}BE${D:1}CC")))
+      , blankVNM
+      )
+    , blankLocalCache
+    , blankTrickCache
+    , blankRG
+    )
+
+case_ReplaceTextTo = assertEqual
+  "crsReplaceTextTo (blankWorld, undefined, theEnv) (VP AtHere (VIV (StrValue \"ABC${D:1}BEC\"))) (VP AtDict (VII 1))"
+  answer
+  question
+ where
+  iInput = (blankWorld, undefined, blankEnv)
+  theEnv = crsInitVariable iInput
+                           (VP AtDict (VII 1))
+                           (VP AtHere (VIV (StrValue "123")))
+  theInput = (blankWorld, undefined, theEnv)
+  question = crsReplaceTextTo
+    theInput
+    (VP AtHere (VIV (StrValue "ABC${D:1}BE${D:1}C")))
+    (VP AtDict (VII 2))
+  answer =
+    ( ( IM.empty
+      , IM.empty
+      , blankVM
+      , blankVNM
+      , IM.fromList
+        [ (1, W (Just (StrValue "123")))
+        , (2, W (Just (StrValue "ABC123BE123C")))
+        ]
+      , blankVNM
+      )
+    , blankLocalCache
+    , blankTrickCache
+    , blankRG
+    )
+
 case_SetVPosition = assertEqual
   "crsSetVPosition (blankWorld, undefined, blankEnv) (VP AtHere (VIV (StrValue \"AtDict[VII=1]\"))) (VP AtDict (VII 1))"
   answer

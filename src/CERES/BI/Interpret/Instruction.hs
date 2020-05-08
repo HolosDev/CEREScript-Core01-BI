@@ -149,12 +149,20 @@ crsConvertValueWith anInput@(aWorld@World {..}, aSI@SI {..}, cState@(wc@(hCache,
   = undefined
 
 crsReplaceText :: Input -> VPosition -> Env
-crsReplaceText anInput@(aWorld@World {..}, aSI@SI {..}, cState@(wc@(hCache, nHCache, vCache, nVCache, dCache, nDCache), lc@(lVCache, lNVCache, lTCache, lNTCache), tCache, rg)) vp
-  = undefined
+crsReplaceText anInput vp = crsReplaceTextTo anInput vp vp
 
 crsReplaceTextTo :: Input -> VPosition -> VPosition -> Env
-crsReplaceTextTo anInput@(aWorld@World {..}, aSI@SI {..}, cState@(wc@(hCache, nHCache, vCache, nVCache, dCache, nDCache), lc@(lVCache, lNVCache, lTCache, lNTCache), tCache, rg)) vpA vpB
-  = undefined
+crsReplaceTextTo anInput@(aWorld, _, cState) vpA vpB = newCState
+ where
+  targetStr     = getStr $ getValue anInput vpA
+  eReplacingStr = findVariables targetStr
+  dLogMsg       = T.append "Fail to read VariablePosition: "
+  newCState     = either
+    (\msg -> dLogAndErr anInput (dLogMsg msg) vpB (dLogMsg msg))
+    (\str ->
+      setEnv aWorld vpB W (Just . StrValue . replaceStr anInput $ str) cState
+    )
+    eReplacingStr
 
 crsGetVPosition :: Input -> VPosition -> VPosition -> Env
 crsGetVPosition anInput@(aWorld, _, cState) vpA vpB = newCState
