@@ -7,6 +7,7 @@ import           Test.Framework.TH
 import           Test.HUnit.Base
 
 import           Data.Bifunctor
+import qualified Data.HashMap.Strict           as HM
 import           Data.IntMap                    ( IntMap )
 import qualified Data.IntMap                   as IM
 import           Data.Maybe
@@ -274,5 +275,35 @@ case_GetVPosition = assertEqual
       )
     , blankLocalCache
     , blankTrickCache
+    , blankRG
+    )
+
+case_LogAtConsole = assertEqual
+  "crsLog (blankWorld, undefined, blankEnv) (VP AtTricky (VIN \"Console\"))) (VP AtHere (VIV (StrValue \"Log at Console\")))"
+  answer
+  question
+ where
+  question = crsLog (blankWorld, undefined, blankEnv)
+                    (VP AtTricky (VIN "Console"))
+                    (VP AtHere (VIV (StrValue "Log at Console")))
+  answer =
+    ( blankWorldCache
+    , blankLocalCache
+    , HM.singleton "Console" (StrValue "Log at Console")
+    , blankRG
+    )
+
+case_LogAtLogger = assertEqual
+  "crsLog (blankWorld, undefined, blankEnv) (VP AtTricky (VIN \"Logger\"))) (VP AtHere (VIV (StrValue \"Log at Logger\")))"
+  answer
+  question
+ where
+  question = crsLog (blankWorld, undefined, blankEnv)
+                    (VP AtTricky (VIN "Logger"))
+                    (VP AtHere (VIV (StrValue "Log at Logger")))
+  answer =
+    ( blankWorldCache
+    , blankLocalCache
+    , HM.singleton "Logger" (StrValue "Log at Logger")
     , blankRG
     )

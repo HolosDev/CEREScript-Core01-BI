@@ -32,6 +32,7 @@ import           CERES.BI.Interpret.Spool
 
 import           CERES.BI.Type
 
+import           CERES.BI.Util
 import           CERES.BI.Util.Random
 
 import           Debug
@@ -260,8 +261,13 @@ crsNoop :: Input -> Env
 crsNoop (_, _, cState) = cState
 
 crsLog :: Input -> VPosition -> VPosition -> Env
-crsLog anInput@(aWorld@World {..}, aSI@SI {..}, cState@(wc@(hCache, nHCache, vCache, nVCache, dCache, nDCache), lc@(lVCache, lNVCache, lTCache, lNTCache), tCache, rg)) vpA vpB
-  = undefined
+crsLog anInput@(aWorld, _, cState@(wc, lc, tCache, rg)) vpA@(VP ~AtTricky ~(VIN logTarget)) vpB
+  = case logTarget of
+    "Console" -> (wc, lc, vNHMapInsert logTarget logV tCache, rg) -- setEnv aWorld vpA W (Just logV) cState
+    "Logger"  -> (wc, lc, vNHMapInsert logTarget logV tCache, rg) -- setEnv aWorld vpA W (Just logV) cState
+    _         -> error "[ERROR]<crsLog> Can't be reached"
+  where logV@(StrValue logMsg) = getValue anInput vpB
+
 
 crsParseScript :: Input -> VPosition -> VPosition -> Env
 crsParseScript anInput@(aWorld@World {..}, aSI@SI {..}, cState@(wc@(hCache, nHCache, vCache, nVCache, dCache, nDCache), lc@(lVCache, lNVCache, lTCache, lNTCache), tCache, rg)) vpA vpB
