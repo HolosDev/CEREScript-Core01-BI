@@ -122,6 +122,8 @@ data SpoolInstance = SI
   , siRWVPSet    :: Set VPosition -- Only World, Dict, Var
   , siLocalVars  :: LocalVariables
   , siLocalNVars :: LocalNVariables
+  , siLocalTemp  :: LocalTemp
+  , siLocalNTemp :: LocalNTemp
   , siSpoolID    :: {-# UNPACK #-} !ID
   , siRestScript :: CEREScript
   , siRG         :: RG
