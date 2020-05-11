@@ -22,11 +22,12 @@ The entries on the Vars/NVars would be changed its value frequently.
 
 ### LocalVars, LocalNVars
 
-Local storage which belong to a spool instance which is lasting after a time slot.
+Local storage which belong to a spool instance.
+Stores long-lasting variables until a SI abolished.
 
 ### LocalTemp, LocalNTemp
 
-Local storage which belongs to a spool instance which is not lasting after a time slot.
+Local storage which belongs to a spool instance which is lasting not for long.
 Stores temporal/focused variable only.
 
 ### Register
@@ -102,7 +103,7 @@ Local storage which limited in a spool instance.
 
 ### AtLTemp, AtLNTemp
 
-Local storage which limited in a spool instance in a time-slot.
+Local storage which limited in a spool instance.
 
 #### Compatible `VariableIndex`
 

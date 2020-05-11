@@ -39,15 +39,18 @@ Use LocalStorage
 
 Serialized Execution
 
-* runSimulator :: `World -> World`
+* `Input` :: `(World,SI,Env)`
+* `Env` :: `(WorldCache, LocalCache, TrickCache, RG)`
+
+* runSimulator :: `Time -> World -> World`
   * runTimeSlot :: `World -> World`
     * siAggregator :: `World -> SpoolForest`
     * runSpoolTree :: `SpoolTree -> World -> (SpoolTree, WorldCache)`
       * cacheMaker :: `SpoolTree -> World -> WorldCache`
-      * runSpoolInstance :: `SI -> WorldCache -> World -> ((SIIS,SI),WorldCache)`
-        * runCEREScript :: `World -> SI -> (WorldCache, LocalVariables, LocalCache, RG) -> CEREScript -> ST (WorldCache, LocalVariables, LocalCache, RG)`
-          * runInstruction :: `World -> SI -> (WorldCache, LocalVariables, LocalCache) -> CERES -> (WorldCache, LocalVariables, LocalCache, RG)`
-    * cacheCommitter' :: `WorldState -> [WorldCache] -> WorldState`
+      * runSpoolInstance :: `World -> SI -> WorldCache  -> ((SIParams,SI),Env)`
+        * runCEREScript :: `Input -> CEREScript -> (Env, CEREScript)`
+          * runInstruction :: `Input -> CERES -> Env`
+      * cacheCommitter' :: `WorldState -> [WorldCache] -> WorldState`
 
 
 ## How to avoid Variable ID collision
