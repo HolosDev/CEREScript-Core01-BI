@@ -156,6 +156,12 @@ instance TextShow SpoolInstance where
       <> showb siSpoolID
       <> ")"
 
+data SIParams = SIParams
+  { siIS :: SIIS
+  }
+
+type SIStatus = (SIParams, SpoolInstance)
+
 type SIIS = SpoolInstanceInheritStatus
 -- NOTE: SIJump takes relative time-slot
 data SpoolInstanceInheritStatus = SIJump Int | SIEnd

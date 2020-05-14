@@ -145,8 +145,7 @@ crsConvertValueBy anInput vpA vpB = crsConvertValue anInput vpA vt
   where vt = getValueType $ getValue anInput vpB
 
 crsConvertValueWith :: Input -> VPosition -> VPosition -> Env
-crsConvertValueWith anInput@(aWorld@World {..}, aSI@SI {..}, cState@(wc@(hCache, nHCache, vCache, nVCache, dCache, nDCache), lc@(lVCache, lNVCache, lTCache, lNTCache), tCache, rg)) vpA vpB
-  = undefined
+crsConvertValueWith anInput@(aWorld, aSI, cState) vpA vpB = undefined
 
 crsReplaceText :: Input -> VPosition -> Env
 crsReplaceText anInput vp = crsReplaceTextTo anInput vp vp
@@ -178,12 +177,12 @@ crsGetVPosition anInput@(aWorld, _, cState) vpA vpB = newCState
                         mTargetPtr
 
 crsSetVPosition :: Input -> VPosition -> VPosition -> Env
-crsSetVPosition anInput@(aWorld@World {..}, _, cState@(wc@(hCache, nHCache, vCache, nVCache, dCache, nDCache), lc@(lVCache, lNVCache, lTCache, lNTCache), tCache, rg)) vpA vpB
-  = setEnv aWorld vpB W (Just . PtrValue $ vpA) cState
+crsSetVPosition anInput@(aWorld, _, cState) vpA vpB =
+  setEnv aWorld vpB W (Just . PtrValue $ vpA) cState
 
 crsRandom :: Input -> VPosition -> ValueType -> Env
-crsRandom (aWorld, _, cState@(wc@(hCache, nHCache, vCache, nVCache, dCache, nDCache), lc@(lVCache, lNVCache, lTCache, lNTCache), tCache, rg)) vp vType
-  = setEnv aWorld vp W (Just rValue) (wc, lc, tCache, nextRG)
+crsRandom (aWorld, _, cState@Env {..}) vp vType =
+  setEnv aWorld vp W (Just rValue) . setRG nextRG $ cState
   where (rValue, nextRG) = randomValue vType rg
 
 crsRandomBy :: Input -> VPosition -> VPosition -> Env
@@ -198,7 +197,7 @@ crsRandomWith
   -> VPosition
   -> VPosition
   -> Env
-crsRandomWith anInput@(aWorld@World {..}, aSI@SI {..}, cState@(wc@(hCache, nHCache, vCache, nVCache, dCache, nDCache), lc@(lVCache, lNVCache, lTCache, lNTCache), tCache, rg)) vpA vType vpC vpD vpE
+crsRandomWith anInput@(aWorld@World {..}, aSI@SI {..}, cState) vpA vType vpC vpD vpE
   = notYetImpl "crsRandomWith"
 
 crsRandomWithBy
@@ -209,7 +208,7 @@ crsRandomWithBy
   -> VPosition
   -> VPosition
   -> Env
-crsRandomWithBy anInput@(aWorld@World {..}, aSI@SI {..}, cState@(wc@(hCache, nHCache, vCache, nVCache, dCache, nDCache), lc@(lVCache, lNVCache, lTCache, lNTCache), tCache, rg)) vpA vpB vpC vpD vpE
+crsRandomWithBy anInput@(aWorld@World {..}, aSI@SI {..}, cState) vpA vpB vpC vpD vpE
   = notYetImpl "crsRandomWith"
 
 randomValueBy :: Value -> RG -> (Value, RG)
@@ -234,7 +233,7 @@ randomValue vType rg = case vType of
   _ -> error "[ERROR]<crsRandom> Can't be reached"
 
 crsElapsedTime :: Input -> VPosition -> VPosition -> Env
-crsElapsedTime anInput@(aWorld@World {..}, aSI@SI {..}, cState@(wc@(hCache, nHCache, vCache, nVCache, dCache, nDCache), lc@(lVCache, lNVCache, lTCache, lNTCache), tCache, rg)) vpA vpB
+crsElapsedTime anInput@(aWorld@World {..}, aSI@SI {..}, cState@Env {..}) vpA vpB
   = undefined
  where
   -- NOTE: 1. Estimate next instruction's executing internal time
@@ -242,65 +241,64 @@ crsElapsedTime anInput@(aWorld@World {..}, aSI@SI {..}, cState@(wc@(hCache, nHCa
   -- NOTE: 3. Else, do interpret, and modify (+executingTime) elapsedTime
   -- NOTE: Calculate executingTime not runCEREScript but here, because length of executingTime is depends on an instruction
   (executingTime, rg1) = bmwrInt worldTSSize rg
-  elapsedTime = maybe 0 getInt . IM.lookup elapsedInternalTimeIdx $ lVCache
-  newElapsedTime       = elapsedTime + executingTime
-  doSkip               = newElapsedTime > worldTSSize
-  elapsedInternalTime  = maybe False getBool $ IM.lookup resumeCodeIdx lVCache
+  elapsedTime =
+    maybe 0 getInt . IM.lookup elapsedInternalTimeIdx $ lVars lCache
+  newElapsedTime = elapsedTime + executingTime
+  doSkip         = newElapsedTime > worldTSSize
+  elapsedInternalTime =
+    maybe False getBool $ IM.lookup resumeCodeIdx $ lVars lCache
 
 crsSPControl :: Input -> VPosition -> Env
-crsSPControl anInput@(aWorld@World {..}, aSI@SI {..}, cState@(wc@(hCache, nHCache, vCache, nVCache, dCache, nDCache), lc@(lVCache, lNVCache, lTCache, lNTCache), tCache, rg)) vp
-  = undefined
+crsSPControl anInput@(aWorld@World {..}, aSI@SI {..}, cState@Env {..}) vp =
+  undefined
 
 crsSIControl :: Input -> VPosition -> VPosition -> Env
-crsSIControl anInput@(aWorld@World {..}, aSI@SI {..}, cState@(wc@(hCache, nHCache, vCache, nVCache, dCache, nDCache), lc@(lVCache, lNVCache, lTCache, lNTCache), tCache, rg)) vpA vpB
+crsSIControl anInput@(aWorld@World {..}, aSI@SI {..}, cState@Env {..}) vpA vpB
   = undefined
 
--- NOTE: crsSIInit does not initiate SI by itself, but would be done by `runSpoolInstance`
+-- NOTE: crsSIInit does not initiate SI by itself, but `runSpoolInstance` do it
 crsSIInit :: Input -> VPosition -> VPosition -> VPosition -> VPosition -> Env
-crsSIInit anInput@(aWorld@World {..}, aSI@SI {..}, cState@(wc@(hCache, nHCache, vCache, nVCache, dCache, nDCache), lc@(lVCache, lNVCache, lTCache, lNTCache), tCache, rg)) vpA vpB vpC vpD
+crsSIInit anInput@(aWorld@World {..}, aSI@SI {..}, cState@Env {..}) vpA vpB vpC vpD
   = undefined
   where spoolID = undefined
 
 crsSIEnd :: Input -> VPosition -> Env
-crsSIEnd anInput@(aWorld@World {..}, aSI@SI {..}, cState@(wc@(hCache, nHCache, vCache, nVCache, dCache, nDCache), lc@(lVCache, lNVCache, lTCache, lNTCache), tCache, rg)) vp
-  = undefined
+crsSIEnd anInput@(aWorld@World {..}, aSI@SI {..}, cState@Env {..}) vp =
+  undefined
 
 crsNoop :: Input -> Env
 crsNoop (_, _, cState) = cState
 
 crsLog :: Input -> VPosition -> VPosition -> Env
-crsLog anInput@(aWorld, _, cState@(wc, lc, tCache, rg)) vpA@(VP ~AtTricky ~(VIN logTarget)) vpB
-  = case logTarget of
-    "Console" -> (wc, lc, vNHMapInsert logTarget logV tCache, rg) -- setEnv aWorld vpA W (Just logV) cState
-    "Logger"  -> (wc, lc, vNHMapInsert logTarget logV tCache, rg) -- setEnv aWorld vpA W (Just logV) cState
-    _         -> error "[ERROR]<crsLog> Can't be reached"
+crsLog anInput@(aWorld, _, cState@Env {..}) vpA@(VP ~AtTricky ~(VIN logTarget)) vpB
+  = setTCache (vNHMapInsert logTarget logV tCache) cState
   where logV@(StrValue logMsg) = getValue anInput vpB
 
 
 crsParseScript :: Input -> VPosition -> VPosition -> Env
-crsParseScript anInput@(aWorld@World {..}, aSI@SI {..}, cState@(wc@(hCache, nHCache, vCache, nVCache, dCache, nDCache), lc@(lVCache, lNVCache, lTCache, lNTCache), tCache, rg)) vpA vpB
+crsParseScript anInput@(aWorld@World {..}, aSI@SI {..}, cState@Env {..}) vpA vpB
   = undefined
 
 crsToInterpreter0 :: Input -> CHeader -> Env
-crsToInterpreter0 anInput@(aWorld@World {..}, aSI@SI {..}, cState@(wc@(hCache, nHCache, vCache, nVCache, dCache, nDCache), lc@(lVCache, lNVCache, lTCache, lNTCache), tCache, rg)) iHeader
+crsToInterpreter0 anInput@(aWorld@World {..}, aSI@SI {..}, cState@Env {..}) iHeader
   = undefined
 
 crsToInterpreter1 :: Input -> CHeader -> VPosition -> Env
-crsToInterpreter1 anInput@(aWorld@World {..}, aSI@SI {..}, cState@(wc@(hCache, nHCache, vCache, nVCache, dCache, nDCache), lc@(lVCache, lNVCache, lTCache, lNTCache), tCache, rg)) iHeader vpA
+crsToInterpreter1 anInput@(aWorld@World {..}, aSI@SI {..}, cState@Env {..}) iHeader vpA
   = undefined
 
 crsToInterpreter2 :: Input -> CHeader -> VPosition -> VPosition -> Env
-crsToInterpreter2 anInput@(aWorld@World {..}, aSI@SI {..}, cState@(wc@(hCache, nHCache, vCache, nVCache, dCache, nDCache), lc@(lVCache, lNVCache, lTCache, lNTCache), tCache, rg)) iHeader vpA vpB
+crsToInterpreter2 anInput@(aWorld@World {..}, aSI@SI {..}, cState@Env {..}) iHeader vpA vpB
   = undefined
 
 crsToInterpreter3
   :: Input -> CHeader -> VPosition -> VPosition -> VPosition -> Env
-crsToInterpreter3 anInput@(aWorld@World {..}, aSI@SI {..}, cState@(wc@(hCache, nHCache, vCache, nVCache, dCache, nDCache), lc@(lVCache, lNVCache, lTCache, lNTCache), tCache, rg)) iHeader vpA vpB vpC
+crsToInterpreter3 anInput@(aWorld@World {..}, aSI@SI {..}, cState@Env {..}) iHeader vpA vpB vpC
   = undefined
 
 crsToInterpreter4
   :: Input -> CHeader -> VPosition -> VPosition -> VPosition -> VPosition -> Env
-crsToInterpreter4 anInput@(aWorld@World {..}, aSI@SI {..}, cState@(wc@(hCache, nHCache, vCache, nVCache, dCache, nDCache), lc@(lVCache, lNVCache, lTCache, lNTCache), tCache, rg)) iHeader vpA vpB vpC vpD
+crsToInterpreter4 anInput@(aWorld@World {..}, aSI@SI {..}, cState@Env {..}) iHeader vpA vpB vpC vpD
   = undefined
 
 crsToInterpreter5
@@ -312,7 +310,7 @@ crsToInterpreter5
   -> VPosition
   -> VPosition
   -> Env
-crsToInterpreter5 anInput@(aWorld@World {..}, aSI@SI {..}, cState@(wc@(hCache, nHCache, vCache, nVCache, dCache, nDCache), lc@(lVCache, lNVCache, lTCache, lNTCache), tCache, rg)) iHeader vpA vpB vpC vpD vpE
+crsToInterpreter5 anInput@(aWorld@World {..}, aSI@SI {..}, cState@Env {..}) iHeader vpA vpB vpC vpD vpE
   = undefined
 
 crsToInterpreter6
@@ -325,7 +323,7 @@ crsToInterpreter6
   -> VPosition
   -> VPosition
   -> Env
-crsToInterpreter6 anInput@(aWorld@World {..}, aSI@SI {..}, cState@(wc@(hCache, nHCache, vCache, nVCache, dCache, nDCache), lc@(lVCache, lNVCache, lTCache, lNTCache), tCache, rg)) iHeader vpA vpB vpC vpD vpE vpF
+crsToInterpreter6 anInput@(aWorld@World {..}, aSI@SI {..}, cState@Env {..}) iHeader vpA vpB vpC vpD vpE vpF
   = undefined
 
 crsToInterpreter7
@@ -339,7 +337,7 @@ crsToInterpreter7
   -> VPosition
   -> VPosition
   -> Env
-crsToInterpreter7 anInput@(aWorld@World {..}, aSI@SI {..}, cState@(wc@(hCache, nHCache, vCache, nVCache, dCache, nDCache), lc@(lVCache, lNVCache, lTCache, lNTCache), tCache, rg)) iHeader vpA vpB vpC vpD vpE vpF vpG
+crsToInterpreter7 anInput@(aWorld@World {..}, aSI@SI {..}, cState@Env {..}) iHeader vpA vpB vpC vpD vpE vpF vpG
   = undefined
 
 crsToInterpreter8
@@ -354,29 +352,29 @@ crsToInterpreter8
   -> VPosition
   -> VPosition
   -> Env
-crsToInterpreter8 anInput@(aWorld@World {..}, aSI@SI {..}, cState@(wc@(hCache, nHCache, vCache, nVCache, dCache, nDCache), lc@(lVCache, lNVCache, lTCache, lNTCache), tCache, rg)) iHeader vpA vpB vpC vpD vpE vpF vpG vpH
+crsToInterpreter8 anInput@(aWorld@World {..}, aSI@SI {..}, cState@Env {..}) iHeader vpA vpB vpC vpD vpE vpF vpG vpH
   = undefined
 
 
 crsExtend0 :: Input -> CHeader -> Env
-crsExtend0 anInput@(aWorld@World {..}, aSI@SI {..}, cState@(wc@(hCache, nHCache, vCache, nVCache, dCache, nDCache), lc@(lVCache, lNVCache, lTCache, lNTCache), tCache, rg)) iHeader
-  = undefined
+crsExtend0 anInput@(aWorld@World {..}, aSI@SI {..}, cState@Env {..}) iHeader =
+  undefined
 
 crsExtend1 :: Input -> CHeader -> VPosition -> Env
-crsExtend1 anInput@(aWorld@World {..}, aSI@SI {..}, cState@(wc@(hCache, nHCache, vCache, nVCache, dCache, nDCache), lc@(lVCache, lNVCache, lTCache, lNTCache), tCache, rg)) iHeader vpA
+crsExtend1 anInput@(aWorld@World {..}, aSI@SI {..}, cState@Env {..}) iHeader vpA
   = undefined
 
 crsExtend2 :: Input -> CHeader -> VPosition -> VPosition -> Env
-crsExtend2 anInput@(aWorld@World {..}, aSI@SI {..}, cState@(wc@(hCache, nHCache, vCache, nVCache, dCache, nDCache), lc@(lVCache, lNVCache, lTCache, lNTCache), tCache, rg)) iHeader vpA vpB
+crsExtend2 anInput@(aWorld@World {..}, aSI@SI {..}, cState@Env {..}) iHeader vpA vpB
   = undefined
 
 crsExtend3 :: Input -> CHeader -> VPosition -> VPosition -> VPosition -> Env
-crsExtend3 anInput@(aWorld@World {..}, aSI@SI {..}, cState@(wc@(hCache, nHCache, vCache, nVCache, dCache, nDCache), lc@(lVCache, lNVCache, lTCache, lNTCache), tCache, rg)) iHeader vpA vpB vpC
+crsExtend3 anInput@(aWorld@World {..}, aSI@SI {..}, cState@Env {..}) iHeader vpA vpB vpC
   = undefined
 
 crsExtend4
   :: Input -> CHeader -> VPosition -> VPosition -> VPosition -> VPosition -> Env
-crsExtend4 anInput@(aWorld@World {..}, aSI@SI {..}, cState@(wc@(hCache, nHCache, vCache, nVCache, dCache, nDCache), lc@(lVCache, lNVCache, lTCache, lNTCache), tCache, rg)) iHeader vpA vpB vpC vpD
+crsExtend4 anInput@(aWorld@World {..}, aSI@SI {..}, cState@Env {..}) iHeader vpA vpB vpC vpD
   = undefined
 
 crsExtend5
@@ -388,7 +386,7 @@ crsExtend5
   -> VPosition
   -> VPosition
   -> Env
-crsExtend5 anInput@(aWorld@World {..}, aSI@SI {..}, cState@(wc@(hCache, nHCache, vCache, nVCache, dCache, nDCache), lc@(lVCache, lNVCache, lTCache, lNTCache), tCache, rg)) iHeader vpA vpB vpC vpD vpE
+crsExtend5 anInput@(aWorld@World {..}, aSI@SI {..}, cState@Env {..}) iHeader vpA vpB vpC vpD vpE
   = undefined
 
 crsExtend6
@@ -401,7 +399,7 @@ crsExtend6
   -> VPosition
   -> VPosition
   -> Env
-crsExtend6 anInput@(aWorld@World {..}, aSI@SI {..}, cState@(wc@(hCache, nHCache, vCache, nVCache, dCache, nDCache), lc@(lVCache, lNVCache, lTCache, lNTCache), tCache, rg)) iHeader vpA vpB vpC vpD vpE vpF
+crsExtend6 anInput@(aWorld@World {..}, aSI@SI {..}, cState@Env {..}) iHeader vpA vpB vpC vpD vpE vpF
   = undefined
 
 crsExtend7
@@ -415,7 +413,7 @@ crsExtend7
   -> VPosition
   -> VPosition
   -> Env
-crsExtend7 anInput@(aWorld@World {..}, aSI@SI {..}, cState@(wc@(hCache, nHCache, vCache, nVCache, dCache, nDCache), lc@(lVCache, lNVCache, lTCache, lNTCache), tCache, rg)) iHeader vpA vpB vpC vpD vpE vpF vpG
+crsExtend7 anInput@(aWorld@World {..}, aSI@SI {..}, cState@Env {..}) iHeader vpA vpB vpC vpD vpE vpF vpG
   = undefined
 
 crsExtend8
@@ -430,5 +428,5 @@ crsExtend8
   -> VPosition
   -> VPosition
   -> Env
-crsExtend8 anInput@(aWorld@World {..}, aSI@SI {..}, cState@(wc@(hCache, nHCache, vCache, nVCache, dCache, nDCache), lc@(lVCache, lNVCache, lTCache, lNTCache), tCache, rg)) iHeader vpA vpB vpC vpD vpE vpF vpG vpH
+crsExtend8 anInput@(aWorld@World {..}, aSI@SI {..}, cState@Env {..}) iHeader vpA vpB vpC vpD vpE vpF vpG vpH
   = undefined

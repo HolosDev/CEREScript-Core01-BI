@@ -53,17 +53,7 @@ case_InitVariable = assertEqual
                              (VP AtDict (VII 1))
                              (VP AtHere (VIV (StrValue "AtDict[VII=1]")))
   answer =
-    ( ( IM.empty
-      , IM.empty
-      , blankVM
-      , blankVNM
-      , IM.singleton 1 (W (Just (StrValue "AtDict[VII=1]")))
-      , blankVNM
-      )
-    , blankLocalCache
-    , blankTrickCache
-    , blankRG
-    )
+    setDCache (IM.singleton 1 (W (Just (StrValue "AtDict[VII=1]")))) blankEnv
 
 case_SetValue = assertEqual
   "crsSetValue (blankWorld, undefined, theEnv) (VP AtDict (VII 1)) (VP AtHere (VIV (StrValue \"AtDict[VII=1]\")))"
@@ -77,34 +67,23 @@ case_SetValue = assertEqual
   question = crsSetValue (blankWorld, undefined, theEnv)
                          (VP AtDict (VII 1))
                          (VP AtHere (VIV (IntValue 1)))
-  answer =
-    ( ( IM.empty
-      , IM.empty
-      , blankVM
-      , blankVNM
-      , IM.singleton 1 (W (Just (IntValue 1)))
-      , blankVNM
-      )
-    , blankLocalCache
-    , blankTrickCache
-    , blankRG
-    )
+  answer = setDCache (IM.singleton 1 (W (Just (IntValue 1)))) blankEnv
 
 case_DeleteVariable = assertEqual
   "crsDeleteVariable (blankWorld, undefined, theEnv) (VP AtDict (VII 1))"
   answer
   question
  where
-  iInput                  = (blankWorld, undefined, blankEnv)
-  theEnv@(theWC, _, _, _) = crsInitVariable
-    iInput
+  iInput = (blankWorld, undefined, blankEnv)
+  theEnv = crsInitVariable iInput
+                           (VP AtDict (VII 1))
+                           (VP AtHere (VIV (StrValue "AtDict[VII=1]")))
+  theState = worldCacheCommitter (wCache theEnv) (worldState blankWorld)
+  newEnv   = crsSetValue
+    (blankWorld { worldState = theState }, undefined, blankEnv)
     (VP AtDict (VII 1))
-    (VP AtHere (VIV (StrValue "AtDict[VII=1]")))
-  theWorld       = worldCacheCommitter theWC (worldState blankWorld)
-  (nWC, _, _, _) = crsSetValue (blankWorld, undefined, theEnv)
-                               (VP AtDict (VII 1))
-                               (VP AtHere (VIV (IntValue 1)))
-  question = worldCacheCommitter nWC theWorld
+    (VP AtHere (VIV (IntValue 1)))
+  question = worldCacheCommitter (wCache newEnv) theState
   answer   = worldState blankWorld
 
 case_Modify1 = assertEqual
@@ -117,18 +96,7 @@ case_Modify1 = assertEqual
     crsInitVariable iInput (VP AtDict (VII 1)) (VP AtHere (VIV (IntValue 1)))
   question =
     crsModifyValue1 (blankWorld, undefined, theEnv) (VP AtDict (VII 1)) COANeg
-  answer =
-    ( ( IM.empty
-      , IM.empty
-      , blankVM
-      , blankVNM
-      , IM.singleton 1 (W (Just (IntValue (-1))))
-      , blankVNM
-      )
-    , blankLocalCache
-    , blankTrickCache
-    , blankRG
-    )
+  answer = setDCache (IM.singleton 1 (W (Just (IntValue (-1))))) blankEnv
 
 case_Modify2 = assertEqual
   "crsModifyValue2 (blankWorld, undefined, theEnv) (VP AtDict (VII 1)) (VP AtDict (VII 2)) COASub"
@@ -145,18 +113,9 @@ case_Modify2 = assertEqual
                              (VP AtDict (VII 1))
                              (VP AtDict (VII 2))
                              COASub
-  answer =
-    ( ( IM.empty
-      , IM.empty
-      , blankVM
-      , blankVNM
-      , IM.fromList [(1, W (Just (IntValue (-2)))), (2, W (Just (IntValue 3)))]
-      , blankVNM
-      )
-    , blankLocalCache
-    , blankTrickCache
-    , blankRG
-    )
+  answer = setDCache
+    (IM.fromList [(1, W (Just (IntValue (-2)))), (2, W (Just (IntValue 3)))])
+    blankEnv
 
 case_CopyValue = assertEqual
   "crsCopyValue (blankWorld, undefined, theEnv) (VP AtDict (VII 1)) (VP AtHere (VIV (StrValue \"AtDict[VII=1]\")))"
@@ -170,18 +129,7 @@ case_CopyValue = assertEqual
   question = crsCopyValue (blankWorld, undefined, theEnv)
                           (VP AtDict (VII 1))
                           (VP AtHere (VIV (IntValue 1)))
-  answer =
-    ( ( IM.empty
-      , IM.empty
-      , blankVM
-      , blankVNM
-      , IM.singleton 1 (W (Just (IntValue 1)))
-      , blankVNM
-      )
-    , blankLocalCache
-    , blankTrickCache
-    , blankRG
-    )
+  answer = setDCache (IM.singleton 1 (W (Just (IntValue (1))))) blankEnv
 
 case_ConvertValue = assertEqual
   "crsConvertValue (blankWorld, undefined, theEnv) (VP AtDict (VII 1)) VTDbl"
@@ -194,18 +142,7 @@ case_ConvertValue = assertEqual
   theInput = (blankWorld, undefined, theEnv)
   question =
     crsConvertValue (blankWorld, undefined, theEnv) (VP AtDict (VII 1)) VTDbl
-  answer =
-    ( ( IM.empty
-      , IM.empty
-      , blankVM
-      , blankVNM
-      , IM.singleton 1 (W (Just (DblValue 12)))
-      , blankVNM
-      )
-    , blankLocalCache
-    , blankTrickCache
-    , blankRG
-    )
+  answer = setDCache (IM.singleton 1 (W (Just (DblValue 12)))) blankEnv
 
 case_ConvertValueBy = assertEqual
   "crsConvertValueBy (blankWorld, undefined, theEnv) (VP AtDict (VII 1)) (VP AtDict (VII 2))"
@@ -221,18 +158,9 @@ case_ConvertValueBy = assertEqual
   question = crsConvertValueBy (blankWorld, undefined, theEnv2)
                                (VP AtDict (VII 1))
                                (VP AtDict (VII 2))
-  answer =
-    ( ( IM.empty
-      , IM.empty
-      , blankVM
-      , blankVNM
-      , IM.fromList [(1, W (Just (DblValue 12))), (2, W (Just (DblValue 3)))]
-      , blankVNM
-      )
-    , blankLocalCache
-    , blankTrickCache
-    , blankRG
-    )
+  answer = setDCache
+    (IM.fromList [(1, W (Just (DblValue 12))), (2, W (Just (DblValue 3)))])
+    blankEnv
 
 case_ReplaceText = assertEqual
   "crsReplaceText (blankWorld, undefined, theEnv) (VP AtHere (VIV (StrValue \"ABC${D:1}BEC\"))) (VP AtDict (VII 1))"
@@ -245,20 +173,12 @@ case_ReplaceText = assertEqual
                            (VP AtHere (VIV (StrValue "ABC${D:1}BE${D:1}C")))
   theInput = (blankWorld, undefined, theEnv)
   question = crsReplaceText theInput (VP AtDict (VII 1))
-  answer =
-    ( ( IM.empty
-      , IM.empty
-      , blankVM
-      , blankVNM
-      , IM.singleton
-        1
-        (W (Just (StrValue "ABCABC${D:1}BE${D:1}CBEABC${D:1}BE${D:1}CC")))
-      , blankVNM
-      )
-    , blankLocalCache
-    , blankTrickCache
-    , blankRG
+  answer   = setDCache
+    (IM.singleton
+      1
+      (W (Just (StrValue "ABCABC${D:1}BE${D:1}CBEABC${D:1}BE${D:1}CC")))
     )
+    blankEnv
 
 case_ReplaceTextTo = assertEqual
   "crsReplaceTextTo (blankWorld, undefined, theEnv) (VP AtHere (VIV (StrValue \"ABC${D:1}BEC\"))) (VP AtDict (VII 1))"
@@ -274,21 +194,11 @@ case_ReplaceTextTo = assertEqual
     theInput
     (VP AtHere (VIV (StrValue "ABC${D:1}BE${D:1}C")))
     (VP AtDict (VII 2))
-  answer =
-    ( ( IM.empty
-      , IM.empty
-      , blankVM
-      , blankVNM
-      , IM.fromList
-        [ (1, W (Just (StrValue "123")))
-        , (2, W (Just (StrValue "ABC123BE123C")))
-        ]
-      , blankVNM
-      )
-    , blankLocalCache
-    , blankTrickCache
-    , blankRG
+  answer = setDCache
+    (IM.fromList
+      [(1, W (Just (StrValue "123"))), (2, W (Just (StrValue "ABC123BE123C")))]
     )
+    blankEnv
 
 case_SetVPosition = assertEqual
   "crsSetVPosition (blankWorld, undefined, blankEnv) (VP AtHere (VIV (StrValue \"AtDict[VII=1]\"))) (VP AtDict (VII 1))"
@@ -298,20 +208,12 @@ case_SetVPosition = assertEqual
   question = crsSetVPosition (blankWorld, undefined, blankEnv)
                              (VP AtHere (VIV (StrValue "AtDict[VII=1]")))
                              (VP AtDict (VII 1))
-  answer =
-    ( ( IM.empty
-      , IM.empty
-      , blankVM
-      , blankVNM
-      , IM.singleton
-        1
-        (W (Just (PtrValue (VP AtHere (VIV (StrValue "AtDict[VII=1]"))))))
-      , blankVNM
-      )
-    , blankLocalCache
-    , blankTrickCache
-    , blankRG
+  answer = setDCache
+    (IM.singleton
+      1
+      (W (Just (PtrValue (VP AtHere (VIV (StrValue "AtDict[VII=1]"))))))
     )
+    blankEnv
 
 case_GetVPosition = assertEqual
   "crsGetVPosition (blankWorld, undefined, blankEnv) (VP AtHere (VIV (StrValue \"AtDict[VII=1]\"))) (VP AtDict (VII 1))"
@@ -321,18 +223,9 @@ case_GetVPosition = assertEqual
   question = crsGetVPosition (blankWorld, undefined, blankEnv)
                              (VP AtHere (VIV (StrValue "AtDict[VII=1]")))
                              (VP AtDict (VII 1))
-  answer =
-    ( ( IM.empty
-      , IM.empty
-      , blankVM
-      , blankVNM
-      , IM.singleton 1 (W (Just (PtrValue (VP AtDict (VII 1)))))
-      , blankVNM
-      )
-    , blankLocalCache
-    , blankTrickCache
-    , blankRG
-    )
+  answer = setDCache
+    (IM.singleton 1 (W (Just (PtrValue (VP AtDict (VII 1))))))
+    blankEnv
 
 case_LogAtConsole = assertEqual
   "crsLog (blankWorld, undefined, blankEnv) (VP AtTricky (VIN \"Console\"))) (VP AtHere (VIV (StrValue \"Log at Console\")))"
@@ -343,11 +236,7 @@ case_LogAtConsole = assertEqual
                     (VP AtTricky (VIN "Console"))
                     (VP AtHere (VIV (StrValue "Log at Console")))
   answer =
-    ( blankWorldCache
-    , blankLocalCache
-    , HM.singleton "Console" (StrValue "Log at Console")
-    , blankRG
-    )
+    setTCache (HM.singleton "Console" (StrValue "Log at Console")) blankEnv
 
 case_LogAtLogger = assertEqual
   "crsLog (blankWorld, undefined, blankEnv) (VP AtTricky (VIN \"Logger\"))) (VP AtHere (VIV (StrValue \"Log at Logger\")))"
@@ -358,8 +247,4 @@ case_LogAtLogger = assertEqual
                     (VP AtTricky (VIN "Logger"))
                     (VP AtHere (VIV (StrValue "Log at Logger")))
   answer =
-    ( blankWorldCache
-    , blankLocalCache
-    , HM.singleton "Logger" (StrValue "Log at Logger")
-    , blankRG
-    )
+    setTCache (HM.singleton "Logger" (StrValue "Log at Logger")) blankEnv

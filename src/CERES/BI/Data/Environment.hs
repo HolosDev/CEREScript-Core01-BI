@@ -28,14 +28,14 @@ type RWMVMap = IntMap RWMV
 type RWMVNMap = Trie RWMV
 type RWMVNHMap = HashMap NKey RWMV
 
-type WorldCache
-  = ( HistoricalCache
-    , NHistoricalCache
-    , VariableCache
-    , NVariableCache
-    , DictionaryCache
-    , NDictionaryCache
-    )
+data WorldCache = WorldCache
+  { hCache :: HistoricalCache
+  , nHCache :: NHistoricalCache
+  , vCache :: VariableCache
+  , nVCache :: NVariableCache
+  , dCache :: DictionaryCache
+  , nDCache :: NDictionaryCache
+  } deriving (Show, Eq)
 -- | HistoricalCache (Map Time (Map ID (Maybe Value)))
 type HistoricalCache = IntMap RWMVMap
 type NHistoricalCache = IntMap RWMVNMap
@@ -44,7 +44,12 @@ type NDictionaryCache = RWMVNMap
 type VariableCache = RWMVMap
 type NVariableCache = RWMVNMap
 
-type LocalCache = (LocalVariables, LocalNVariables, LocalTemp, LocalNTemp)
+data LocalCache = LocalCache
+  { lVars :: LocalVariables
+  , lNVars :: LocalNVariables
+  , lTemp :: LocalTemp
+  , lNTemp :: LocalNTemp
+  } deriving (Show, Eq)
 type LocalVariables = ValueMap
 type LocalNVariables = ValueNMap
 type LocalTemp = ValueMap
@@ -52,10 +57,17 @@ type LocalNTemp = ValueNMap
 
 type TrickCache = ValueNHMap
 
-type Env = (WorldCache, LocalCache, TrickCache, RG)
-blankEnv = (blankWorldCache, blankLocalCache, blankTrickCache, blankRG)
-blankWorldCache = (IM.empty, IM.empty, blankVM, blankVNM, blankVM, blankVNM)
-blankLocalCache = (blankVM, blankVNM, blankVM, blankVNM)
+data Env = Env
+  { wCache :: WorldCache
+  , lCache :: LocalCache
+  , tCache :: TrickCache
+  , rg :: RG
+  } deriving (Show, Eq)
+
+blankEnv = Env blankWorldCache blankLocalCache blankTrickCache blankRG
+blankWorldCache =
+  WorldCache IM.empty IM.empty blankVM blankVNM blankVM blankVNM
+blankLocalCache = LocalCache blankVM blankVNM blankVM blankVNM
 blankTrickCache = blankVNHM
 blankRG = mkGenFromInt 0
 

@@ -34,51 +34,60 @@ import           Debug
 -- TODO: But using getValues* is hard to use
 worldCacheMaker :: SpoolTree -> World -> WorldCache
 worldCacheMaker SpoolTree {..} World {..} = S.foldr cacheMakerSub
-                                                    blankCache
+                                                    blankWorldCache
                                                     vpSet
  where
-  blankCache = (IM.empty, IM.empty, blankVM, blankVNM, blankVM, blankVNM)
-  cacheMakerSub vp aCache = case vp of
+  cacheMakerSub vp aWCache = case vp of
     (VP AtWorld (VII idx)) ->
       let mValue    = getHValueFromWS worldState 0 idx
-          (hCache, nHCache, vCache, nVCache, dCache, nDCache) = aCache
-          newHCache = setHCache 0 idx R mValue hCache
-      in  (newHCache, nHCache, vCache, nVCache, dCache, nDCache)
+          newHCache = setValueInHCache 0 idx R mValue (hCache aWCache)
+      in  aWCache { hCache = newHCache }
     (VP AtWorld ~(VIIT idx time)) ->
       let mValue    = getHValueFromWS worldState time idx
-          (hCache, nHCache, vCache, nVCache, dCache, nDCache) = aCache
-          newHCache = setHCache time idx R mValue hCache
-      in  (newHCache, nHCache, vCache, nVCache, dCache, nDCache)
+          newHCache = setValueInHCache time idx R mValue (hCache aWCache)
+      in  aWCache { hCache = newHCache }
     (VP AtTime (VII idx)) ->
       let mValue    = getHValueFromWS worldState worldTime idx
-          (hCache, nHCache, vCache, nVCache, dCache, nDCache) = aCache
-          newHCache = setHCache worldTime idx R mValue hCache
-      in  (newHCache, nHCache, vCache, nVCache, dCache, nDCache)
+          newHCache = setValueInHCache worldTime idx R mValue (hCache aWCache)
+      in  aWCache { hCache = newHCache }
     (VP AtTime ~(VIIT idx time)) ->
       let mValue    = getHValueFromWS worldState (worldTime + time) idx
-          (hCache, nHCache, vCache, nVCache, dCache, nDCache) = aCache
-          newHCache = setHCache worldTime idx R mValue hCache
-      in  (newHCache, nHCache, vCache, nVCache, dCache, nDCache)
+          newHCache = setValueInHCache worldTime idx R mValue (hCache aWCache)
+      in  aWCache { hCache = newHCache }
+    (VP AtNWorld (VIN nKey)) ->
+      let mValue     = getNHValueFromWS worldState 0 nKey
+          newNHCache = setValueInNHCache 0 nKey R mValue (nHCache aWCache)
+      in  aWCache { nHCache = newNHCache }
+    (VP AtNWorld ~(VINT nKey time)) ->
+      let mValue     = getNHValueFromWS worldState time nKey
+          newNHCache = setValueInNHCache time nKey R mValue (nHCache aWCache)
+      in  aWCache { nHCache = newNHCache }
+    (VP AtNTime (VIN nKey)) ->
+      let mValue = getNHValueFromWS worldState worldTime nKey
+          newNHCache =
+              setValueInNHCache worldTime nKey R mValue (nHCache aWCache)
+      in  aWCache { nHCache = newNHCache }
+    (VP AtNTime ~(VINT nKey time)) ->
+      let mValue = getNHValueFromWS worldState (worldTime + time) nKey
+          newNHCache =
+              setValueInNHCache worldTime nKey R mValue (nHCache aWCache)
+      in  aWCache { nHCache = newNHCache }
     (VP AtVars ~(VII idx)) ->
       let mValue    = getVValueFromWS worldState idx
-          (hCache, nHCache, vCache, nVCache, dCache, nDCache) = aCache
-          newVCache = setRWMVMap idx R mValue vCache
-      in  (hCache, nHCache, newVCache, nVCache, dCache, nDCache)
+          newVCache = setRWMVMap idx R mValue (vCache aWCache)
+      in  aWCache { vCache = newVCache }
     (VP AtNVars ~(VIN nKey)) ->
       let mValue     = getNVValueFromWS worldState nKey
-          (hCache, nHCache, vCache, nVCache, dCache, nDCache) = aCache
-          newNVCache = setRWMVNMap nKey R mValue nVCache
-      in  (hCache, nHCache, vCache, newNVCache, dCache, nDCache)
+          newNVCache = setRWMVNMap nKey R mValue (nVCache aWCache)
+      in  aWCache { nVCache = newNVCache }
     (VP AtDict ~(VII idx)) ->
       let mValue    = getDValueFromWS worldState idx
-          (hCache, nHCache, vCache, nVCache, dCache, nDCache) = aCache
-          newDCache = setRWMVMap idx R mValue dCache
-      in  (hCache, nHCache, vCache, nVCache, newDCache, nDCache)
+          newDCache = setRWMVMap idx R mValue (dCache aWCache)
+      in  aWCache { dCache = newDCache }
     (VP AtNDict ~(VIN nKey)) ->
       let mValue     = getNDValueFromWS worldState nKey
-          (hCache, nHCache, vCache, nVCache, dCache, nDCache) = aCache
-          newNDCache = setRWMVNMap nKey R mValue nDCache
-      in  (hCache, nHCache, vCache, nVCache, dCache, newNDCache)
+          newNDCache = setRWMVNMap nKey R mValue (nDCache aWCache)
+      in  aWCache { nDCache = newNDCache }
     (VP AtPtr _) -> error $ "[ERROR]<cacheMaker :=: AtPtr> Not yet implemented"
     (VP AtTricky _) ->
       error $ "[ERROR]<cacheMaker :=: AtTricky> Not yet implemented"
@@ -90,8 +99,8 @@ worldCacheMaker SpoolTree {..} World {..} = S.foldr cacheMakerSub
       error $ "[ERROR]<cacheMaker :=: AtLTemp> Can't be reached"
     (VP AtLNTemp _) ->
       error $ "[ERROR]<cacheMaker :=: AtLNTemp> Can't be reached"
-    (VP AtHere _) -> aCache
-    (VP AtNull _) -> aCache
+    (VP AtHere _) -> error $ "[ERROR]<cacheMaker :=: AtHere> Can't be reached"
+    (VP AtNull _) -> error $ "[ERROR]<cacheMaker :=: AtNull> Can't be reached"
     _ -> error $ "[ERROR]<cacheMaker> Not compatible for " ++ show vp
 
 
@@ -99,8 +108,7 @@ worldCacheMaker SpoolTree {..} World {..} = S.foldr cacheMakerSub
 -- TODO: This style is for foldr, we may change this better
 -- TODO: Change this for when many WorldCache is given as List or etc.
 worldCacheCommitter :: WorldCache -> WorldState -> WorldState
-worldCacheCommitter (hCache, nHCache, vCache, nVCache, dCache, nDCache) aWorldState@WorldState {..}
-  = newWorldState
+worldCacheCommitter WorldCache {..} aWorldState@WorldState {..} = newWorldState
  where
   newWorldState =
     newWorldHistory

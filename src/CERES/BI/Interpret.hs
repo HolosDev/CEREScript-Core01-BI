@@ -44,7 +44,7 @@ runTimeSlot aWorld@World {..} = newWorld
  where
   aSpoolForest     = siAggregator aWorld
   resultList       = map (runSpoolTree aWorld) aSpoolForest
-  siisList         = concatMap fst resultList
+  siStatusList     = concatMap fst resultList
   wcList           = map snd resultList
   -- TODO: Change cacheCommitter style or union WorldCache in wcList
   committed        = foldr worldCacheCommitter worldState wcList
@@ -63,11 +63,20 @@ runTimeSlot aWorld@World {..} = newWorld
           $ committed
     newNextEpochRow = EpochRow nextWorldTime theNextValues
   newWorldState = committed { worldHistory = nextWorldHistory }
-  newSITable    = siisExecutor worldTime worldSITable siisList
+  newSITable    = siisExecutor worldTime worldSITable siStatusList
   newWorld      = updateWorld aWorld newWorldState newSITable nextWorldTime
 
 
-runSpoolTree :: World -> SpoolTree -> ([(SIIS, SpoolInstance)], WorldCache)
+{-
+# How to initiate SpoolInstance
+`runInstruction` or `runCEREScript` can't initiate a SpoolInstance, because they returns only Env and/or CEREScript.
+Therefore, `runSpoolInstance` should initiate a new SpoolInstance.
+
+To make it, `runCEREScript` should end its recursive call when `crsSIInit` run without reaching `CRSJump` or etc.
+-}
+
+-- TODO: How to avoid SpoolInstance ID collision
+runSpoolTree :: World -> SpoolTree -> ([SIStatus], WorldCache)
 runSpoolTree aWorld@World {..} aSpoolTree@SpoolTree {..} =
   (siisList, newWorldCache)
  where
@@ -81,9 +90,9 @@ runSpoolTree aWorld@World {..} aSpoolTree@SpoolTree {..} =
 
 -- TODO: How to avoid SpoolInstance ID collision
 runSpoolInstance
-  :: World -> SpoolInstance -> WorldCache -> ((SIIS, SpoolInstance), WorldCache)
-runSpoolInstance world@World {..} si@SI {..} wCache =
-  ((siis, newSI), newWorldCache)
+  :: World -> SpoolInstance -> WorldCache -> (SIStatus, WorldCache)
+runSpoolInstance world@World {..} si@SI {..} aWCache =
+  ((SIParams { siIS = siis }, newSI), wCache newCache)
  where
   -- TODO: Change `StrValue "Retain"` as a named constant
   iLTCache = csInitLocalTemp $ worldSpools IM.! siSpoolID
@@ -94,23 +103,25 @@ runSpoolInstance world@World {..} si@SI {..} wCache =
       . IM.insert resumeCodeIdx (BoolValue False)
       $ siLocalVars
   -- FIXME
-  iLNVCache   = undefined
+  iLNVCache                  = undefined
   -- FIXME
-  iLNTCache   = undefined
-  iLocalCache = (iLVCache, iLNVCache, iLTCache, iLNTCache)
-  (newCache@(newWorldCache, (newLVCache, newLNVCache, newLTCache, newLNTCache), newTrickCache, newRG), restCEREScript)
-    = runCEREScript (world, si, (wCache, iLocalCache, blankVNHM, siRG))
-                    siRestScript
-  siisCode = maybe "Retain" getStr $ vMapLookup retainCodeIdx newLTCache
+  iLNTCache                  = undefined
+  iLocalCache                = LocalCache iLVCache iLNVCache iLTCache iLNTCache
+  (newCache, restCEREScript) = runCEREScript
+    (world, si, Env aWCache iLocalCache blankVNHM siRG)
+    siRestScript
+  --initSI = getBool $ vMapLookup initSICodeIdx newLTCache
+  newLC    = lCache newCache
+  siisCode = maybe "Retain" getStr $ vMapLookup retainCodeIdx (lTemp newLC)
   (doAbolish, doInit, nextLocalVars, nextLocalNVars) = case siisCode of
-    "Retain"  -> (False, False, newLVCache, newLNVCache)
+    "Retain"  -> (False, False, lVars newLC, lNVars newLC)
     "Forget"  -> (False, False, blankVM, blankVNM)
     -- FIXME: Add SI initiation logic
     "Init"    -> (False, True, blankVM, blankVNM)
     "Abolish" -> (True, False, blankVM, blankVNM)
     _ -> error "[ERROR]<runSpoolInstance :=: _> Undefined Retention Code"
   -- NOTE: SIJump takes relative time-slot
-  jumpTarget = maybe 1 getInt $ vMapLookup jumpOffsetIdx newLTCache
+  jumpTarget = maybe 1 getInt $ vMapLookup jumpOffsetIdx (lTemp newLC)
   siis       = if doAbolish || null (restCEREScript :: CEREScript)
     then SIEnd
     else SIJump jumpTarget
@@ -128,43 +139,40 @@ runSpoolInstance world@World {..} si@SI {..} wCache =
   newSI = si { siLocalVars  = nextLocalVars
              , siLocalNVars = nextLocalNVars
              , siRestScript = nextCEREScript
-             , siRG         = newRG
+             , siRG         = rg newCache
              }
 
 
 runCEREScript :: Input -> CEREScript -> (Env, CEREScript)
-runCEREScript (aWorld@World {..}, aSI@SI {..}, cState) = runCEREScriptSub
-  cState
+runCEREScript (_, _, cState) [] = (cState, [])
+runCEREScript anInput@(aWorld@World {..}, aSI@SI {..}, cState) (ceres : cScript)
+  = if sp
+  -- NOTE: sp == True, then end runCEREScript
+    then (Env nextWC nextLC nextTC nextRG, nextCEREScript)
+    else runCEREScript (aWorld, aSI, Env nextWC nextLC nextTC nextRG)
+                       nextCEREScript
  where
-  runCEREScriptSub cState [] = (cState, [])
-  runCEREScriptSub cState@(wc@(hCache, nHCache, vCache, nVCache, dCache, nDCache), lc@(lVCache, lNVCache, lTCache, lNTCache), tCache, rg) (ceres : cScript)
-    = if sp
-    -- NOTE: si == True, then end runCEREScript
-      then ((nextWC, nextLC, nextTCache, nextRG), nextCEREScript)
-      else runCEREScriptSub (nextWC, nextLC, nextTCache, nextRG) nextCEREScript
-   where
-    (newWC, newLC, newTCache, newRG) =
-      runInstruction (aWorld, aSI, cState) ceres
-    -- TODO: Check Stop or Pause
-    spCode        = maybe "" getStr $ vMapLookup spCodeIdx newLTCache
-    sp            = spCode == "Stop" || spCode == "Pause"
-    retentionCode = case spCode of
-      "Stop"  -> "Abolish"
-      -- TODO: Not sure do I need to identify whether this is "Pause"
-      "Pause" -> "Retain"
-      _       -> maybe "Retain" getStr $ vMapLookup retainCodeIdx newLTCache
-    -- TODO: Check the instruction is executed or not
-    resumeFlag     = maybe False getBool $ vMapLookup resumeCodeIdx newLVCache
-    nextCEREScript = if resumeFlag then (ceres : cScript) else cScript
-    (newLVCache, newLNVCache, newLTCache, newLNTCache) = newLC
-    nextWC         = newWC
-    nextLVCache    = IM.insert retainCodeIdx (StrValue retentionCode) newLVCache
-    nextLNVCache   = newLNVCache
-    nextLTCache    = newLTCache
-    nextLNTCache   = newLNTCache
-    nextLC         = (nextLVCache, nextLNVCache, nextLTCache, nextLNTCache)
-    nextTCache     = newTCache
-    nextRG         = newRG
+  newCState     = runInstruction (aWorld, aSI, cState) ceres
+  -- TODO: Check Stop or Pause
+  spCode        = maybe "" getStr $ vMapLookup spCodeIdx (lTemp newLC)
+  sp            = spCode == "Stop" || spCode == "Pause"
+  retentionCode = case spCode of
+    "Stop"  -> "Abolish"
+    -- TODO: Not sure do I need to identify whether this is "Pause"
+    "Pause" -> "Retain"
+    _       -> maybe "Retain" getStr $ vMapLookup retainCodeIdx (lTemp newLC)
+  -- TODO: Check the instruction is executed or not
+  resumeFlag     = maybe False getBool $ vMapLookup resumeCodeIdx (lVars newLC)
+  nextCEREScript = if resumeFlag then (ceres : cScript) else cScript
+  newLC          = lCache newCState
+  nextWC         = wCache newCState
+  nextLVCache = IM.insert retainCodeIdx (StrValue retentionCode) (lVars newLC)
+  nextLNVCache   = lNVars newLC
+  nextLTCache    = lTemp newLC
+  nextLNTCache   = lNTemp newLC
+  nextLC         = LocalCache nextLVCache nextLNVCache nextLTCache nextLNTCache
+  nextTC         = tCache newCState
+  nextRG         = rg newCState
 
 
 runInstruction :: Input -> CERES -> Env
