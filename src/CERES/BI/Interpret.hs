@@ -1,6 +1,9 @@
 module CERES.BI.Interpret where
 
 
+import           Control.Parallel
+import           Control.Parallel.Strategies
+
 import           Data.IntMap                    ( IntMap )
 import qualified Data.IntMap                   as IM
 import           Data.Maybe
@@ -26,6 +29,8 @@ import           CERES.BI.Util
 
 import           Debug
 
+import Util.Parallel
+
 
 runSimulator :: Time -> World -> World
 runSimulator endTime = runSimulatorSub
@@ -43,7 +48,7 @@ runTimeSlot :: World -> World
 runTimeSlot aWorld@World {..} = newWorld
  where
   aSpoolForest     = siAggregator aWorld
-  resultList       = map (runSpoolTree aWorld) aSpoolForest
+  resultList       = parMap rpar (runSpoolTree aWorld) aSpoolForest
   siStatusList     = concatMap fst resultList
   wcList           = map snd resultList
   -- TODO: Change cacheCommitter style or union WorldCache in wcList

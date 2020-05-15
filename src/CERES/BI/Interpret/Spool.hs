@@ -33,14 +33,16 @@ siAggregatorSub aSI@SI {..} aSpoolForest = newSpoolTree : dList
  where
   (dList, jList) = partition (S.disjoint siRWVPSet . vpSet) aSpoolForest
   newSpoolTree
-    | null jList       = SpoolTree siRWVPSet [aSI]
-    | length jList > 1 = SpoolTree (S.union jVPSet siRWVPSet) (aSI : jSIList)
-    | otherwise        = SpoolTree (S.union oVPSet siRWVPSet) (aSI : oSIList)
+    | null jList       = siRWVPSet `seq` SpoolTree siRWVPSet [aSI]
+    | length jList > 1 = jRWVPSet `seq` SpoolTree jRWVPSet (aSI : jSIList)
+    | otherwise        = oRWVPSet `seq` SpoolTree oRWVPSet (aSI : oSIList)
    where
     SpoolTree oVPSet oSIList = head jList
     SpoolTree jVPSet jSIList = foldr stJoiner (SpoolTree S.empty []) dList
     stJoiner stA stB =
       SpoolTree (S.union (vpSet stA) (vpSet stB)) (siList stA ++ siList stB)
+    jRWVPSet = S.union jVPSet siRWVPSet
+    oRWVPSet = S.union oVPSet siRWVPSet
 
 siisExecutor
   :: Time
