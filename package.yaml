@@ -20,6 +20,7 @@ dependencies:
 - monad-par
 - mtl
 - parallel
+- min-max-pqueue
 - random-adaptor
 - splitmix
 - text

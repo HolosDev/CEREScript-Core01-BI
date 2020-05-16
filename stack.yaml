@@ -10,6 +10,7 @@ extra-deps:
 - github: QuietJoon/text-trie
   commit: 4bc4a818f6bea86635aee2a20a418c72d0fdcc4b
 - splitmix-0.0.4
+- min-max-pqueue-0.1.0.1
 #- git: https://gitlab.com/holosdev/CEREScript-SS
 - github: HolosDev/CEREScript-SS
   commit: febb13ef5712592d613f1418ed95e6d62b071962

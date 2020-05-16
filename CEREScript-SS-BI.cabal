@@ -40,6 +40,7 @@ library
       CERES.BI.Interpret.SpoolTree
       CERES.BI.Type
       CERES.BI.Util
+      CERES.BI.Util.PQueue
       CERES.BI.Util.Random
       Debug
       Util
@@ -61,6 +62,7 @@ library
     , base >=4.7 && <5
     , containers
     , deepseq
+    , min-max-pqueue
     , monad-par
     , mtl
     , parallel
@@ -99,6 +101,7 @@ executable CEREScript-SS-BI-MT-exe
     , base >=4.7 && <5
     , containers
     , deepseq
+    , min-max-pqueue
     , monad-par
     , mtl
     , parallel
@@ -133,6 +136,7 @@ executable CEREScript-SS-BI-exe
     , base >=4.7 && <5
     , containers
     , deepseq
+    , min-max-pqueue
     , monad-par
     , mtl
     , parallel
@@ -168,6 +172,7 @@ test-suite CEREScript-SS-BI-test
     , base >=4.7 && <5
     , containers
     , deepseq
+    , min-max-pqueue
     , monad-par
     , mtl
     , parallel
