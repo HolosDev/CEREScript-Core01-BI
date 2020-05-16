@@ -13,6 +13,7 @@ import qualified Data.IntMap                   as IM
 import           Data.Maybe
 import qualified Data.Text                     as T
 import qualified Data.Text.Lazy                as TL
+import qualified Data.Trie.Text                as Trie
 
 import           TextShow
 
@@ -236,7 +237,7 @@ case_LogAtConsole = assertEqual
                     (VP AtTricky (VIN "Console"))
                     (VP AtHere (VIV (StrValue "Log at Console")))
   answer =
-    setTCache (HM.singleton "Console" (StrValue "Log at Console")) blankEnv
+    setTCache (Trie.singleton "Console" (StrValue "Log at Console")) blankEnv
 
 case_LogAtLogger = assertEqual
   "crsLog (blankWorld, undefined, blankEnv) (VP AtTricky (VIN \"Logger\"))) (VP AtHere (VIV (StrValue \"Log at Logger\")))"
@@ -247,4 +248,4 @@ case_LogAtLogger = assertEqual
                     (VP AtTricky (VIN "Logger"))
                     (VP AtHere (VIV (StrValue "Log at Logger")))
   answer =
-    setTCache (HM.singleton "Logger" (StrValue "Log at Logger")) blankEnv
+    setTCache (Trie.singleton "Logger" (StrValue "Log at Logger")) blankEnv

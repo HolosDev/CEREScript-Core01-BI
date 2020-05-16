@@ -146,7 +146,7 @@ setEnvBy _ (VP AtLNTemp ~(VIN nKey)) mode mValue aEnv@Env {..} = setLNTemp
 setEnvBy _ (VP AtTricky ~(VIN nKey)) mode mValue aEnv@Env {..} = aEnv
   { tCache = newTrickCache
   }
-  where newTrickCache = vNHMapUpdate nKey mValue tCache
+  where newTrickCache = vNMapUpdate nKey mValue tCache
 setEnvBy _ _ _ _ cState = cState
 
 

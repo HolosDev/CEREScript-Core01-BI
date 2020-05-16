@@ -114,7 +114,7 @@ runSpoolInstance world@World {..} si@SI {..} aWCache =
   iLNTemp                    = siLocalNTemp
   iLocalCache                = LocalCache iLVars iLNVars iLTemp iLNTemp
   (newCache, restCEREScript) = runCEREScript
-    (world, si, Env aWCache iLocalCache blankVNHM siRG)
+    (world, si, Env aWCache iLocalCache blankVNM siRG)
     siRestScript
   --initSI = getBool $ vMapLookup initSICodeIdx newLTCache
   newLC    = lCache newCache

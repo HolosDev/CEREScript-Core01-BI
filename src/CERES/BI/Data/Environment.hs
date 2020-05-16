@@ -55,7 +55,7 @@ type LocalNVariables = ValueNMap
 type LocalTemp = ValueMap
 type LocalNTemp = ValueNMap
 
-type TrickCache = ValueNHMap
+type TrickCache = ValueNMap
 
 data Env = Env
   { wCache :: WorldCache
@@ -68,7 +68,7 @@ blankEnv = Env blankWorldCache blankLocalCache blankTrickCache blankRG
 blankWorldCache =
   WorldCache IM.empty IM.empty blankVM blankVNM blankVM blankVNM
 blankLocalCache = LocalCache blankVM blankVNM blankVM blankVNM
-blankTrickCache = blankVNHM
+blankTrickCache = blankVNM
 blankRG = mkGenFromInt 0
 
 data RW a = R a | W a | RW a deriving (Eq, Ord)

@@ -271,7 +271,7 @@ crsNoop (_, _, cState) = cState
 
 crsLog :: Input -> VPosition -> VPosition -> Env
 crsLog anInput@(aWorld, _, cState@Env {..}) vpA@(VP ~AtTricky ~(VIN logTarget)) vpB
-  = setTCache (vNHMapInsert logTarget logV tCache) cState
+  = setTCache (vNMapInsert logTarget logV tCache) cState
   where logV@(StrValue logMsg) = getValue anInput vpB
 
 
