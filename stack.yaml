@@ -7,12 +7,13 @@ packages:
 #- /AoDw/CEREScript/CEREScript-SS00-Parser
 
 extra-deps:
-- text-trie-0.2.5.0
+- github: QuietJoon/text-trie
+  commit: 4bc4a818f6bea86635aee2a20a418c72d0fdcc4b
 - splitmix-0.0.4
 #- git: https://gitlab.com/holosdev/CEREScript-SS
 - github: HolosDev/CEREScript-SS
-  commit: 095760f861d864f3e2c8c0db708b83f17a465755
+  commit: febb13ef5712592d613f1418ed95e6d62b071962
 - github: HolosDev/CEREScript-SS-Parser
-  commit: b34bc879fb18b9cd2c16f4b074b1aa56a00806b7
+  commit: 08492f6c23e99d4d4ea7464ec49a0ea1ccbb3eb3
 - github: QuietJoon/random-adaptor
   commit: f2f7578027ec2a855a59f7a10f4afeaa0f870b37
