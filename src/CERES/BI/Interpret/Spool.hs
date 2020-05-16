@@ -18,8 +18,8 @@ import           CERES.BI.Data.Environment
 
 type SpoolForest = [SpoolTree]
 data SpoolTree = SpoolTree
-  { vpSet :: Set VPosition
-  , siList :: [SpoolInstance]
+  { siList :: [SpoolInstance]
+  , vpSet :: Set VPosition
   }
 
 siAggregator :: World -> SpoolForest
@@ -33,14 +33,14 @@ siAggregatorSub aSI@SI {..} aSpoolForest = newSpoolTree : dList
  where
   (dList, jList) = partition (S.disjoint siRWVPSet . vpSet) aSpoolForest
   newSpoolTree
-    | null jList       = siRWVPSet `seq` SpoolTree siRWVPSet [aSI]
-    | length jList > 1 = jRWVPSet `seq` SpoolTree jRWVPSet (aSI : jSIList)
-    | otherwise        = oRWVPSet `seq` SpoolTree oRWVPSet (aSI : oSIList)
+    | null jList       = SpoolTree [aSI] $! siRWVPSet
+    | length jList > 1 = SpoolTree (aSI : jSIList) $! jRWVPSet
+    | otherwise        = SpoolTree (aSI : oSIList) $! oRWVPSet
    where
-    SpoolTree oVPSet oSIList = head jList
-    SpoolTree jVPSet jSIList = foldr stJoiner (SpoolTree S.empty []) dList
+    SpoolTree oSIList oVPSet = head jList
+    SpoolTree jSIList jVPSet = foldr stJoiner (SpoolTree [] S.empty) dList
     stJoiner stA stB =
-      SpoolTree (S.union (vpSet stA) (vpSet stB)) (siList stA ++ siList stB)
+      SpoolTree (siList stA ++ siList stB) (S.union (vpSet stA) (vpSet stB))
     jRWVPSet = S.union jVPSet siRWVPSet
     oRWVPSet = S.union oVPSet siRWVPSet
 
