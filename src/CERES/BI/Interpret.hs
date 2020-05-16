@@ -29,7 +29,7 @@ import           CERES.BI.Util
 
 import           Debug
 
-import Util.Parallel
+import           Util.Parallel
 
 
 runSimulator :: Time -> World -> World
@@ -69,7 +69,8 @@ runTimeSlot aWorld@World {..} = newWorld
     newNextEpochRow = EpochRow nextWorldTime theNextValues
   newWorldState = committed { worldHistory = nextWorldHistory }
   newSITable    = siisExecutor worldTime worldSITable siStatusList
-  newWorld      = updateWorld aWorld newWorldState newSITable nextWorldTime
+  newWorld =
+    updateWorldInTimeSlot aWorld newWorldState newSITable nextWorldTime
 
 
 {-
@@ -100,18 +101,17 @@ runSpoolInstance world@World {..} si@SI {..} aWCache =
   ((SIParams { siIS = siis }, newSI), wCache newCache)
  where
   -- TODO: Change `StrValue "Retain"` as a named constant
-  iLTCache = csInitLocalTemp $ worldSpools IM.! siSpoolID
   isResume = maybe False getBool $ vMapLookup resumeCodeIdx siLocalVars
-  iLVCache =
-    -- TODO: Not sure to initialize ExecutingTime variable
+  -- TODO: Not sure to initialize ExecutingTime variable
+  -- FIXME: Should have control with prior retain with Maker
+  iLVars =
     (if isResume then id else IM.insert executingTimeIdx (IntValue 0))
       . IM.insert resumeCodeIdx (BoolValue False)
       $ siLocalVars
-  -- FIXME
-  iLNVCache                  = undefined
-  -- FIXME
-  iLNTCache                  = undefined
-  iLocalCache                = LocalCache iLVCache iLNVCache iLTCache iLNTCache
+  iLNVars                    = siLocalNVars
+  iLTemp                     = csInitLocalTemp $ worldSpools IM.! siSpoolID
+  iLNTemp                    = siLocalNTemp
+  iLocalCache                = LocalCache iLVars iLNVars iLTemp iLNTemp
   (newCache, restCEREScript) = runCEREScript
     (world, si, Env aWCache iLocalCache blankVNHM siRG)
     siRestScript
@@ -171,11 +171,11 @@ runCEREScript anInput@(aWorld@World {..}, aSI@SI {..}, cState) (ceres : cScript)
   nextCEREScript = if resumeFlag then (ceres : cScript) else cScript
   newLC          = lCache newCState
   nextWC         = wCache newCState
-  nextLVCache = IM.insert retainCodeIdx (StrValue retentionCode) (lVars newLC)
-  nextLNVCache   = lNVars newLC
-  nextLTCache    = lTemp newLC
-  nextLNTCache   = lNTemp newLC
-  nextLC         = LocalCache nextLVCache nextLNVCache nextLTCache nextLNTCache
+  nextLVars = vMapInsert retainCodeIdx (StrValue retentionCode) (lVars newLC)
+  nextLNVars     = lNVars newLC
+  nextLTemp      = lTemp newLC
+  nextLNTemp     = lNTemp newLC
+  nextLC         = LocalCache nextLVars nextLNVars nextLTemp nextLNTemp
   nextTC         = tCache newCState
   nextRG         = rg newCState
 

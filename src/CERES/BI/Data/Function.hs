@@ -39,8 +39,9 @@ updateWorldState ws newHistoricalTable newNHistoricalTable newVars newNVars newD
        , worldNDict    = newNDict
        }
 
-updateWorld :: World -> WorldState -> SpoolInstanceTable -> Time -> World
-updateWorld aWorld newWorldState newSITable newWorldTime = aWorld
+updateWorldInTimeSlot
+  :: World -> WorldState -> SpoolInstanceTable -> Time -> World
+updateWorldInTimeSlot aWorld newWorldState newSITable newWorldTime = aWorld
   { worldState   = newWorldState
   , worldSITable = newSITable
   , worldTime    = newWorldTime
