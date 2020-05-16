@@ -23,7 +23,7 @@ import           CERES.BI.Data.Constants
 import           CERES.BI.Data.Environment
 import           CERES.BI.Data.Function
 
-import           CERES.BI.Interpret.Spool
+import           CERES.BI.Interpret.SpoolTree
 
 import           CERES.BI.Type
 

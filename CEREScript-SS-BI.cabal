@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: bed4a1b7e625133871d9903bea55e908c7beffb8632cb4011bcd2962862b25d3
+-- hash: ecd943f9c6eecdedc15819cb0e90429b44e939371ba313d9b86508d8c5292a7d
 
 name:           CEREScript-SS-BI
 version:        0.7.0.0
@@ -37,7 +37,7 @@ library
       CERES.BI.Interpret.Instruction
       CERES.BI.Interpret.Modify
       CERES.BI.Interpret.Script
-      CERES.BI.Interpret.Spool
+      CERES.BI.Interpret.SpoolTree
       CERES.BI.Type
       CERES.BI.Util
       CERES.BI.Util.Random

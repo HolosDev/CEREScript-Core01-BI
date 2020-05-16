@@ -1,4 +1,4 @@
-module CERES.BI.Interpret.Spool where
+module CERES.BI.Interpret.SpoolTree where
 
 
 import           Data.IntMap                    ( IntMap )

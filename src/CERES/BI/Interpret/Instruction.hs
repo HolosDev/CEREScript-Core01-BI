@@ -28,7 +28,7 @@ import           CERES.BI.Data.Function
 
 import           CERES.BI.Interpret.Cache
 import           CERES.BI.Interpret.Modify
-import           CERES.BI.Interpret.Spool
+import           CERES.BI.Interpret.SpoolTree
 
 import           CERES.BI.Type
 
