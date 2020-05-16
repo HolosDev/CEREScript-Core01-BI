@@ -1,0 +1,185 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.33.0.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: bed4a1b7e625133871d9903bea55e908c7beffb8632cb4011bcd2962862b25d3
+
+name:           CEREScript-SS-BI
+version:        0.7.0.0
+description:    Please see the README on GitHub at <https://github.com/HolosDev/CEREScript-SS-BI#readme>
+homepage:       https://github.com/HolosDev/CEREScript-SS-BI#readme
+bug-reports:    https://github.com/HolosDev/CEREScript-SS-BI/issues
+author:         YongJoon Joe
+maintainer:     Holos Works <developer@holos.dev>
+copyright:      2019-2020 Holos Works / PPUZZL Group
+license:        OtherLicense
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    README.md
+    ChangeLog.md
+
+source-repository head
+  type: git
+  location: https://github.com/HolosDev/CEREScript-SS-BI
+
+library
+  exposed-modules:
+      CERES.BI.Data
+      CERES.BI.Data.Cache.Function
+      CERES.BI.Data.Constants
+      CERES.BI.Data.Environment
+      CERES.BI.Data.Function
+      CERES.BI.Interpret
+      CERES.BI.Interpret.Cache
+      CERES.BI.Interpret.Instruction
+      CERES.BI.Interpret.Modify
+      CERES.BI.Interpret.Script
+      CERES.BI.Interpret.Spool
+      CERES.BI.Type
+      CERES.BI.Util
+      CERES.BI.Util.Random
+      Debug
+      Util
+      Util.Parallel
+      Util.Parallel.Granularity
+      Test.CERES.BI.Interpret.Instruction
+  other-modules:
+      Paths_CEREScript_SS_BI
+  hs-source-dirs:
+      src
+      test
+  default-extensions: OverloadedStrings RecordWildCards TemplateHaskell
+  build-depends:
+      CEREScript-SS
+    , CEREScript-SS-Parser
+    , HUnit
+    , QuickCheck
+    , array
+    , base >=4.7 && <5
+    , containers
+    , deepseq
+    , monad-par
+    , mtl
+    , parallel
+    , random-adaptor
+    , silently
+    , splitmix
+    , test-framework
+    , test-framework-hunit
+    , test-framework-quickcheck2
+    , test-framework-th
+    , text
+    , text-show
+    , text-trie
+    , unordered-containers
+  default-language: Haskell2010
+
+executable CEREScript-SS-BI-MT-exe
+  main-is: Main.hs
+  other-modules:
+      MT.Data
+      MT.Scenario
+      MT.Script
+      MT.Spool
+      Paths_CEREScript_SS_BI
+  hs-source-dirs:
+      apps/money_transfer
+  default-extensions: OverloadedStrings RecordWildCards TemplateHaskell
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      CEREScript-SS
+    , CEREScript-SS-BI
+    , CEREScript-SS-Parser
+    , HUnit
+    , QuickCheck
+    , array
+    , base >=4.7 && <5
+    , containers
+    , deepseq
+    , monad-par
+    , mtl
+    , parallel
+    , random-adaptor
+    , silently
+    , splitmix
+    , test-framework
+    , test-framework-hunit
+    , test-framework-quickcheck2
+    , test-framework-th
+    , text
+    , text-show
+    , text-trie
+    , unordered-containers
+  default-language: Haskell2010
+
+executable CEREScript-SS-BI-exe
+  main-is: Main.hs
+  other-modules:
+      Paths_CEREScript_SS_BI
+  hs-source-dirs:
+      apps/init
+  default-extensions: OverloadedStrings RecordWildCards TemplateHaskell
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      CEREScript-SS
+    , CEREScript-SS-BI
+    , CEREScript-SS-Parser
+    , HUnit
+    , QuickCheck
+    , array
+    , base >=4.7 && <5
+    , containers
+    , deepseq
+    , monad-par
+    , mtl
+    , parallel
+    , random-adaptor
+    , silently
+    , splitmix
+    , test-framework
+    , test-framework-hunit
+    , test-framework-quickcheck2
+    , test-framework-th
+    , text
+    , text-show
+    , text-trie
+    , unordered-containers
+  default-language: Haskell2010
+
+test-suite CEREScript-SS-BI-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      Paths_CEREScript_SS_BI
+  hs-source-dirs:
+      tests/Spec
+  default-extensions: OverloadedStrings RecordWildCards TemplateHaskell
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      CEREScript-SS
+    , CEREScript-SS-BI
+    , CEREScript-SS-Parser
+    , HUnit
+    , QuickCheck
+    , array
+    , base >=4.7 && <5
+    , containers
+    , deepseq
+    , monad-par
+    , mtl
+    , parallel
+    , random-adaptor
+    , silently
+    , splitmix
+    , test-framework
+    , test-framework-hunit
+    , test-framework-quickcheck2
+    , test-framework-th
+    , text
+    , text-show
+    , text-trie
+    , unordered-containers
+  default-language: Haskell2010
