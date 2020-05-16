@@ -86,8 +86,8 @@ data CERESSpool = CERESSpool
   , csName            :: Name
   , csScript          :: Maker (World,Env) CEREScript CEREScript
   , csSINameMaker     :: Maker (World,Env) CEREScript Name
-  , csSIReadVPMaker   :: Maker (World,Env) CEREScript (Set VPosition) -- TODO: Not sure this could be static or dynamic
-  , csSIWriteVPMaker  :: Maker (World,Env) CEREScript (Set VPosition) -- TODO: Not sure this could be static or dynamic
+  , csSIReadVPMaker   :: Maker (World,Env) CEREScript (Set VPosition)
+  , csSIWriteVPMaker  :: Maker (World,Env) CEREScript (Set VPosition)
   , csSIPriorityMaker :: Maker (World,Env) CEREScript Priority
   , csInitLocalVars   :: ValueMap
   , csInitLocalNVars  :: ValueNMap
@@ -116,18 +116,20 @@ data SpoolInstanceRow = SIRow
 type SpoolInstances = IntMap SpoolInstance
 
 data SpoolInstance = SI
-  { siID         :: {-# UNPACK #-} !ID
-  , siName       :: Name
-  , siPriority   :: {-# UNPACK #-} !Priority
-  , siRWVPSet    :: Set VPosition -- Only World, Dict, Var
-  , siLocalVars  :: LocalVariables
-  , siLocalNVars :: LocalNVariables
-  , siLocalTemp  :: LocalTemp
-  , siLocalNTemp :: LocalNTemp
-  , siSpoolID    :: {-# UNPACK #-} !ID
-  , siRestScript :: CEREScript
-  , siRG         :: RG
-  , siF          :: World -> World
+  { siID          :: {-# UNPACK #-} !ID
+  , siName        :: Name
+  , siPriority    :: {-# UNPACK #-} !Priority
+  , siElapsedTime :: !Time
+  , siRWVPSet     :: Set VPosition -- Only World, Dict, Var
+  , siLocalVars   :: LocalVariables
+  , siLocalNVars  :: LocalNVariables
+  , siLocalTemp   :: LocalTemp
+  , siLocalNTemp  :: LocalNTemp
+  , siSpoolID     :: {-# UNPACK #-} !ID
+  , siParentSIID  :: {-# UNPACK #-} !ID
+  , siRestScript  :: CEREScript
+  , siRG          :: RG
+  , siF           :: World -> World
   }
 
 instance Eq SpoolInstance where
