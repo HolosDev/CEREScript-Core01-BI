@@ -16,6 +16,9 @@ dependencies:
 - base >= 4.7 && < 5
 - array
 - containers
+- deepseq
+- monad-par
+- mtl
 - parallel
 - random-adaptor
 - splitmix
