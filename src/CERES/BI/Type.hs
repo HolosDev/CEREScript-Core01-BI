@@ -26,6 +26,12 @@ data Maker s f a = Maker { mDef :: a, mF :: f, mMaker :: s -> f -> Maybe a }
 
 runMaker Maker {..} s = fromMaybe mDef (mMaker s mF)
 
+onlyDefault :: s -> Maybe a
+onlyDefault _ = Nothing
+defaultMaker :: s -> f -> Maybe a
+defaultMaker _ _ = Nothing
+
+
 type InternalTime = Int
 
 

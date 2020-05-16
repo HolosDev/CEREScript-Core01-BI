@@ -21,6 +21,7 @@ import           CERES.BI.Data.Function
 
 import           CERES.BI.Interpret.Cache
 import           CERES.BI.Interpret.Instruction
+import           CERES.BI.Interpret.Script
 import           CERES.BI.Interpret.Spool
 
 import           CERES.BI.Type
@@ -127,9 +128,8 @@ runSpoolInstance world@World {..} si@SI {..} aWCache =
     _ -> error "[ERROR]<runSpoolInstance :=: _> Undefined Retention Code"
   -- NOTE: SIJump takes relative time-slot
   jumpTarget = maybe 1 getInt $ vMapLookup jumpOffsetIdx (lTemp newLC)
-  siis       = if doAbolish || null (restCEREScript :: CEREScript)
-    then SIEnd
-    else SIJump jumpTarget
+  siis =
+    if doAbolish || isScriptEnd restCEREScript then SIEnd else SIJump jumpTarget
   nextCEREScript = if doInit then newCEREScript else restCEREScript
    where
     newCEREScript =
