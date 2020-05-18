@@ -23,8 +23,22 @@ executingTimeIdx = -3
 elapsedInternalTimeIdx = -4
 resumeCodeIdx = -5
 
--- LocalCache
+-- LocalTemp
 retainCodeIdx, jumpOffsetIdx, spCodeIdx :: Idx
 retainCodeIdx = -1
 jumpOffsetIdx = -2
 spCodeIdx = -4
+
+-- TrickCache Key
+consoleLogKey, loggerLogKey :: NKey
+consoleLogKey = "Console"
+loggerLogKey = "Logger"
+elapsedInternalTimeKey = "SIEIT"
+
+-- SpoolInstance Priority
+setTime, startTimeSlot, afterTimeSlot :: Time
+setTime = 0
+
+startTimeSlot = 2 ^ 16
+
+afterTimeSlot = startTimeSlot * 2

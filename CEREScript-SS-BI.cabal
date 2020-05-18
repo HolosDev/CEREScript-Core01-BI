@@ -37,6 +37,7 @@ library
       CERES.BI.Interpret.Instruction
       CERES.BI.Interpret.Modify
       CERES.BI.Interpret.Script
+      CERES.BI.Interpret.SpoolInstance
       CERES.BI.Interpret.SpoolTree
       CERES.BI.Type
       CERES.BI.Util
