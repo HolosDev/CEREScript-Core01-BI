@@ -27,6 +27,16 @@ vNHMapUpdate :: NKey -> Maybe Value -> ValueNHMap -> ValueNHMap
 vNHMapUpdate nKey mValue vnhMap =
   maybe (HM.delete nKey vnhMap) (\v -> HM.insert nKey v vnhMap) mValue
 
+
+vMapDelete :: Idx -> ValueMap -> ValueMap
+vMapDelete = IM.delete
+vNMapDelete :: NKey -> ValueNMap -> ValueNMap
+vNMapDelete = Trie.delete
+vNMapDeleteSubmap :: NKey -> ValueNMap -> ValueNMap
+vNMapDeleteSubmap = Trie.deleteSubmap
+vNHMapDelete :: NKey -> ValueNHMap -> ValueNHMap
+vNHMapDelete = HM.delete
+
 vMapLookup :: Idx -> ValueMap -> Maybe Value
 vMapLookup = IM.lookup
 vNMapLookup :: NKey -> ValueNMap -> Maybe Value

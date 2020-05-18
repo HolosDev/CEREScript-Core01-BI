@@ -94,8 +94,6 @@ runSpoolTree aWorld@World {..} aSpoolTree@SpoolTree {..} =
     siList
   joint aList (s, aWorldCache) = (s : aList, aWorldCache)
 
-
--- TODO: How to avoid SpoolInstance ID collision
 runSpoolInstance
   :: World -> SpoolInstance -> WorldCache -> (SIStatus, WorldCache)
 runSpoolInstance world@World {..} si@SI {..} aWCache =
@@ -151,13 +149,15 @@ runSpoolInstance world@World {..} si@SI {..} aWCache =
 runCEREScript :: Input -> CEREScript -> (Env, CEREScript)
 runCEREScript (_, _, cState) [] = (cState, [])
 runCEREScript anInput@(aWorld@World {..}, aSI@SI {..}, cState) (ceres : cScript)
-  = if sp
-  -- NOTE: sp == True, then end runCEREScript
+  = logConsole $ if sp -- NOTE: sp == True, then end runCEREScript
     then (Env nextWC nextLC nextTC nextRG, nextCEREScript)
     else runCEREScript (aWorld, aSI, Env nextWC nextLC nextTC nextRG)
                        nextCEREScript
  where
   newCState     = runInstruction (aWorld, aSI, cState) ceres
+  newInput = (aWorld,aSI,newCState)
+  endOfScript = isScriptEnd cScript
+  doesNotExceedTS = not $ exceedTS newInput
   -- TODO: Check Stop or Pause
   spCode        = maybe "" getStr $ vMapLookup spCodeIdx (lTemp newLC)
   sp            = spCode == "Stop" || spCode == "Pause"
@@ -170,13 +170,16 @@ runCEREScript anInput@(aWorld@World {..}, aSI@SI {..}, cState) (ceres : cScript)
   resumeFlag     = maybe False getBool $ vMapLookup resumeCodeIdx (lVars newLC)
   nextCEREScript = if resumeFlag then (ceres : cScript) else cScript
   newLC          = lCache newCState
+  newTC          = tCache newCState
+  logMsg         = undefined
+  logConsole     = undefined
   nextWC         = wCache newCState
   nextLVars = vMapInsert retainCodeIdx (StrValue retentionCode) (lVars newLC)
   nextLNVars     = lNVars newLC
   nextLTemp      = lTemp newLC
   nextLNTemp     = lNTemp newLC
   nextLC         = LocalCache nextLVars nextLNVars nextLTemp nextLNTemp
-  nextTC         = tCache newCState
+  nextTC         = vNMapDeleteSubmap consoleLogKey newTC
   nextRG         = rg newCState
 
 
