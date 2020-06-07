@@ -101,7 +101,7 @@ worldCacheMaker SpoolTree {..} World {..} = S.foldr cacheMakerSub
       error $ "[ERROR]<cacheMaker :=: AtLNTemp> Can't be reached"
     (VP AtHere _) -> error $ "[ERROR]<cacheMaker :=: AtHere> Can't be reached"
     (VP AtNull _) -> error $ "[ERROR]<cacheMaker :=: AtNull> Can't be reached"
-    _ -> error $ "[ERROR]<cacheMaker> Not compatible for " ++ show vp
+    _ -> error $ "[ERROR]<cacheMaker> Not compatible for " <> show vp
 
 
 
@@ -144,7 +144,7 @@ updateWorldHistoryFromCache aHistoricalTable hCache = IM.map newRow uniqueTimes
       .  map (\x -> (x, x))
       .  nub
       $  IM.keys aHistoricalTable
-      ++ IM.keys hCache
+      <> IM.keys hCache
   newRow time = EpochRow time newValues
    where
     baseRow     = maybe blankVM values . IM.lookup time $ aHistoricalTable
@@ -162,7 +162,7 @@ updateWorldNHistoryFromCache aNHistoricalTable nHCache = IM.map newRow
       .  map (\x -> (x, x))
       .  nub
       $  IM.keys aNHistoricalTable
-      ++ IM.keys nHCache
+      <> IM.keys nHCache
   newRow time = NEpochRow time newNValues
    where
     baseRow     = maybe blankVNM nValues . IM.lookup time $ aNHistoricalTable

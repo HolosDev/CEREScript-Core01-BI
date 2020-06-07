@@ -30,7 +30,7 @@ modify1 aOp aValue = newValue
  where
   mOperator = operator1Selector aOp
   newValue  = maybe
-    (ErrValue $ T.append "[ERROR]<modify1> No such operator1 like " (showt aOp))
+    (ErrValue $ "[ERROR]<modify1> No such operator1 like " <> showt aOp)
     (\o -> o aValue)
     mOperator
 
@@ -39,7 +39,7 @@ modify2 aOp vA vB = newValue
  where
   mOperator = operator2Selector aOp
   newValue  = maybe
-    (ErrValue $ T.append "[ERROR]<modify2> No such operator1 like " (showt aOp))
+    (ErrValue $ "[ERROR]<modify2> No such operator1 like " <> showt aOp)
     (\o -> o vA vB)
     mOperator
 
@@ -48,7 +48,7 @@ modify3 aOp vA vB vC = newValue
  where
   mOperator = undefined -- operator3Selector aOp
   newValue  = maybe
-    (ErrValue $ T.append "[ERROR]<modify1> No such operator3 like " (showt aOp))
+    (ErrValue $ "[ERROR]<modify1> No such operator3 like " <> showt aOp)
     (\o -> o vA vB vC)
     mOperator
 
@@ -57,7 +57,7 @@ modify4 aOp vA vB vC vD = newValue
  where
   mOperator = undefined -- operator4Selector aOp
   newValue  = maybe
-    (ErrValue $ T.append "[ERROR]<modify1> No such operator4 like " (showt aOp))
+    (ErrValue $ "[ERROR]<modify1> No such operator4 like " <> showt aOp)
     (\o -> o vA vB vC vD)
     mOperator
 
@@ -72,7 +72,7 @@ findVariablesSub given accList = if T.null postStr
   then Right $ preStr : accList
   else if T.isPrefixOf "}" restStr
     then findVariablesSub (T.drop 1 restStr) (stripped : preStr : accList)
-    else Left $ T.append "[ERROR]<findVariable> Wrong Syntax " given
+    else Left $ "[ERROR]<findVariable> Wrong Syntax " <> given
  where
   (preStr  , postStr) = T.breakOn "${" given
   (stripped, restStr) = T.breakOn "}" . T.drop 2 $ postStr

@@ -35,13 +35,15 @@ siAggregatorSub aSI@SI {..} aSpoolForest = newSpoolTree : dList
   (dList, jList) = partition (S.disjoint siRWVPSet . vpSet) aSpoolForest
   newSpoolTree
     | null jList       = SpoolTree 1 [aSI] $! siRWVPSet
-    | length jList > 1 = SpoolTree (jSize +1) (aSI : jSIList) $! jRWVPSet
-    | otherwise        = SpoolTree (oSize  +1) (aSI : oSIList) $! oRWVPSet
+    | length jList > 1 = SpoolTree (jSize + 1) (aSI : jSIList) $! jRWVPSet
+    | otherwise        = SpoolTree (oSize + 1) (aSI : oSIList) $! oRWVPSet
    where
     SpoolTree oSize oSIList oVPSet = head jList
-    SpoolTree jSize jSIList jVPSet = foldr stJoiner (SpoolTree 0 [] S.empty) dList
-    stJoiner stA stB =
-      SpoolTree (stSize stA + stSize stB) (siList stA ++ siList stB) (S.union (vpSet stA) (vpSet stB))
+    SpoolTree jSize jSIList jVPSet =
+      foldr stJoiner (SpoolTree 0 [] S.empty) dList
+    stJoiner stA stB = SpoolTree (stSize stA + stSize stB)
+                                 (siList stA <> siList stB)
+                                 (S.union (vpSet stA) (vpSet stB))
     jRWVPSet = S.union jVPSet siRWVPSet
     oRWVPSet = S.union oVPSet siRWVPSet
 

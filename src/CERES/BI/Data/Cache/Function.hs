@@ -186,64 +186,64 @@ setRWMVNMap nKey mode mValue = Trie.insert nKey (mode mValue)
 
 getValue :: Input -> VPosition -> Value
 getValue anInput vp@(VP AtWorld (VII idx)) = fromMaybe
-  (error $ "[ERROR]<getValue :=: AtWorld[VII]> No such value at " ++ show vp)
+  (error $ "[ERROR]<getValue :=: AtWorld[VII]> No such value at " <> show vp)
   (getMValue anInput vp)
 getValue anInput vp@(VP AtWorld ~(VIIT idx time)) = fromMaybe
-  (error $ "[ERROR]<getValue :=: AtWorld[VIIT]> No such value at " ++ show vp)
+  (error $ "[ERROR]<getValue :=: AtWorld[VIIT]> No such value at " <> show vp)
   (getMValue anInput vp)
 getValue anInput vp@(VP AtNWorld (VIN nKey)) = fromMaybe
-  (error $ "[ERROR]<getValue :=: AtNWorld[VIN]> No such value at " ++ show vp)
+  (error $ "[ERROR]<getValue :=: AtNWorld[VIN]> No such value at " <> show vp)
   (getMValue anInput vp)
 getValue anInput vp@(VP AtNWorld ~(VINT nKey time)) = fromMaybe
-  (error $ "[ERROR]<getValue :=: AtNWorld[VINT]> No such value at " ++ show vp)
+  (error $ "[ERROR]<getValue :=: AtNWorld[VINT]> No such value at " <> show vp)
   (getMValue anInput vp)
 getValue anInput vp@(VP AtTime (VII idx)) = fromMaybe
-  (error $ "[ERROR]<getValue :=: AtTime[VII]> No such value at " ++ show vp)
+  (error $ "[ERROR]<getValue :=: AtTime[VII]> No such value at " <> show vp)
   (getMValue anInput vp)
 getValue anInput vp@(VP AtTime ~(VIIT idx time)) = fromMaybe
-  (error $ "[ERROR]<getValue :=: AtTime[VIIT] > No such value at " ++ show vp)
+  (error $ "[ERROR]<getValue :=: AtTime[VIIT] > No such value at " <> show vp)
   (getMValue anInput vp)
 getValue anInput vp@(VP AtNTime (VIN nKey)) = fromMaybe
-  (error $ "[ERROR]<getValue :=: AtNTime[VIN]> No such value at " ++ show vp)
+  (error $ "[ERROR]<getValue :=: AtNTime[VIN]> No such value at " <> show vp)
   (getMValue anInput vp)
 getValue anInput vp@(VP AtNTime ~(VINT nKey time)) = fromMaybe
-  (error $ "[ERROR]<getValue :=: AtNTime[VINT]> No such value at " ++ show vp)
+  (error $ "[ERROR]<getValue :=: AtNTime[VINT]> No such value at " <> show vp)
   (getMValue anInput vp)
 getValue anInput vp@(VP AtVars ~(VII idx)) = fromMaybe
-  (error $ "[ERROR]<getValue :=: AtVars[VII]> No such value at " ++ show vp)
+  (error $ "[ERROR]<getValue :=: AtVars[VII]> No such value at " <> show vp)
   (getMValue anInput vp)
 getValue anInput vp@(VP AtNVars ~(VIN nKey)) = fromMaybe
-  (error $ "[ERROR]<getValue :=: AtNVars[VIN]> No such value at " ++ show vp)
+  (error $ "[ERROR]<getValue :=: AtNVars[VIN]> No such value at " <> show vp)
   (getMValue anInput vp)
 getValue anInput vp@(VP AtDict ~(VII idx)) = fromMaybe
-  (error $ "[ERROR]<getValue :=: AtDict[VII]> No such value at " ++ show vp)
+  (error $ "[ERROR]<getValue :=: AtDict[VII]> No such value at " <> show vp)
   (getMValue anInput vp)
 getValue anInput vp@(VP AtNDict ~(VIN nKey)) = fromMaybe
-  (error $ "[ERROR]<getValue :=: AtNDict[VIN]> No such value at " ++ show vp)
+  (error $ "[ERROR]<getValue :=: AtNDict[VIN]> No such value at " <> show vp)
   (getMValue anInput vp)
 getValue anInput vp@(VP AtLVars ~(VII idx)) = fromMaybe
-  (error $ "[ERROR]<getValue :=: AtLVars[VII]> No such value at " ++ show vp)
+  (error $ "[ERROR]<getValue :=: AtLVars[VII]> No such value at " <> show vp)
   (getMValue anInput vp)
 getValue anInput vp@(VP AtLNVars ~(VIN nKey)) = fromMaybe
-  (error $ "[ERROR]<getValue :=: AtLNVars[VIN]> No such value at " ++ show vp)
+  (error $ "[ERROR]<getValue :=: AtLNVars[VIN]> No such value at " <> show vp)
   (getMValue anInput vp)
 getValue anInput vp@(VP AtLTemp ~(VII idx)) = fromMaybe
-  (error $ "[ERROR]<getValue :=: AtLTemp[VII] > No such value at " ++ show vp)
+  (error $ "[ERROR]<getValue :=: AtLTemp[VII] > No such value at " <> show vp)
   (getMValue anInput vp)
 getValue anInput vp@(VP AtLNTemp ~(VIN nKey)) = fromMaybe
-  (error $ "[ERROR]<getValue :=: AtLNTemp[VIN] > No such value at " ++ show vp)
+  (error $ "[ERROR]<getValue :=: AtLNTemp[VIN] > No such value at " <> show vp)
   (getMValue anInput vp)
 getValue anInput vp@(VP AtHere   ~(VIV v)) = v
 -- TODO: Need to implement
 getValue anInput vp@(VP AtTricky _       ) = fromMaybe
-  (error $ "[ERROR]<getValue :=: > No such value at " ++ show vp)
+  (error $ "[ERROR]<getValue :=: > No such value at " <> show vp)
   (Just $ error "[ERROR]<getValue :=: AtTricky> Not yet implemented")
 getValue anInput (VP AtPtr ~(VIV ~(PtrValue pVP))) = getValue anInput pVP
 getValue _ (VP AtReg _) =
   error "[ERROR]<getValue :=: AtReg> Not yet implemented"
 getValue _ (VP AtNull _) =
   error "[ERROR]<getValue :=: AtNull> Can't access AtNull"
-getValue _ vp = error $ "[ERROR]<getValue> Can't be reached with " ++ show vp
+getValue _ vp = error $ "[ERROR]<getValue> Can't be reached with " <> show vp
 
 
 -- FIXME: Fix when refers non-cached value
@@ -296,7 +296,7 @@ getMValue _ (VP AtReg _) =
   error "[ERROR]<getMValue :=: AtReg> Not yet implemented"
 getMValue _ (VP AtNull _) =
   error "[ERROR]<getMValue :=: AtNull> Can't access AtNull"
-getMValue _ vp = error $ "[ERROR]<getMValue> Can't be reached with " ++ show vp
+getMValue _ vp = error $ "[ERROR]<getMValue> Can't be reached with " <> show vp
 
 getHCache :: Time -> Idx -> HistoricalCache -> Maybe Value
 getHCache time idx hCache = IM.lookup time hCache >>= IM.lookup idx >>= runRW

@@ -134,8 +134,8 @@ runSpoolInstance world@World {..} si@SI {..} aWCache =
       maybe
           (  error
           $  "[ERROR]<runSpoolInstance :=: newCEREScript> No such SpoolID("
-          ++ show siSpoolID
-          ++ ") in worldSpools"
+          <> show siSpoolID
+          <> ") in worldSpools"
           )
           (\s -> runMaker (csScript s) (world, newCache))
         $ IM.lookup siSpoolID worldSpools
@@ -154,14 +154,14 @@ runCEREScript anInput@(aWorld@World {..}, aSI@SI {..}, cState) (ceres : cScript)
     else runCEREScript (aWorld, aSI, Env nextWC nextLC nextTC nextRG)
                        nextCEREScript
  where
-  newCState     = runInstruction (aWorld, aSI, cState) ceres
-  newInput = (aWorld,aSI,newCState)
-  endOfScript = isScriptEnd cScript
+  newCState       = runInstruction (aWorld, aSI, cState) ceres
+  newInput        = (aWorld, aSI, newCState)
+  endOfScript     = isScriptEnd cScript
   doesNotExceedTS = not $ exceedTS newInput
   -- TODO: Check Stop or Pause
-  spCode        = maybe "" getStr $ vMapLookup spCodeIdx (lTemp newLC)
-  sp            = spCode == "Stop" || spCode == "Pause"
-  retentionCode = case spCode of
+  spCode          = maybe "" getStr $ vMapLookup spCodeIdx (lTemp newLC)
+  sp              = spCode == "Stop" || spCode == "Pause"
+  retentionCode   = case spCode of
     "Stop"  -> "Abolish"
     -- TODO: Not sure do I need to identify whether this is "Pause"
     "Pause" -> "Retain"

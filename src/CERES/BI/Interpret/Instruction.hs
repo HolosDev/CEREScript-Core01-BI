@@ -50,9 +50,8 @@ crsInitVariable anInput@(aWorld, _, cState) vpA vpB = newCState
  where
   theValue     = getValue anInput vpB
   theExistence = getMValue anInput vpA
-  theDLogMsg =
-    T.append "[Fail]<crsInitVariable> VP exists already at" (showt vpA)
-  newCState = maybe
+  theDLogMsg   = "[Fail]<crsInitVariable> VP exists already at" <> showt vpA
+  newCState    = maybe
     (setEnv aWorld vpA W (Just theValue) cState)
     (\_ -> dLogAndErr anInput theDLogMsg vpA "[Fail]<InitVariable>")
     theExistence
@@ -68,7 +67,7 @@ crsSetValue anInput@(aWorld, _, cState) vpA vpB = newCState
   theValue     = getValue anInput vpB
   theExistence = getMValue anInput vpA
   theDLogMsg =
-    T.append "[Fail]<crsSetVariable> A variable does not exists at" (showt vpA)
+    "[Fail]<crsSetVariable> A variable does not exists at" <> showt vpA
   newCState = maybe (dLogAndErr anInput theDLogMsg vpA "[Fail]<SetVariable>")
                     (\_ -> setEnv aWorld vpA W (Just theValue) cState)
                     theExistence
@@ -78,7 +77,7 @@ crsDeleteVariable anInput@(aWorld, _, cState) vp = newCState
  where
   theExistence = getMValue anInput vp
   theDLogMsg =
-    T.append "[Fail]<crsSetVariable> A variable does not exists at" (showt vp)
+    "[Fail]<crsSetVariable> A variable does not exists at" <> showt vp
   newCState = maybe (dLogAndErr anInput theDLogMsg (VP AtNull VINull) "")
                     (\_ -> setEnv aWorld vp W Nothing cState)
                     theExistence
@@ -123,7 +122,7 @@ crsCopyValue anInput@(aWorld, _, cState) vpA vpB = newCState
   theValue     = getValue anInput vpB
   theExistence = getMValue anInput vpA
   theDLogMsg =
-    T.append "[Fail]<crsCopyValue> A variable does not exists at" (showt vpA)
+    "[Fail]<crsCopyValue> A variable does not exists at" <> showt vpA
   newCState = maybe (dLogAndErr anInput theDLogMsg vpA "[Fail]<CopyValue>")
                     (\_ -> setEnv aWorld vpA W (Just theValue) cState)
                     theExistence
@@ -134,7 +133,7 @@ crsConvertValue anInput@(aWorld, _, cState) vp vt = newCState
   theValue     = getValue anInput vp
   theExistence = getMValue anInput vp
   theDLogMsg =
-    T.append "[Fail]<crsConvertValue> A variable does not exists at" (showt vp)
+    "[Fail]<crsConvertValue> A variable does not exists at" <> showt vp
   newValue  = convertValue theValue vt
   newCState = maybe (dLogAndErr anInput theDLogMsg vp "[Fail]<ConvertValue>")
                     (\_ -> setEnv aWorld vp W (Just newValue) cState)
@@ -155,9 +154,9 @@ crsReplaceTextTo anInput@(aWorld, _, cState) vpA vpB = newCState
  where
   targetStr     = getStr $ getValue anInput vpA
   eReplacingStr = findVariables targetStr
-  dLogMsg       = T.append "Fail to read VariablePosition: "
+  dLogMsg       = "Fail to read VariablePosition: "
   newCState     = either
-    (\msg -> dLogAndErr anInput (dLogMsg msg) vpB (dLogMsg msg))
+    (\msg -> dLogAndErr anInput (dLogMsg <> msg) vpB (dLogMsg <> msg))
     (\str ->
       setEnv aWorld vpB W (Just . StrValue . replaceStr anInput $ str) cState
     )
@@ -171,7 +170,7 @@ crsGetVPosition anInput@(aWorld, _, cState) vpA vpB = newCState
   rTargetPtr    = parseVariablePosition lazyTargetStr
   mTargetPtr    = getResult rTargetPtr
   aMsg          = fromJust . getMessage $ rTargetPtr
-  theDLogMsg    = T.append "Fail to read VariablePosition: " (showt targetStr)
+  theDLogMsg    = "Fail to read VariablePosition: " <> showt targetStr
   newCState     = maybe (dLogAndErr anInput theDLogMsg vpB aMsg)
                         (\p -> setEnv aWorld vpB W (Just . PtrValue $ p) cState)
                         mTargetPtr
